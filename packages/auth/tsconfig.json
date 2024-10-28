@@ -1,5 +1,10 @@
 {
-  "extends": "@acme/tsconfig/base.json",
-  "include": ["src", "*.ts"],
-  "exclude": ["node_modules"]
+  "extends": "@eslee/tsconfig/base.json",
+  "include": [
+    "src",
+    "*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
