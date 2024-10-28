@@ -1,3 +1,4 @@
+# https://registry.terraform.io/providers/cloudflare/cloudflare/latest/docs/resources/dns_record
 resource "cloudflare_dns_record" "eslee_io" {
   zone_id = var.cloudflare_zone_id
   name    = "@"
