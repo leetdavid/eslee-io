@@ -9,10 +9,16 @@ export const env = createEnv({
       process.env.NODE_ENV === "production"
         ? z.string().min(1)
         : z.string().min(1).optional(),
+    // CLERK_SECRET_KEY: z.string().min(1),
     NODE_ENV: z.enum(["development", "production"]).optional(),
   },
-  client: {},
-  experimental__runtimeEnv: {},
+  client: {
+    // NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().min(1),
+  },
+  experimental__runtimeEnv: {
+    // NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:
+    //   process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+  },
   skipValidation:
     !!process.env.CI || process.env.npm_lifecycle_event === "lint",
 });
