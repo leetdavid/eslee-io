@@ -1,5 +1,5 @@
 import { auth, signIn, signOut } from "@eslee/auth";
-import { Button } from "@eslee/ui/button";
+import { Button } from "@eslee/ui";
 
 export async function AuthShowcase() {
   const session = await auth();

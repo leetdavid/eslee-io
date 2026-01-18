@@ -7,10 +7,6 @@
     ".": {
       "types": "./dist/src/index.d.ts",
       "default": "./src/index.ts"
-    },
-    "./*": {
-      "types": "./dist/src/*.d.ts",
-      "default": ["./src/*.ts", "./src/*.tsx"]
     }
   },
   "license": "MIT",
@@ -36,13 +32,13 @@
   "devDependencies": {
     "@eslee/tailwind-config": "workspace:*",
     "@eslee/tsconfig": "workspace:*",
-    "@types/react": "catalog:react18",
-    "react": "catalog:react18",
+    "@types/react": "catalog:react19",
+    "react": "catalog:react19",
     "typescript": "catalog:",
     "zod": "catalog:"
   },
   "peerDependencies": {
-    "react": "catalog:react18",
+    "react": "catalog:react19",
     "zod": "catalog:"
   }
 }

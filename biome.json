@@ -14,7 +14,8 @@
       "**/.turbo/**",
       "**/.cache/**",
       "**/build/**",
-      "**/public/**"
+      "**/public/**",
+      "**/*-types.ts"
     ]
   },
   "formatter": {

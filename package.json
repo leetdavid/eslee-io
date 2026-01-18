@@ -24,5 +24,13 @@
     "@turbo/gen": "^2.1.3",
     "turbo": "^2.1.3",
     "typescript": "catalog:"
+  },
+  "pnpm": {
+    "peerDependencyRules": {
+      "allowedVersions": {
+        "react": "*",
+        "react-dom": "*"
+      }
+    }
   }
 }
