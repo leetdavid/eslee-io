@@ -1,19 +1,7 @@
-import { fileURLToPath } from "node:url";
-import { createJiti } from "jiti";
-
-// Import env files to validate at build time. Use jiti so we can load .ts files in here.
-await createJiti(fileURLToPath(import.meta.url)).import("./src/env");
-
-/** @type {import("next").NextConfig} */
-const config = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   reactStrictMode: true,
-
-  /** Enables hot reloading for local packages without a build step */
-  transpilePackages: ["@eslee/api", "@eslee/auth", "@eslee/db", "@eslee/ui", "@eslee/validators"],
-
-  /** We already do linting and typechecking as separate tasks in CI */
-  eslint: { ignoreDuringBuilds: true },
-  typescript: { ignoreBuildErrors: true },
+  transpilePackages: ["@eslee/ui"],
 };
 
-export default config;
+export default nextConfig;
