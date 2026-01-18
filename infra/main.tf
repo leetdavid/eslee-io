@@ -9,7 +9,7 @@ resource "cloudflare_dns_record" "eslee_io" {
 
 locals {
   vercel_cnames_map = {
-    developers = {
+    cms = {
       name    = "cms.eslee.io"
       content = "96207210ac0cd4b0.vercel-dns-017.com."
     }
