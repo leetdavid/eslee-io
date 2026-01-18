@@ -22,7 +22,8 @@
     "format:fix": "biome format --write .",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
-    "ui-add": "turbo run ui-add"
+    "ui-add": "turbo run ui-add",
+    "generate:types": "pnpm -F @eslee/payload generate:types"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",

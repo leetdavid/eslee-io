@@ -4,6 +4,7 @@ import { postgresAdapter } from "@payloadcms/db-postgres";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { buildConfig } from "payload";
 import sharp from "sharp";
+import { vercelBlobStorage } from "@payloadcms/storage-vercel-blob";
 
 import { Media } from "./collections/Media";
 import { Photos } from "./collections/Photos";
@@ -31,7 +32,21 @@ export const config = buildConfig({
     },
   }),
   sharp,
-  plugins: [],
+  plugins: [
+    vercelBlobStorage({
+      enabled: true,
+      clientUploads: true,
+      collections: {
+        media: {
+          prefix: "media",
+        },
+        photos: {
+          prefix: "photos",
+        },
+      },
+      token: process.env.BLOB_READ_WRITE_TOKEN,
+    }),
+  ],
 });
 
 export default config;

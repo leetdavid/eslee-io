@@ -21,6 +21,7 @@
   "dependencies": {
     "@payloadcms/db-postgres": "catalog:payload",
     "@payloadcms/richtext-lexical": "catalog:payload",
+    "@payloadcms/storage-vercel-blob": "catalog:payload",
     "exifr": "^7.1.3",
     "payload": "catalog:payload",
     "sharp": "^0.33.5"

@@ -20,6 +20,7 @@
     "@payloadcms/db-postgres": "catalog:payload",
     "@payloadcms/next": "catalog:payload",
     "@payloadcms/richtext-lexical": "catalog:payload",
+    "@payloadcms/storage-vercel-blob": "catalog:payload",
     "@payloadcms/ui": "catalog:payload",
     "cross-env": "^7.0.3",
     "graphql": "^16.8.1",
