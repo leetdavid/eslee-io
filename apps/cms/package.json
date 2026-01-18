@@ -9,7 +9,7 @@
     "start": "pnpm with-env next start -p 3002",
     "lint": "biome lint .",
     "typecheck": "tsc --noEmit",
-    "generate:types": "pnpm with-env payload generate:types",
+    "generate:importmap": "payload generate:importmap",
     "payload": "pnpm with-env payload",
     "with-env": "dotenv -e ../../.env --"
   },

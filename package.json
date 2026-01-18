@@ -23,7 +23,8 @@
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
     "ui-add": "turbo run ui-add",
-    "generate:types": "pnpm -F @eslee/payload generate:types"
+    "generate:importmap": "pnpm -F @eslee/cms  generate:importmap",
+    "generate:types": "pnpm -F @eslee/cms -F @eslee/payload generate:types"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",

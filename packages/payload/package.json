@@ -15,7 +15,6 @@
     "dev": "tsc",
     "lint": "biome lint .",
     "typecheck": "tsc --noEmit",
-    "generate:importmap": "payload generate:importmap",
     "generate:types": "payload generate:types"
   },
   "dependencies": {
