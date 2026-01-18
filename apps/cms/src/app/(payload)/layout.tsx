@@ -13,7 +13,11 @@ type Args = {
 };
 
 const Layout = ({ children }: Args) => (
-  <RootLayout config={config} importMap={importMap}>
+  <RootLayout
+    // biome-ignore lint/suspicious/noExplicitAny: Payload version mismatch workaround
+    config={Promise.resolve(config) as any}
+    importMap={importMap}
+  >
     {children}
   </RootLayout>
 );

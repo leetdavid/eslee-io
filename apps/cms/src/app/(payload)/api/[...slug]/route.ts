@@ -9,8 +9,13 @@ import {
   REST_POST,
 } from "@payloadcms/next/routes";
 
-export const GET = REST_GET(config);
-export const POST = REST_POST(config);
-export const DELETE = REST_DELETE(config);
-export const PATCH = REST_PATCH(config);
-export const OPTIONS = REST_OPTIONS(config);
+// biome-ignore lint/suspicious/noExplicitAny: Payload version mismatch workaround
+export const GET = REST_GET(config as any);
+// biome-ignore lint/suspicious/noExplicitAny: Payload version mismatch workaround
+export const POST = REST_POST(config as any);
+// biome-ignore lint/suspicious/noExplicitAny: Payload version mismatch workaround
+export const DELETE = REST_DELETE(config as any);
+// biome-ignore lint/suspicious/noExplicitAny: Payload version mismatch workaround
+export const PATCH = REST_PATCH(config as any);
+// biome-ignore lint/suspicious/noExplicitAny: Payload version mismatch workaround
+export const OPTIONS = REST_OPTIONS(config as any);

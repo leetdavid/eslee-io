@@ -15,13 +15,14 @@
     "dev": "tsc",
     "lint": "biome lint .",
     "typecheck": "tsc --noEmit",
+    "generate:importmap": "payload generate:importmap",
     "generate:types": "payload generate:types"
   },
   "dependencies": {
-    "@payloadcms/db-postgres": "3.0.0-beta.119",
-    "@payloadcms/richtext-lexical": "3.0.0-beta.119",
+    "@payloadcms/db-postgres": "catalog:payload",
+    "@payloadcms/richtext-lexical": "catalog:payload",
     "exifr": "^7.1.3",
-    "payload": "3.0.0-beta.119",
+    "payload": "catalog:payload",
     "sharp": "^0.33.5"
   },
   "devDependencies": {

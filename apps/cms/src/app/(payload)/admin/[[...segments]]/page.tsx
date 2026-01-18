@@ -14,9 +14,11 @@ type Args = {
 };
 
 export const generateMetadata = ({ params, searchParams }: Args) =>
-  generatePageMetadata({ config, params, searchParams });
+  // biome-ignore lint/suspicious/noExplicitAny: Payload version mismatch workaround
+  generatePageMetadata({ config: config as any, params, searchParams });
 
 const Page = ({ params, searchParams }: Args) =>
-  RootPage({ config, params, searchParams, importMap });
+  // biome-ignore lint/suspicious/noExplicitAny: Payload version mismatch workaround
+  RootPage({ config: config as any, params, searchParams, importMap });
 
 export default Page;
