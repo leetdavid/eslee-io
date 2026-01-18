@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@eslee/db": "workspace:*",
+    "@eslee/payload": "workspace:*",
     "@eslee/ui": "workspace:*",
     "@payloadcms/db-postgres": "3.0.0-beta.119",
     "@payloadcms/next": "3.0.0-beta.119",
