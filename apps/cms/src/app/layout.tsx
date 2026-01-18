@@ -1,6 +1,6 @@
 export const metadata = {
-  title: "ESLEE CMS",
-  description: "Content Management System for ESLEE.io",
+  title: "Payload CMS for eslee.io",
+  description: "Payload CMS for eslee.io",
 };
 
 export default function RootLayout({
@@ -9,9 +9,5 @@ export default function RootLayout({
   // biome-ignore lint/suspicious/noExplicitAny: React 19 type mismatch workaround
   children: any;
 }) {
-  return (
-    <html lang="en">
-      <body>{children}</body>
-    </html>
-  );
+  return <>{children}</>;
 }

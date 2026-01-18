@@ -2,21 +2,31 @@
 /* DO NOT MODIFY IT BECAUSE IT COULD BE REWRITTEN AT ANY TIME. */
 import config from "@payload-config";
 import "@payloadcms/next/css";
-import { RootLayout } from "@payloadcms/next/layouts"; // Import RootLayout from layouts
+import type { ServerFunctionClient } from "payload";
+import { handleServerFunctions, RootLayout } from "@payloadcms/next/layouts";
 import { importMap } from "~/importMap";
+import React from "react";
 
 import "./custom.css";
 
 type Args = {
-  // biome-ignore lint/suspicious/noExplicitAny: React 19 type mismatch workaround
-  children: any;
+  children: React.ReactNode;
+};
+
+const serverFunction: ServerFunctionClient = async function (args) {
+  "use server";
+  return handleServerFunctions({
+    ...args,
+    config,
+    importMap,
+  });
 };
 
 const Layout = ({ children }: Args) => (
   <RootLayout
-    // biome-ignore lint/suspicious/noExplicitAny: Payload version mismatch workaround
-    config={Promise.resolve(config) as any}
+    config={config}
     importMap={importMap}
+    serverFunction={serverFunction}
   >
     {children}
   </RootLayout>
