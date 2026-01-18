@@ -13,8 +13,6 @@
   "license": "MIT",
   "scripts": {
     "clean": "git clean -xdf .cache .turbo dist node_modules",
-    "format": "prettier --check . --ignore-path ../../.gitignore",
-    "lint": "eslint",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -29,12 +27,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@eslee/eslint-config": "workspace:*",
-    "@eslee/prettier-config": "workspace:*",
     "@eslee/tsconfig": "workspace:*",
-    "eslint": "catalog:",
-    "prettier": "catalog:",
     "typescript": "catalog:"
-  },
-  "prettier": "@eslee/prettier-config"
+  }
 }

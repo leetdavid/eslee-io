@@ -4,14 +4,7 @@ import type { RouterOutputs } from "@eslee/api";
 import { CreatePostSchema } from "@eslee/db/schema";
 import { cn } from "@eslee/ui";
 import { Button } from "@eslee/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-  useForm,
-} from "@eslee/ui/form";
+import { Form, FormControl, FormField, FormItem, FormMessage, useForm } from "@eslee/ui/form";
 import { Input } from "@eslee/ui/input";
 import { toast } from "@eslee/ui/toast";
 
@@ -146,20 +139,10 @@ export function PostCardSkeleton(props: { pulse?: boolean }) {
   return (
     <div className="flex flex-row rounded-lg bg-muted p-4">
       <div className="flex-grow">
-        <h2
-          className={cn(
-            "w-1/4 rounded bg-primary text-2xl font-bold",
-            pulse && "animate-pulse",
-          )}
-        >
+        <h2 className={cn("w-1/4 rounded bg-primary text-2xl font-bold", pulse && "animate-pulse")}>
           &nbsp;
         </h2>
-        <p
-          className={cn(
-            "mt-2 w-1/3 rounded bg-current text-sm",
-            pulse && "animate-pulse",
-          )}
-        >
+        <p className={cn("mt-2 w-1/3 rounded bg-current text-sm", pulse && "animate-pulse")}>
           &nbsp;
         </p>
       </div>

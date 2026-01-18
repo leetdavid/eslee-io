@@ -22,8 +22,6 @@
     "build": "tsc",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
     "dev": "tsc",
-    "format": "prettier --check . --ignore-path ../../.gitignore",
-    "lint": "eslint",
     "push": "pnpm with-env drizzle-kit push",
     "studio": "pnpm with-env drizzle-kit studio",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false",
@@ -36,14 +34,9 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@eslee/eslint-config": "workspace:*",
-    "@eslee/prettier-config": "workspace:*",
     "@eslee/tsconfig": "workspace:*",
     "dotenv-cli": "^7.4.2",
     "drizzle-kit": "^0.26.2",
-    "eslint": "catalog:",
-    "prettier": "catalog:",
     "typescript": "catalog:"
-  },
-  "prettier": "@eslee/prettier-config"
+  }
 }

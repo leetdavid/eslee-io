@@ -10,8 +10,6 @@
     "dev:ios": "expo start --ios",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "format": "prettier --check . --ignore-path ../../.gitignore",
-    "lint": "eslint",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -47,16 +45,11 @@
     "@babel/preset-env": "^7.25.8",
     "@babel/runtime": "^7.25.7",
     "@eslee/api": "workspace:*",
-    "@eslee/eslint-config": "workspace:*",
-    "@eslee/prettier-config": "workspace:*",
     "@eslee/tailwind-config": "workspace:*",
     "@eslee/tsconfig": "workspace:*",
     "@types/babel__core": "^7.20.5",
     "@types/react": "catalog:react18",
-    "eslint": "catalog:",
-    "prettier": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "catalog:"
-  },
-  "prettier": "@eslee/prettier-config"
+  }
 }

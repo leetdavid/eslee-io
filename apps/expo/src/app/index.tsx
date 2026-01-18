@@ -1,8 +1,8 @@
+import { FlashList } from "@shopify/flash-list";
+import { Link, Stack } from "expo-router";
 import { useState } from "react";
 import { Button, Pressable, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Link, Stack } from "expo-router";
-import { FlashList } from "@shopify/flash-list";
 
 import type { RouterOutputs } from "~/utils/api";
 import { api } from "~/utils/api";
@@ -23,9 +23,7 @@ function PostCard(props: {
           }}
         >
           <Pressable className="">
-            <Text className="text-xl font-semibold text-primary">
-              {props.post.title}
-            </Text>
+            <Text className="text-xl font-semibold text-primary">{props.post.title}</Text>
             <Text className="mt-2 text-foreground">{props.post.content}</Text>
           </Pressable>
         </Link>
@@ -60,9 +58,7 @@ function CreatePost() {
         placeholder="Title"
       />
       {error?.data?.zodError?.fieldErrors.title && (
-        <Text className="mb-2 text-destructive">
-          {error.data.zodError.fieldErrors.title}
-        </Text>
+        <Text className="mb-2 text-destructive">{error.data.zodError.fieldErrors.title}</Text>
       )}
       <TextInput
         className="items-center rounded-md border border-input bg-background px-3 text-lg leading-[1.25] text-foreground"
@@ -71,9 +67,7 @@ function CreatePost() {
         placeholder="Content"
       />
       {error?.data?.zodError?.fieldErrors.content && (
-        <Text className="mb-2 text-destructive">
-          {error.data.zodError.fieldErrors.content}
-        </Text>
+        <Text className="mb-2 text-destructive">{error.data.zodError.fieldErrors.content}</Text>
       )}
       <Pressable
         className="flex items-center rounded bg-primary p-2"
@@ -87,9 +81,7 @@ function CreatePost() {
         <Text className="text-foreground">Create</Text>
       </Pressable>
       {error?.data?.code === "UNAUTHORIZED" && (
-        <Text className="mt-2 text-destructive">
-          You need to be logged in to create a post
-        </Text>
+        <Text className="mt-2 text-destructive">You need to be logged in to create a post</Text>
       )}
     </View>
   );
@@ -135,9 +127,7 @@ export default function Index() {
         <MobileAuth />
 
         <View className="py-2">
-          <Text className="font-semibold italic text-primary">
-            Press on a post
-          </Text>
+          <Text className="font-semibold italic text-primary">Press on a post</Text>
         </View>
 
         <FlashList
@@ -145,10 +135,7 @@ export default function Index() {
           estimatedItemSize={20}
           ItemSeparatorComponent={() => <View className="h-2" />}
           renderItem={(p) => (
-            <PostCard
-              post={p.item}
-              onDelete={() => deletePostMutation.mutate(p.item.id)}
-            />
+            <PostCard post={p.item} onDelete={() => deletePostMutation.mutate(p.item.id)} />
           )}
         />
 
