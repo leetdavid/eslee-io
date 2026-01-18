@@ -1,5 +1,9 @@
 locals {
   vercel_cnames_map = {
+    www = {
+      name    = "www.eslee.io"
+      content = "31001004ba3b35ab.vercel-dns-017.com."
+    }
     cms = {
       name    = "cms.eslee.io"
       content = "96207210ac0cd4b0.vercel-dns-017.com."
@@ -16,6 +20,17 @@ resource "cloudflare_dns_record" "eslee_io_vercel_cnames_map" {
   type    = "CNAME"
   name    = each.value.name
   content = each.value.content
+  ttl     = 1
+  proxied = false
+}
+
+
+# ? Homepage (Manual Config)
+resource "cloudflare_dns_record" "eslee_io_root" {
+  zone_id = var.cloudflare_zone_id
+  type    = "A"
+  name    = "@"
+  content = "216.198.79.1"
   ttl     = 1
   proxied = false
 }
