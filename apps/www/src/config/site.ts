@@ -3,7 +3,7 @@ export const siteConfig = {
   description: "general purpose software engineer.",
   domain: "eslee.io",
   links: {
-    github: "https://github.com/eslee", // Keeping placeholder as not provided in prompt
+    github: "https://github.com/leetdavid",
     linkedin: "https://www.linkedin.com/in/leetdavid/",
     email: "david@eslee.io", // Keeping placeholder
   },
