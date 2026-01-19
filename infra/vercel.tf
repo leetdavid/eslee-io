@@ -8,6 +8,10 @@ locals {
       name    = "cms.eslee.io"
       content = "96207210ac0cd4b0.vercel-dns-017.com."
     }
+    photography = {
+      name    = "photography.eslee.io"
+      content = "af5be78ee6612dfd.vercel-dns-017.com."
+    }
   }
 }
 
