@@ -1,13 +1,14 @@
 "use client";
 
+import { DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import type { Photo } from "@eslee/payload";
-import { Info } from "lucide-react";
-import Image from "next/image";
-import { useState } from "react";
-import { getImageUrl } from "./gallery";
-import { DialogTitle } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { Info } from "lucide-react";
+import { useTheme } from "next-themes";
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import { getImageUrl } from "./gallery";
 
 interface PhotoDetailViewProps {
   photo: Photo;
@@ -41,8 +42,21 @@ const backgroundColors = [
 ];
 
 export function PhotoDetailView({ photo }: PhotoDetailViewProps) {
-  const [activeColor, setActiveColor] = useState(backgroundColors[0]);
+  const { theme } = useTheme();
+  const [activeColor, setActiveColor] = useState(() => {
+    // Initialize state based on theme to avoid flicker
+    return theme === "light" ? backgroundColors[1] : backgroundColors[0];
+  });
   const [showInfo, setShowInfo] = useState(true);
+
+  // Update background when theme changes
+  useEffect(() => {
+    if (theme === "light") {
+      setActiveColor(backgroundColors[1]); // White
+    } else if (theme === "dark") {
+      setActiveColor(backgroundColors[0]); // Black
+    }
+  }, [theme]);
 
   if (!activeColor) return null;
 
@@ -97,9 +111,7 @@ export function PhotoDetailView({ photo }: PhotoDetailViewProps) {
               title={`Set background to ${color.name}`}
               style={{
                 borderColor:
-                  activeColor.text === "text-white"
-                    ? "rgba(255,255,255,0.3)"
-                    : "rgba(0,0,0,0.3)",
+                  activeColor.text === "text-white" ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)",
               }}
             />
           ))}
@@ -137,22 +149,14 @@ export function PhotoDetailView({ photo }: PhotoDetailViewProps) {
 
             {settings && (
               <div className="grid grid-cols-2 gap-x-8 gap-y-1 font-mono text-xs opacity-80 border-t border-current/20 pt-3">
-                {settings.cameraModel && (
-                  <div className="col-span-2">{settings.cameraModel}</div>
-                )}
-                {settings.lens && (
-                  <div className="col-span-2 opacity-80">{settings.lens}</div>
-                )}
+                {settings.cameraModel && <div className="col-span-2">{settings.cameraModel}</div>}
+                {settings.lens && <div className="col-span-2 opacity-80">{settings.lens}</div>}
 
                 <div className="col-span-2 mt-2 flex flex-wrap gap-x-4 gap-y-1 opacity-90">
                   {settings.fStop && <span>f/{settings.fStop}</span>}
-                  {settings.shutterSpeed && (
-                    <span>{settings.shutterSpeed}</span>
-                  )}
+                  {settings.shutterSpeed && <span>{settings.shutterSpeed}</span>}
                   {settings.iso && <span>ISO {settings.iso}</span>}
-                  {settings.focalLength && (
-                    <span>{settings.focalLength}mm</span>
-                  )}
+                  {settings.focalLength && <span>{settings.focalLength}mm</span>}
                 </div>
               </div>
             )}

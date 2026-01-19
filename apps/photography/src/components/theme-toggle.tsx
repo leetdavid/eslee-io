@@ -25,11 +25,7 @@ export function ThemeToggle() {
       type="button"
       onClick={cycleTheme}
       className={`h-3 w-3 rounded-full transition-colors duration-300 ${
-        theme === "dark"
-          ? "bg-white"
-          : theme === "light"
-            ? "bg-black"
-            : "bg-gray-400"
+        theme === "dark" ? "bg-white" : theme === "light" ? "bg-black" : "bg-gray-400"
       }`}
       aria-label="Toggle theme"
       title={`Current theme: ${theme}`}

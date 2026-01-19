@@ -35,8 +35,7 @@ export const resume = {
       role: "system administrator",
       start: "2018",
       end: "2020",
-      description:
-        "developed frontend for intranet portal. administered servers and databases.",
+      description: "developed frontend for intranet portal. administered servers and databases.",
       url: "https://rokaf.airforce.mil.kr/afa/index.do",
     },
     {

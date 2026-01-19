@@ -48,11 +48,7 @@ export function PhotoCard({ photo }: { photo: Photo }) {
                   <span className="text-gray-400 dark:text-gray-600 block text-[10px] uppercase mb-1">
                     Date
                   </span>
-                  {new Date(captureDate)
-                    .toISOString()
-                    .substring(0, 10)
-                    .split("-")
-                    .join(".")}
+                  {new Date(captureDate).toISOString().substring(0, 10).split("-").join(".")}
                 </div>
               )}
 
@@ -60,49 +56,37 @@ export function PhotoCard({ photo }: { photo: Photo }) {
                 <div className="grid grid-cols-2 gap-x-4 gap-y-2 font-mono text-[10px] text-gray-600 dark:text-gray-300">
                   {settings.cameraModel && (
                     <div className="col-span-2">
-                      <span className="text-gray-400 dark:text-gray-600 mr-1">
-                        CAM
-                      </span>
+                      <span className="text-gray-400 dark:text-gray-600 mr-1">CAM</span>
                       {settings.cameraModel}
                     </div>
                   )}
                   {settings.lens && (
                     <div className="col-span-2">
-                      <span className="text-gray-400 dark:text-gray-600 mr-1">
-                        LENS
-                      </span>
+                      <span className="text-gray-400 dark:text-gray-600 mr-1">LENS</span>
                       {settings.lens}
                     </div>
                   )}
                   {settings.fStop && (
                     <div>
-                      <span className="text-gray-400 dark:text-gray-600 mr-1">
-                        AP
-                      </span>
+                      <span className="text-gray-400 dark:text-gray-600 mr-1">AP</span>
                       f/{settings.fStop}
                     </div>
                   )}
                   {settings.shutterSpeed && (
                     <div>
-                      <span className="text-gray-400 dark:text-gray-600 mr-1">
-                        SS
-                      </span>
+                      <span className="text-gray-400 dark:text-gray-600 mr-1">SS</span>
                       {settings.shutterSpeed}
                     </div>
                   )}
                   {settings.iso && (
                     <div>
-                      <span className="text-gray-400 dark:text-gray-600 mr-1">
-                        ISO
-                      </span>
+                      <span className="text-gray-400 dark:text-gray-600 mr-1">ISO</span>
                       {settings.iso}
                     </div>
                   )}
                   {settings.focalLength && (
                     <div>
-                      <span className="text-gray-400 dark:text-gray-600 mr-1">
-                        FL
-                      </span>
+                      <span className="text-gray-400 dark:text-gray-600 mr-1">FL</span>
                       {settings.focalLength}mm
                     </div>
                   )}
@@ -112,7 +96,7 @@ export function PhotoCard({ photo }: { photo: Photo }) {
           </div>
         </div>
       </DialogTrigger>
-      <DialogContent className="max-w-none w-screen h-screen p-0 border-none rounded-none bg-black overflow-hidden focus:outline-hidden">
+      <DialogContent className="max-w-none w-[90%] h-[90%] p-0 border-none rounded-none bg-black overflow-hidden focus:outline-hidden">
         <PhotoDetailView photo={photo} />
       </DialogContent>
     </Dialog>
