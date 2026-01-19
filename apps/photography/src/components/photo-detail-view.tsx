@@ -87,7 +87,7 @@ export function PhotoDetailView({ photo }: PhotoDetailViewProps) {
               type="button"
               onClick={() => setActiveColor(color)}
               className={cn(
-                "h-5 w-5 rounded-full border transition-all hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2",
+                "h-5 w-5 rounded-full border transition-all hover:scale-110 focus:outline-hidden focus:ring-2 focus:ring-offset-2",
                 color.value,
                 color.border,
                 activeColor.name === color.name

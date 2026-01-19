@@ -18,7 +18,7 @@ export function PhotoCard({ photo }: { photo: Photo }) {
     <Dialog>
       <DialogTrigger asChild>
         <div
-          className="group relative aspect-[4/5] w-full bg-white dark:bg-neutral-900 overflow-hidden"
+          className="group relative aspect-4/5 w-full bg-white dark:bg-neutral-900 overflow-hidden"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
@@ -103,7 +103,7 @@ export function PhotoCard({ photo }: { photo: Photo }) {
           </div>
         </div>
       </DialogTrigger>
-      <DialogContent className="max-w-none w-screen h-screen p-0 border-none rounded-none bg-black overflow-hidden focus:outline-none">
+      <DialogContent className="max-w-none w-screen h-screen p-0 border-none rounded-none bg-black overflow-hidden focus:outline-hidden">
         <PhotoDetailView photo={photo} />
       </DialogContent>
     </Dialog>
