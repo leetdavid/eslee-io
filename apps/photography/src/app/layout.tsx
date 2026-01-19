@@ -7,7 +7,7 @@ import { TRPCReactProvider } from "@/trpc/react";
 import { ThemeProvider } from "@/components/theme-provider";
 
 export const metadata: Metadata = {
-  title: "Photography Portfolio",
+  title: "eslee Photography",
   description: "A collection of captured moments",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
@@ -24,7 +24,7 @@ export default function RootLayout({
       <body>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="light"
           enableSystem
           disableTransitionOnChange
         >
