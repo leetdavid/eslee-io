@@ -1,22 +1,25 @@
 import { HydrateClient, api } from "@/trpc/server";
-import { PhotoGallery } from "./_components/gallery";
+import { PhotoGallery } from "@/components/gallery";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default async function Home() {
   void api.photos.getAll.prefetch();
 
   return (
     <HydrateClient>
-      <main className="min-h-screen bg-black text-white">
-        <div className="container mx-auto px-4 py-16">
-          <header className="mb-16 text-center">
-            <h1 className="mb-4 text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
-                Portfolio
-              </span>
+      <main className="min-h-screen bg-white dark:bg-black text-black dark:text-white font-sans transition-colors duration-300">
+        <header className="sticky top-0 z-50 w-full border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-black/80 backdrop-blur-md">
+          <div className="flex h-16 items-center justify-between px-6">
+            <h1 className="font-mono text-sm font-bold uppercase tracking-widest text-gray-900 dark:text-gray-100">
+              ESLEE / PHOTOGRAPHY
             </h1>
-            <p className="text-xl text-gray-400">Captured moments in time</p>
-          </header>
+            <div className="flex items-center gap-6">
+              <ThemeToggle />
+            </div>
+          </div>
+        </header>
 
+        <div className="w-full">
           <PhotoGallery />
         </div>
       </main>
