@@ -7,10 +7,8 @@ import type { Photo } from "@eslee/payload";
 export function getImageUrl(url?: string | null) {
   if (!url) return "";
   if (url.startsWith("http")) return url;
-  // In development, point to the CMS running on port 3002
-  // In production, point to the CMS domain
-  const baseUrl =
-    process.env.NODE_ENV === "development" ? "http://localhost:3002" : "https://cms.eslee.io";
+  // Use the configured CMS URL from environment variables
+  const baseUrl = process.env.NEXT_PUBLIC_CMS_URL || "https://cms.eslee.io";
   return `${baseUrl}${url}`;
 }
 
