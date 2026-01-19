@@ -7,7 +7,7 @@ import { TRPCReactProvider } from "@/trpc/react";
 import { ThemeProvider } from "@/components/theme-provider";
 
 export const metadata: Metadata = {
-  title: "eslee Photography",
+  title: "eslee - photography",
   description: "A collection of captured moments",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
