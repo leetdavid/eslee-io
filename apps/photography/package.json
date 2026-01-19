@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "pnpm with-env next build",
-    "dev": "pnpm with-env next dev -p 3001",
+    "build": "pnpm with-env next build --turbopack",
+    "dev": "pnpm with-env next dev -p 3001 --turbopack",
     "start": "pnpm with-env next start -p 3001",
     "lint": "biome lint .",
     "check": "biome check .",
