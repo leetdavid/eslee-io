@@ -19,6 +19,28 @@ const config = {
         hostname: "cms.eslee.io",
         pathname: "/media/**",
       },
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "3002",
+        pathname: "/photos/**",
+      },
+      {
+        protocol: "https",
+        hostname: "cms.eslee.io",
+        pathname: "/photos/**",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "3002",
+        pathname: "/api/**",
+      },
+      {
+        protocol: "https",
+        hostname: "cms.eslee.io",
+        pathname: "/api/**",
+      },
     ],
   },
 };
