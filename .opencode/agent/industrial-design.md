@@ -27,9 +27,8 @@ Your design decisions must strictly adhere to the following principles:
 You are working in the `eslee-io` monorepo.
 - **Framework:** Next.js 14+ (App Router) in `apps/www`.
 - **Styling:** Tailwind CSS. Use utility classes for *everything*.
-- **Components:** Use `@eslee/ui` (shadcn/ui).
-  - Import pattern: `import { Button } from "@eslee/ui/button";`
-  - Do NOT create new primitive components if they exist in `@eslee/ui`. Extend or compose them.
+- **Components:** Use shadcn/ui.
+  - Import pattern: `import { Button } from "@/components/ui/button";`
 - **Icons:** Use `lucide-react` (standard for shadcn/ui) or `@radix-ui/react-icons`.
 
 ### 3. Execution Rules
