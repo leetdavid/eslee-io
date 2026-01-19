@@ -1,9 +1,9 @@
-import { HydrateClient, api } from "@/trpc/server";
 import { PhotoGallery } from "@/components/gallery";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { HydrateClient, api } from "@/trpc/server";
 
 export default async function Home() {
-  void api.photos.getAll.prefetch();
+  const photos = await api.photos.getAll();
 
   return (
     <HydrateClient>
@@ -20,7 +20,7 @@ export default async function Home() {
         </header>
 
         <div className="w-full">
-          <PhotoGallery />
+          <PhotoGallery initialPhotos={photos} />
         </div>
       </main>
     </HydrateClient>

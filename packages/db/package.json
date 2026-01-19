@@ -28,7 +28,7 @@
     "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
-    "drizzle-orm": "^0.35.1",
+    "drizzle-orm": "catalog:",
     "drizzle-zod": "^0.5.1",
     "postgres": "^3.4.5",
     "zod": "catalog:"
@@ -37,7 +37,7 @@
     "@eslee/tsconfig": "workspace:*",
     "@types/node": "catalog:node",
     "dotenv-cli": "^7.4.2",
-    "drizzle-kit": "^0.26.2",
+    "drizzle-kit": "catalog:",
     "typescript": "catalog:"
   }
 }
