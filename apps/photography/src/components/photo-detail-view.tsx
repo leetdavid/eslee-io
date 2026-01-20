@@ -1,6 +1,7 @@
 "use client";
 
 import { DialogTitle } from "@/components/ui/dialog";
+import { getImageUrl } from "@/lib/cms-utils";
 import { cn } from "@/lib/utils";
 import type { Photo } from "@eslee/payload";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
@@ -8,7 +9,6 @@ import { Info } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { getImageUrl } from "./gallery";
 
 interface PhotoDetailViewProps {
   photo: Photo;
@@ -61,6 +61,7 @@ export function PhotoDetailView({ photo }: PhotoDetailViewProps) {
   if (!activeColor) return null;
 
   const { title, url, settings, captureDate } = photo;
+
   const imageUrl = getImageUrl(url);
 
   return (

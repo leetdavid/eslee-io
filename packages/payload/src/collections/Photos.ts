@@ -102,13 +102,11 @@ export const Photos: CollectionConfig = {
 
               const settings = data.settings || {};
 
-              if (!settings.fStop && exif.FNumber)
-                settings.fStop = exif.FNumber;
+              if (!settings.fStop && exif.FNumber) settings.fStop = exif.FNumber;
               if (!settings.iso && exif.ISO) settings.iso = exif.ISO;
               if (!settings.focalLength && exif.FocalLength)
                 settings.focalLength = exif.FocalLength;
-              if (!settings.cameraModel && exif.Model)
-                settings.cameraModel = exif.Model;
+              if (!settings.cameraModel && exif.Model) settings.cameraModel = exif.Model;
               if (!settings.shutterSpeed && exif.ExposureTime) {
                 // Convert decimal exposure time to fraction if possible, or just string
                 const time = exif.ExposureTime;
@@ -118,8 +116,7 @@ export const Photos: CollectionConfig = {
                   settings.shutterSpeed = String(time);
                 }
               }
-              if (!settings.lens && exif.LensModel)
-                settings.lens = exif.LensModel;
+              if (!settings.lens && exif.LensModel) settings.lens = exif.LensModel;
 
               data.settings = settings;
             }

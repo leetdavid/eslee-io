@@ -1,9 +1,9 @@
 "use client";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { getImageUrl } from "@/lib/cms-utils";
 import type { Photo } from "@eslee/payload";
 import Image from "next/image";
 import { useState } from "react";
-import { getImageUrl } from "./gallery";
 import { PhotoDetailView } from "./photo-detail-view";
 
 export function PhotoCard({ photo }: { photo: Photo }) {

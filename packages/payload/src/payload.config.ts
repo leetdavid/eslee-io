@@ -2,9 +2,9 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { postgresAdapter } from "@payloadcms/db-postgres";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
+import { vercelBlobStorage } from "@payloadcms/storage-vercel-blob";
 import { buildConfig } from "payload";
 import sharp from "sharp";
-import { vercelBlobStorage } from "@payloadcms/storage-vercel-blob";
 
 import { Media } from "./collections/Media";
 import { Photos } from "./collections/Photos";
