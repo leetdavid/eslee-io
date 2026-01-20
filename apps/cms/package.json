@@ -28,7 +28,7 @@
     "payload": "catalog:payload",
     "react": "catalog:react19",
     "react-dom": "catalog:react19",
-    "sharp": "^0.33.5"
+    "sharp": "^0.34.5"
   },
   "devDependencies": {
     "@eslee/tsconfig": "workspace:*",

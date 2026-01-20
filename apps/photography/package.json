@@ -36,7 +36,7 @@
     "react": "catalog:react19",
     "react-dom": "catalog:react19",
     "server-only": "^0.0.1",
-    "sharp": "^0.33.5",
+    "sharp": "^0.34.5",
     "superjson": "^2.2.1",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
