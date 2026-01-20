@@ -18,6 +18,9 @@ catalogs:
     next:
       specifier: 15.5.9
       version: 15.5.9
+    sharp:
+      specifier: ^0.33.5
+      version: 0.33.5
     tailwindcss:
       specifier: ^3.4.14
       version: 3.4.14
@@ -151,8 +154,8 @@ importers:
         specifier: catalog:react19
         version: 19.1.4(react@19.1.4)
       sharp:
-        specifier: ^0.34.5
-        version: 0.34.5
+        specifier: 'catalog:'
+        version: 0.33.5
     devDependencies:
       '@eslee/tsconfig':
         specifier: workspace:*
@@ -242,8 +245,8 @@ importers:
         specifier: ^0.0.1
         version: 0.0.1
       sharp:
-        specifier: ^0.34.5
-        version: 0.34.5
+        specifier: 'catalog:'
+        version: 0.33.5
       superjson:
         specifier: ^2.2.1
         version: 2.2.1
@@ -466,7 +469,7 @@ importers:
         specifier: catalog:payload
         version: 3.72.0(bufferutil@4.0.8)(graphql@16.12.0)(typescript@5.6.3)(utf-8-validate@6.0.4)
       sharp:
-        specifier: ^0.33.5
+        specifier: 'catalog:'
         version: 0.33.5
     devDependencies:
       '@eslee/tsconfig':
@@ -7042,7 +7045,8 @@ snapshots:
     dependencies:
       react-hook-form: 7.53.0(react@19.1.4)
 
-  '@img/colour@1.0.0': {}
+  '@img/colour@1.0.0':
+    optional: true
 
   '@img/sharp-darwin-arm64@0.33.5':
     optionalDependencies:
@@ -11859,8 +11863,8 @@ snapshots:
   sharp@0.33.5:
     dependencies:
       color: 4.2.3
-      detect-libc: 2.0.3
-      semver: 7.6.3
+      detect-libc: 2.1.2
+      semver: 7.7.3
     optionalDependencies:
       '@img/sharp-darwin-arm64': 0.33.5
       '@img/sharp-darwin-x64': 0.33.5
@@ -11912,6 +11916,7 @@ snapshots:
       '@img/sharp-win32-arm64': 0.34.5
       '@img/sharp-win32-ia32': 0.34.5
       '@img/sharp-win32-x64': 0.34.5
+    optional: true
 
   shebang-command@2.0.0:
     dependencies:
