@@ -151,8 +151,8 @@ importers:
         specifier: catalog:react19
         version: 19.1.4(react@19.1.4)
       sharp:
-        specifier: ^0.33.5
-        version: 0.33.5
+        specifier: ^0.34.5
+        version: 0.34.5
     devDependencies:
       '@eslee/tsconfig':
         specifier: workspace:*
@@ -242,8 +242,8 @@ importers:
         specifier: ^0.0.1
         version: 0.0.1
       sharp:
-        specifier: ^0.33.5
-        version: 0.33.5
+        specifier: ^0.34.5
+        version: 0.34.5
       superjson:
         specifier: ^2.2.1
         version: 2.2.1
@@ -7042,8 +7042,7 @@ snapshots:
     dependencies:
       react-hook-form: 7.53.0(react@19.1.4)
 
-  '@img/colour@1.0.0':
-    optional: true
+  '@img/colour@1.0.0': {}
 
   '@img/sharp-darwin-arm64@0.33.5':
     optionalDependencies:
@@ -11806,8 +11805,7 @@ snapshots:
 
   semver@7.6.3: {}
 
-  semver@7.7.3:
-    optional: true
+  semver@7.7.3: {}
 
   send@0.19.0:
     dependencies:
@@ -11914,7 +11912,6 @@ snapshots:
       '@img/sharp-win32-arm64': 0.34.5
       '@img/sharp-win32-ia32': 0.34.5
       '@img/sharp-win32-x64': 0.34.5
-    optional: true
 
   shebang-command@2.0.0:
     dependencies:
