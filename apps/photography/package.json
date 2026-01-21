@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "pnpm with-env next build --turbopack",
+    "build": "pnpm with-env next build",
     "dev": "pnpm with-env next dev -p 3001 --turbopack",
     "start": "pnpm with-env next start -p 3001",
     "lint": "biome lint .",
@@ -30,6 +30,7 @@
     "lucide-react": "^0.453.0",
     "next": "catalog:",
     "next-themes": "^0.3.0",
+    "optional": "^0.1.4",
     "payload": "catalog:payload",
     "pg": "^8.13.0",
     "postgres": "^3.4.4",

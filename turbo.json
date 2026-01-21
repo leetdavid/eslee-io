@@ -43,6 +43,10 @@
     "ui-add": {
       "cache": false,
       "interactive": true
+    },
+    "start": {
+      "cache": true,
+      "persistent": true
     }
   },
   "globalEnv": [

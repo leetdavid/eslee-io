@@ -226,6 +226,9 @@ importers:
       next-themes:
         specifier: ^0.3.0
         version: 0.3.0(react-dom@19.1.4(react@19.1.4))(react@19.1.4)
+      optional:
+        specifier: ^0.1.4
+        version: 0.1.4
       payload:
         specifier: catalog:payload
         version: 3.72.0(bufferutil@4.0.8)(graphql@16.12.0)(typescript@5.6.3)(utf-8-validate@6.0.4)
@@ -5048,6 +5051,9 @@ packages:
   openapi-typescript@6.7.6:
     resolution: {integrity: sha512-c/hfooPx+RBIOPM09GSxABOZhYPblDoyaGhqBkD/59vtpN21jEuWKDlM0KYTvqJVlSYjKs0tBcIdeXKChlSPtw==}
     hasBin: true
+
+  optional@0.1.4:
+    resolution: {integrity: sha512-gtvrrCfkE08wKcgXaVwQVgwEQ8vel2dc5DDBn9RLQZ3YtmtkBss6A2HY6BnJH4N/4Ku97Ri/SF8sNWE2225WJw==}
 
   ora@4.1.1:
     resolution: {integrity: sha512-sjYP8QyVWBpBZWD6Vr1M/KwknSw6kJOz41tvGMlwWeClHBtYKTbHMki1PsLZnxKpXMPbTKv9b3pjQu3REib96A==}
@@ -11078,6 +11084,8 @@ snapshots:
       supports-color: 9.4.0
       undici: 5.28.4
       yargs-parser: 21.1.1
+
+  optional@0.1.4: {}
 
   ora@4.1.1:
     dependencies:

@@ -20,6 +20,7 @@
     "lint:fix": "biome lint --fix .",
     "format": "biome format .",
     "format:fix": "biome format --write .",
+    "start": "turbo run start",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
     "ui-add": "turbo run ui-add",
