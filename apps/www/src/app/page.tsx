@@ -47,7 +47,9 @@ export default function Home() {
 
       {/* Experience */}
       <section>
-        <h3 className="font-bold text-sm mb-6 text-muted-foreground">experience</h3>
+        <h3 className="font-bold text-sm mb-6 text-muted-foreground">
+          experience
+        </h3>
         <ul className="flex flex-col border-t border-border">
           {resume.experience.map((job) => (
             <li key={`${job.company}-${job.start}`} className="group">
@@ -85,7 +87,9 @@ export default function Home() {
 
       {/* Education */}
       <section>
-        <h3 className="font-bold text-sm mb-6 text-muted-foreground">education</h3>
+        <h3 className="font-bold text-sm mb-6 text-muted-foreground">
+          education
+        </h3>
         <ul className="flex flex-col border-t border-border">
           {resume.education.map((edu) => (
             <li key={edu.school}>
