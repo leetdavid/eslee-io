@@ -48,6 +48,9 @@
   --color-chart-3: hsl(var(--chart-3));
   --color-chart-4: hsl(var(--chart-4));
   --color-chart-5: hsl(var(--chart-5));
+
+  /* Custom scale values for subtle zoom animations */
+  --scale-98: 0.98;
 }
 
 /*
@@ -97,11 +100,11 @@
     --radius: 0.5rem;
   }
   .dark {
-    --background: 222.2 84% 4.9%;
+    --background: 0 0% 0%;
     --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
+    --card: 0 0% 0%;
     --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
+    --popover: 0 0% 0%;
     --popover-foreground: 210 40% 98%;
     --primary: 210 40% 98%;
     --primary-foreground: 222.2 47.4% 11.2%;
