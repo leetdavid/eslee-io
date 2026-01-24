@@ -96,7 +96,7 @@ export function PhotoCard({ photo }: { photo: Photo }) {
           </div>
         </div>
       </DialogTrigger>
-      <DialogContent className="max-w-none w-[90%] h-[90%] p-0 border-none rounded-none bg-black overflow-hidden focus:outline-hidden">
+      <DialogContent className="max-w-none w-full h-full md:w-[90%] md:h-[90%] p-0 border-none rounded-none bg-black overflow-hidden focus:outline-hidden">
         <PhotoDetailView photo={photo} />
       </DialogContent>
     </Dialog>
