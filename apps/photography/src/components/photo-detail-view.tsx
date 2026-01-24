@@ -5,7 +5,7 @@ import { getImageUrl } from "@/lib/cms-utils";
 import { cn } from "@/lib/utils";
 import type { Photo } from "@eslee/payload";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import { Info } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -20,24 +20,28 @@ const backgroundColors = [
     value: "bg-black",
     text: "text-white",
     border: "border-white/20",
+    gradient: "bg-gradient-to-t from-black/80 via-black/40 to-transparent",
   },
   {
     name: "White",
     value: "bg-white",
     text: "text-black",
     border: "border-black/20",
+    gradient: "bg-gradient-to-t from-white/80 via-white/40 to-transparent",
   },
   {
     name: "Grey",
     value: "bg-neutral-800",
     text: "text-white",
     border: "border-white/20",
+    gradient: "bg-gradient-to-t from-neutral-800/80 via-neutral-800/40 to-transparent",
   },
   {
     name: "Beige",
     value: "bg-[#e5e5e0]",
     text: "text-black",
     border: "border-black/20",
+    gradient: "bg-gradient-to-t from-[#e5e5e0]/80 via-[#e5e5e0]/40 to-transparent",
   },
 ];
 
@@ -87,6 +91,18 @@ export function PhotoDetailView({ photo }: PhotoDetailViewProps) {
         />
       </div>
 
+      {/* Gradient Scrim - only visible when info is shown */}
+      {showInfo && (
+        <div
+          className={cn(
+            "absolute inset-x-0 bottom-0 h-2/5 pointer-events-none",
+            "transition-opacity duration-500",
+            "animate-in fade-in duration-500",
+            activeColor.gradient,
+          )}
+        />
+      )}
+
       {/* Controls & Info */}
       <div
         className={cn(
@@ -96,6 +112,18 @@ export function PhotoDetailView({ photo }: PhotoDetailViewProps) {
       >
         {/* Color Toggles */}
         <div className="mb-6 flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setShowInfo(!showInfo)}
+            className={cn(
+              "flex h-6 w-6 items-center justify-center rounded-full transition-all hover:bg-current/10",
+              !showInfo && "opacity-50",
+            )}
+            title={showInfo ? "Collapse Info" : "Expand Info"}
+          >
+            {showInfo ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
+          </button>
+          <div className="h-4 w-px bg-current opacity-20 mx-1" />
           {backgroundColors.map((color) => (
             <button
               key={color.name}
@@ -116,18 +144,6 @@ export function PhotoDetailView({ photo }: PhotoDetailViewProps) {
               }}
             />
           ))}
-          <div className="h-4 w-px bg-current opacity-20 mx-1" />
-          <button
-            type="button"
-            onClick={() => setShowInfo(!showInfo)}
-            className={cn(
-              "flex h-6 w-6 items-center justify-center rounded-full transition-all hover:bg-current/10",
-              !showInfo && "opacity-50",
-            )}
-            title="Toggle Info"
-          >
-            <Info size={16} />
-          </button>
         </div>
 
         {/* EXIF Data */}
