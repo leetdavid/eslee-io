@@ -5,6 +5,7 @@ export const siteConfig = {
   links: {
     github: "https://github.com/leetdavid",
     linkedin: "https://www.linkedin.com/in/leetdavid/",
+    photography: "https://photography.eslee.io",
     // email: "david@eslee.io", // Keeping placeholder
     email: "mailto:leetdavidu@gmail.com", // Keeping placeholder
   },
