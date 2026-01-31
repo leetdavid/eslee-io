@@ -46,6 +46,6 @@ resource "cloudflare_dns_record" "eslee_io_google_site_verification" {
   type    = "TXT"
   name    = "@"
   content = "google-site-verification=LUi5KHoamAkZvHa2Uj9SP3s-odkJfMcnuUHsdXmMzJY"
-  ttl     = 1
+  ttl     = 3600
   proxied = false
 }
