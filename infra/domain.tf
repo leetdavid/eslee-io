@@ -41,7 +41,7 @@ resource "cloudflare_dns_record" "eslee_io_root" {
 
 
 # ? Google site verification
-resource "cloudflare_dns_record" "eslee_io_root" {
+resource "cloudflare_dns_record" "eslee_io_google_site_verification" {
   zone_id = var.cloudflare_zone_id
   type    = "TXT"
   name    = "@"
