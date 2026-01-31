@@ -2,6 +2,8 @@
 
 Monorepo for the `eslee.io` domain, built with turborepo and pnpm.
 
+Infrastructure as Code (IaC) is managed using Terraform Cloud.
+
 ## Quick Start
 
 ```bash
