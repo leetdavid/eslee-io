@@ -38,3 +38,14 @@ resource "cloudflare_dns_record" "eslee_io_root" {
   ttl     = 1
   proxied = false
 }
+
+
+# ? Google site verification
+resource "cloudflare_dns_record" "eslee_io_root" {
+  zone_id = var.cloudflare_zone_id
+  type    = "TXT"
+  name    = "@"
+  content = "google-site-verification=LUi5KHoamAkZvHa2Uj9SP3s-odkJfMcnuUHsdXmMzJY"
+  ttl     = 1
+  proxied = false
+}
