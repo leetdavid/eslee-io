@@ -63,6 +63,8 @@ Nitro server that proxies OAuth requests in preview deployments.
 
 All apps are deployed to Vercel.
 
+Domains are on Cloudflare and managed using Terraform Cloud.
+
 ## License
 
 Private
