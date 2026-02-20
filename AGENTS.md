@@ -48,8 +48,8 @@ If adding tests:
 
 ### Imports
 
-- **Absolute Imports:** Use the `~` alias for local imports within `src/` directories.
-  - _Good:_ `import { api } from "~/trpc/server";`
+- **Absolute Imports:** Use the `@` alias for local imports within `src/` directories.
+  - _Good:_ `import { api } from "@/trpc/server";`
   - _Bad:_ `import { api } from "../../trpc/server";`
 - **External Packages:** Import standard packages normally.
 - **Monorepo Packages:** Import shared packages by their name (e.g., `@eslee/db`, `@eslee/api`).

@@ -1,5 +1,5 @@
 {
-  "extends": "@eslee/tsconfig/base.json",
-  "include": ["src", "*.ts"],
+  "extends": "@eslee/tsconfig/internal-package.json",
+  "include": ["src"],
   "exclude": ["node_modules"]
 }
