@@ -1,14 +1,16 @@
-import { getSystemPrompt, models } from "@/lib/ai";
+import { type ModelId, defaultModel, getSystemPrompt, models } from "@/lib/ai";
 import { auth } from "@eslee/auth";
 import { streamText } from "ai";
 import { headers } from "next/headers";
 import { z } from "zod";
 
+const modelIds = Object.keys(models) as [ModelId, ...ModelId[]];
+
 const explainInputSchema = z.object({
   text: z.string().min(1).max(5000),
   context: z.string().max(1000).optional(),
   userLanguage: z.enum(["en", "ko"]).default("en"),
-  model: z.enum(["gpt-4o-mini", "gpt-4o", "claude-sonnet-4-5"] as const).default("gpt-4o-mini"),
+  model: z.enum(modelIds).default(defaultModel),
 });
 
 export async function POST(req: Request) {
@@ -30,7 +32,7 @@ export async function POST(req: Request) {
 
   const { text, context, userLanguage, model: modelId } = parsed.data;
 
-  const selectedModel = models[modelId];
+  const selectedModel = models[modelId].model;
 
   const result = streamText({
     model: selectedModel,
