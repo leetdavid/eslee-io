@@ -16,7 +16,7 @@ export function PhotoCard({ photo }: { photo: Photo }) {
 
   return (
     <Dialog>
-      <DialogTrigger asChild>
+      <DialogTrigger>
         <div
           className="group relative aspect-4/5 w-full bg-white dark:bg-neutral-900 overflow-hidden"
           onMouseEnter={() => setIsHovered(true)}
