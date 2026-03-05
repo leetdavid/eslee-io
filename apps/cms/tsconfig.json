@@ -4,7 +4,7 @@
     "baseUrl": ".",
     "paths": {
       "@payload-config": ["./src/payload.config.ts"],
-      "~/*": ["./src/*"]
+      "@/*": ["./src/*"]
     },
     "module": "esnext",
     "moduleResolution": "bundler",

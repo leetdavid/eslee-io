@@ -32,11 +32,19 @@
     "//#clean": {
       "cache": false
     },
-    "push": {
+    "db:generate": {
       "cache": false,
       "interactive": true
     },
-    "studio": {
+    "db:migrate": {
+      "cache": false,
+      "interactive": true
+    },
+    "db:push": {
+      "cache": false,
+      "interactive": true
+    },
+    "db:studio": {
       "cache": false,
       "persistent": true
     },
@@ -55,6 +63,15 @@
     "AUTH_DISCORD_SECRET",
     "AUTH_REDIRECT_PROXY_URL",
     "AUTH_SECRET",
+    "BETTER_AUTH_SECRET",
+    "BETTER_AUTH_URL",
+    "GOOGLE_CLIENT_ID",
+    "GOOGLE_CLIENT_SECRET",
+    "GITHUB_CLIENT_ID",
+    "GITHUB_CLIENT_SECRET",
+    "OPENAI_API_KEY",
+    "ANTHROPIC_API_KEY",
+    "PAYLOAD_SECRET",
     "PORT"
   ],
   "globalPassThroughEnv": [

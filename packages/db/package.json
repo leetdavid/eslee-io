@@ -13,8 +13,8 @@
       "default": "./src/client.ts"
     },
     "./schema": {
-      "types": "./dist/schema.d.ts",
-      "default": "./src/schema.ts"
+      "types": "./dist/schema/index.d.ts",
+      "default": "./src/schema/index.ts"
     }
   },
   "license": "MIT",
@@ -23,20 +23,23 @@
     "clean": "git clean -xdf .cache .turbo dist node_modules",
     "dev": "tsc",
     "push": "pnpm with-env drizzle-kit push",
+    "db:generate": "pnpm with-env drizzle-kit generate",
+    "db:migrate": "pnpm with-env drizzle-kit migrate",
+    "db:studio": "pnpm with-env drizzle-kit studio",
     "studio": "pnpm with-env drizzle-kit studio",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false",
     "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
     "drizzle-orm": "catalog:",
-    "drizzle-zod": "^0.5.1",
-    "postgres": "^3.4.5",
+    "drizzle-zod": "^0.8.3",
+    "postgres": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@eslee/tsconfig": "workspace:*",
     "@types/node": "catalog:node",
-    "dotenv-cli": "^7.4.2",
+    "dotenv-cli": "catalog:",
     "drizzle-kit": "catalog:",
     "typescript": "catalog:"
   }

@@ -5,30 +5,35 @@
   "type": "module",
   "exports": {
     ".": {
-      "react-server": "./src/index.rsc.ts",
+      "types": "./dist/index.d.ts",
       "default": "./src/index.ts"
     },
-    "./env": "./env.ts"
+    "./client": {
+      "types": "./dist/client.d.ts",
+      "default": "./src/client.ts"
+    },
+    "./env": "./src/env.ts"
   },
   "license": "MIT",
   "scripts": {
+    "build": "tsc",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
-    "typecheck": "tsc --noEmit"
+    "dev": "tsc",
+    "with-env": "dotenv -e ../../.env --",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
-    "@auth/core": "0.34.2",
-    "@auth/drizzle-adapter": "^1.11.1",
     "@eslee/db": "workspace:*",
     "@t3-oss/env-nextjs": "^0.11.1",
+    "better-auth": "catalog:",
+    "drizzle-orm": "catalog:",
     "next": "catalog:",
-    "next-auth": "5.0.0-beta.20",
-    "react": "catalog:react19",
-    "react-dom": "catalog:react19",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@eslee/tsconfig": "workspace:*",
-    "@types/react": "catalog:react19",
+    "@types/node": "catalog:node",
+    "dotenv-cli": "catalog:",
     "typescript": "catalog:"
   }
 }

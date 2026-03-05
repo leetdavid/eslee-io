@@ -1,10 +1,7 @@
 "use client";
-
-import { DialogTitle } from "@/components/ui/dialog";
 import { getImageUrl } from "@/lib/cms-utils";
 import { cn } from "@/lib/utils";
 import type { Photo } from "@eslee/payload";
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
@@ -75,9 +72,6 @@ export function PhotoDetailView({ photo }: PhotoDetailViewProps) {
         activeColor.value,
       )}
     >
-      <VisuallyHidden asChild>
-        <DialogTitle>Photo Details</DialogTitle>
-      </VisuallyHidden>
       {/* Image Container */}
       <div className="relative h-full w-full p-0 md:p-8 flex items-center justify-center">
         <Image

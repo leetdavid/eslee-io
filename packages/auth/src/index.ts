@@ -1,15 +1,42 @@
-import NextAuth from "next-auth";
+import { betterAuth } from "better-auth";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
 
-import { authConfig } from "./config";
+import { db } from "@eslee/db/client";
 
-export type { Session } from "next-auth";
+import { env } from "./env";
 
-const { handlers, auth, signIn, signOut } = NextAuth(authConfig);
+export const auth = betterAuth({
+  database: drizzleAdapter(db, {
+    provider: "pg",
+  }),
+  secret: env.BETTER_AUTH_SECRET,
+  baseURL: env.BETTER_AUTH_URL,
+  emailAndPassword: {
+    enabled: true,
+  },
+  socialProviders: {
+    ...(env.GOOGLE_CLIENT_ID &&
+      env.GOOGLE_CLIENT_SECRET && {
+        google: {
+          clientId: env.GOOGLE_CLIENT_ID,
+          clientSecret: env.GOOGLE_CLIENT_SECRET,
+        },
+      }),
+    ...(env.GITHUB_CLIENT_ID &&
+      env.GITHUB_CLIENT_SECRET && {
+        github: {
+          clientId: env.GITHUB_CLIENT_ID,
+          clientSecret: env.GITHUB_CLIENT_SECRET,
+        },
+      }),
+  },
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60, // 5 minutes
+    },
+  },
+});
 
-export { handlers, auth, signIn, signOut };
-
-export {
-  invalidateSessionToken,
-  validateToken,
-  isSecureContext,
-} from "./config";
+export type Session = typeof auth.$Infer.Session;
+export type User = typeof auth.$Infer.Session.user;
