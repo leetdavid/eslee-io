@@ -1,8 +1,16 @@
 import { getSystemPrompt, models } from "@/lib/ai";
-import type { ModelId } from "@/lib/ai";
 import { auth } from "@eslee/auth";
 import { streamText } from "ai";
 import { headers } from "next/headers";
+import { z } from "zod";
+
+const generateInputSchema = z.object({
+  topic: z.string().min(1).max(500),
+  type: z.enum(["reading", "grammar", "vocabulary", "quiz"]),
+  jlptLevel: z.string().optional(),
+  userLanguage: z.enum(["en", "ko"]).default("en"),
+  model: z.string(), // Loosen the schema to string and validate manually, since types are inferred from keys now
+});
 
 export async function POST(req: Request) {
   const session = await auth.api.getSession({
@@ -13,25 +21,29 @@ export async function POST(req: Request) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const {
-    topic,
-    type,
-    jlptLevel,
-    userLanguage,
-    model: modelId,
-  } = (await req.json()) as {
-    topic: string;
-    type: "reading" | "grammar" | "vocabulary" | "quiz";
-    jlptLevel?: string;
-    userLanguage?: "en" | "ko";
-    model?: ModelId;
-  };
+  const parsed = generateInputSchema.safeParse(await req.json());
+  if (!parsed.success) {
+    return new Response(JSON.stringify({ error: parsed.error.flatten() }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
 
-  const selectedModel = models[modelId ?? "gpt-4o-mini"];
+  const { topic, type, jlptLevel, userLanguage, model: modelId } = parsed.data;
+
+  const selectedModel = models[modelId as keyof typeof models];
+
+  if (!selectedModel) {
+    return new Response(JSON.stringify({ error: "Invalid model specified" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   const langName = userLanguage === "ko" ? "Korean" : "English";
   const levelNote = jlptLevel ? ` Appropriate for JLPT ${jlptLevel} level.` : "";
 
-  const prompts: Record<"reading" | "grammar" | "vocabulary" | "quiz", string> = {
+  const prompts: Record<typeof type, string> = {
     reading: `Generate a Japanese reading passage about "${topic}".${levelNote}
 
 Include:
@@ -67,7 +79,7 @@ Include:
   };
 
   const result = streamText({
-    model: selectedModel,
+    model: selectedModel.model,
     system: getSystemPrompt(userLanguage),
     messages: [
       {

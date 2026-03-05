@@ -21,7 +21,7 @@ export const createTable = pgTableCreator((name) => `nihongo_${name}`);
 
 export const languageEnum = pgEnum("nihongo_language", ["ja", "en", "ko"]);
 export const jlptLevelEnum = pgEnum("nihongo_jlpt_level", ["N5", "N4", "N3", "N2", "N1"]);
-export const aiTypeEnum = pgEnum("nihongo_ai_type", ["explanation", "document", "grammar", "quiz"]);
+export const aiTypeEnum = pgEnum("nihongo_ai_type", ["reading", "grammar", "vocabulary", "quiz"]);
 
 // ---------------------------------------------------------------------------
 // Clips
@@ -31,8 +31,8 @@ export const clips = createTable(
   "clip",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    userId: uuid("user_id").notNull(),
-    title: varchar("title", { length: 256 }).notNull(),
+    userId: text("user_id").notNull(),
+    title: varchar("title", { length: 256 }),
     content: jsonb("content").notNull(), // Tiptap JSON document
     sourceLanguage: languageEnum("source_language").notNull().default("ja"),
     targetLanguage: languageEnum("target_language"),
@@ -63,7 +63,7 @@ export const vocabulary = createTable(
   "vocabulary",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    userId: uuid("user_id").notNull(),
+    userId: text("user_id").notNull(),
     word: varchar("word", { length: 255 }).notNull(),
     reading: varchar("reading", { length: 255 }), // furigana
     meaning: text("meaning").notNull(),
@@ -127,7 +127,7 @@ export const studyProgress = createTable(
   "study_progress",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    userId: uuid("user_id").notNull(),
+    userId: text("user_id").notNull(),
     vocabularyId: uuid("vocabulary_id")
       .notNull()
       .references(() => vocabulary.id, { onDelete: "cascade" }),
@@ -165,7 +165,7 @@ export const aiGenerations = createTable(
   "ai_generation",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    userId: uuid("user_id").notNull(),
+    userId: text("user_id").notNull(),
     prompt: text("prompt").notNull(),
     response: text("response").notNull(),
     model: varchar("model", { length: 100 }).notNull(),

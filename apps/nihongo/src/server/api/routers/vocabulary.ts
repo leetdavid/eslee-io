@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { and, desc, eq, ilike } from "drizzle-orm";
 import { z } from "zod";
 
@@ -39,7 +40,7 @@ export const vocabularyRouter = createTRPCRouter({
       });
 
       if (!item) {
-        throw new Error("Vocabulary item not found");
+        throw new TRPCError({ code: "NOT_FOUND", message: "Vocabulary item not found" });
       }
 
       return item;

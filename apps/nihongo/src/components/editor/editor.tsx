@@ -12,6 +12,7 @@ import { Furigana } from "./extensions/furigana";
 import { TranslationBlock } from "./extensions/translation-block";
 import { VocabularyHighlight } from "./extensions/vocabulary-highlight";
 import { EditorToolbar } from "./toolbar";
+import { TranslationBubble } from "./translation-bubble";
 
 interface EditorProps {
   content?: JSONContent;
@@ -60,8 +61,9 @@ export function Editor({
   }
 
   return (
-    <div className="rounded-md border border-input bg-background">
+    <div className="rounded-md border border-input bg-background relative">
       {editable && <EditorToolbar editor={editor} />}
+      <TranslationBubble editor={editor} />
       <EditorContent editor={editor} />
     </div>
   );

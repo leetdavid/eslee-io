@@ -27,6 +27,10 @@ export const Furigana = Mark.create<FuriganaOptions>({
       reading: {
         default: "",
         parseHTML: (element) => {
+          // Check data attribute first, then fallback to <rt> tag
+          const dataReading = element.getAttribute("data-reading");
+          if (dataReading) return dataReading;
+
           const rt = element.querySelector("rt");
           return rt?.textContent ?? "";
         },
@@ -46,7 +50,7 @@ export const Furigana = Mark.create<FuriganaOptions>({
     return [
       "ruby",
       mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
-      0, // content slot
+      ["span", {}, 0], // The content hole (0) must be the only child of its parent node in ProseMirror
       ["rp", {}, "("],
       ["rt", {}, reading],
       ["rp", {}, ")"],
@@ -65,18 +69,6 @@ export const Furigana = Mark.create<FuriganaOptions>({
         ({ commands }) => {
           return commands.unsetMark(this.name);
         },
-    };
-  },
-
-  addKeyboardShortcuts() {
-    return {
-      "Mod-r": () => {
-        const reading = window.prompt("Enter furigana reading:");
-        if (reading) {
-          return this.editor.commands.setFurigana(reading);
-        }
-        return false;
-      },
     };
   },
 });

@@ -1,8 +1,15 @@
 import { getSystemPrompt, models } from "@/lib/ai";
-import type { ModelId } from "@/lib/ai";
 import { auth } from "@eslee/auth";
 import { streamText } from "ai";
 import { headers } from "next/headers";
+import { z } from "zod";
+
+const explainInputSchema = z.object({
+  text: z.string().min(1).max(5000),
+  context: z.string().max(1000).optional(),
+  userLanguage: z.enum(["en", "ko"]).default("en"),
+  model: z.enum(["gpt-4o-mini", "gpt-4o", "claude-sonnet-4-5"] as const).default("gpt-4o-mini"),
+});
 
 export async function POST(req: Request) {
   const session = await auth.api.getSession({
@@ -13,19 +20,17 @@ export async function POST(req: Request) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const {
-    text,
-    context,
-    userLanguage,
-    model: modelId,
-  } = (await req.json()) as {
-    text: string;
-    context?: string;
-    userLanguage?: "en" | "ko";
-    model?: ModelId;
-  };
+  const parsed = explainInputSchema.safeParse(await req.json());
+  if (!parsed.success) {
+    return new Response(JSON.stringify({ error: parsed.error.flatten() }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
 
-  const selectedModel = models[modelId ?? "gpt-4o-mini"];
+  const { text, context, userLanguage, model: modelId } = parsed.data;
+
+  const selectedModel = models[modelId];
 
   const result = streamText({
     model: selectedModel,

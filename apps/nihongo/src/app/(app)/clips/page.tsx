@@ -2,11 +2,13 @@
 
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
-import { FileText, Plus, Search, Trash2 } from "lucide-react";
+import { FileText, Loader2, Plus, Search, Trash2 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function ClipsPage() {
+  const router = useRouter();
   const [search, setSearch] = useState("");
 
   const { data, isLoading } = api.clip.getAll.useQuery(search ? { search } : undefined);
@@ -18,7 +20,23 @@ export default function ClipsPage() {
     },
   });
 
+  const createClip = api.clip.create.useMutation({
+    onSuccess: (clip) => {
+      if (clip) {
+        router.push(`/clips/${clip.id}`);
+      }
+    },
+  });
+
   const utils = api.useUtils();
+
+  const handleCreateClip = () => {
+    createClip.mutate({
+      title: "Untitled Clip",
+      content: { type: "doc", content: [{ type: "paragraph" }] },
+      sourceLanguage: "ja",
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -27,17 +45,23 @@ export default function ClipsPage() {
           <h1 className="text-2xl font-bold tracking-tight">Clips</h1>
           <p className="text-sm text-muted-foreground">Your saved Japanese text clips</p>
         </div>
-        <Link
-          href="/clips/new"
+        <button
+          type="button"
+          onClick={handleCreateClip}
+          disabled={createClip.isPending}
           className={cn(
             "inline-flex h-10 items-center gap-2 rounded-md bg-primary px-4 py-2",
             "text-sm font-medium text-primary-foreground",
-            "hover:bg-primary/90 transition-colors",
+            "hover:bg-primary/90 transition-colors disabled:opacity-50",
           )}
         >
-          <Plus className="h-4 w-4" />
+          {createClip.isPending ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Plus className="h-4 w-4" />
+          )}
           New Clip
-        </Link>
+        </button>
       </div>
 
       {/* Search */}
@@ -70,17 +94,23 @@ export default function ClipsPage() {
           <p className="mt-1 text-sm text-muted-foreground">
             Create your first clip to start learning Japanese
           </p>
-          <Link
-            href="/clips/new"
+          <button
+            type="button"
+            onClick={handleCreateClip}
+            disabled={createClip.isPending}
             className={cn(
               "mt-4 inline-flex h-10 items-center gap-2 rounded-md bg-primary px-4 py-2",
               "text-sm font-medium text-primary-foreground",
-              "hover:bg-primary/90 transition-colors",
+              "hover:bg-primary/90 transition-colors disabled:opacity-50",
             )}
           >
-            <Plus className="h-4 w-4" />
+            {createClip.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Plus className="h-4 w-4" />
+            )}
             New Clip
-          </Link>
+          </button>
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -92,7 +122,7 @@ export default function ClipsPage() {
             >
               <div className="flex items-start justify-between">
                 <div className="space-y-1">
-                  <h3 className="font-medium leading-none">{clip.title}</h3>
+                  <h3 className="font-medium leading-none">{clip.title ?? "Untitled"}</h3>
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <span className="uppercase">{clip.sourceLanguage}</span>
                     {clip.targetLanguage && (

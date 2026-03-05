@@ -2,7 +2,7 @@
 
 import { api } from "@/trpc/react";
 import { Check, ChevronRight, GraduationCap, RotateCcw, X } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export default function StudyPage() {
   const { data: stats } = api.study.getStats.useQuery();
@@ -19,14 +19,60 @@ export default function StudyPage() {
 
   const currentCard = dueCards?.[0];
 
-  const handleGrade = (quality: number) => {
-    if (!currentCard) return;
-    submitReview.mutate({
-      vocabularyId: currentCard.vocabularyId,
-      quality,
-    });
-    setShowAnswer(false);
-  };
+  const handleGrade = useCallback(
+    (quality: number) => {
+      if (!currentCard) return;
+      submitReview.mutate({
+        vocabularyId: currentCard.vocabularyId,
+        quality,
+      });
+      setShowAnswer(false);
+    },
+    [currentCard, submitReview],
+  );
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if user is typing in an input
+      if (
+        document.activeElement?.tagName === "INPUT" ||
+        document.activeElement?.tagName === "TEXTAREA"
+      ) {
+        return;
+      }
+
+      if (!currentCard) return;
+
+      if (!showAnswer) {
+        if (e.code === "Space" || e.code === "Enter") {
+          e.preventDefault();
+          setShowAnswer(true);
+        }
+      } else {
+        switch (e.key) {
+          case "1":
+            e.preventDefault();
+            handleGrade(0);
+            break;
+          case "2":
+            e.preventDefault();
+            handleGrade(3);
+            break;
+          case "3":
+            e.preventDefault();
+            handleGrade(4);
+            break;
+          case "4":
+            e.preventDefault();
+            handleGrade(5);
+            break;
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [currentCard, showAnswer, handleGrade]); // Re-bind when dependencies change
 
   return (
     <div className="space-y-6">
@@ -82,7 +128,9 @@ export default function StudyPage() {
             )}
 
             {!showAnswer && (
-              <p className="mt-4 text-sm text-muted-foreground">Click to reveal answer</p>
+              <p className="mt-4 text-sm text-muted-foreground">
+                Click or press Space to reveal answer
+              </p>
             )}
           </button>
 
@@ -91,34 +139,46 @@ export default function StudyPage() {
               <button
                 type="button"
                 onClick={() => handleGrade(0)}
-                className="flex h-12 w-24 flex-col items-center justify-center rounded-lg border border-destructive/50 bg-destructive/10 text-sm font-medium text-destructive hover:bg-destructive/20"
+                className="group flex h-14 w-24 flex-col items-center justify-center rounded-lg border border-destructive/50 bg-destructive/10 text-sm font-medium text-destructive hover:bg-destructive/20 relative"
               >
-                <X className="h-4 w-4" />
+                <X className="h-4 w-4 mb-1" />
                 Again
+                <span className="absolute bottom-1 right-2 text-[10px] opacity-50 font-mono">
+                  1
+                </span>
               </button>
               <button
                 type="button"
                 onClick={() => handleGrade(3)}
-                className="flex h-12 w-24 flex-col items-center justify-center rounded-lg border border-yellow-500/50 bg-yellow-500/10 text-sm font-medium text-yellow-600 dark:text-yellow-400 hover:bg-yellow-500/20"
+                className="group flex h-14 w-24 flex-col items-center justify-center rounded-lg border border-yellow-500/50 bg-yellow-500/10 text-sm font-medium text-yellow-600 dark:text-yellow-400 hover:bg-yellow-500/20 relative"
               >
-                <RotateCcw className="h-4 w-4" />
+                <RotateCcw className="h-4 w-4 mb-1" />
                 Hard
+                <span className="absolute bottom-1 right-2 text-[10px] opacity-50 font-mono">
+                  2
+                </span>
               </button>
               <button
                 type="button"
                 onClick={() => handleGrade(4)}
-                className="flex h-12 w-24 flex-col items-center justify-center rounded-lg border border-primary/50 bg-primary/10 text-sm font-medium text-primary hover:bg-primary/20"
+                className="group flex h-14 w-24 flex-col items-center justify-center rounded-lg border border-primary/50 bg-primary/10 text-sm font-medium text-primary hover:bg-primary/20 relative"
               >
-                <Check className="h-4 w-4" />
+                <Check className="h-4 w-4 mb-1" />
                 Good
+                <span className="absolute bottom-1 right-2 text-[10px] opacity-50 font-mono">
+                  3
+                </span>
               </button>
               <button
                 type="button"
                 onClick={() => handleGrade(5)}
-                className="flex h-12 w-24 flex-col items-center justify-center rounded-lg border border-emerald-500/50 bg-emerald-500/10 text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20"
+                className="group flex h-14 w-24 flex-col items-center justify-center rounded-lg border border-emerald-500/50 bg-emerald-500/10 text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 relative"
               >
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className="h-4 w-4 mb-1" />
                 Easy
+                <span className="absolute bottom-1 right-2 text-[10px] opacity-50 font-mono">
+                  4
+                </span>
               </button>
             </div>
           )}

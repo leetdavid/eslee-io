@@ -18,11 +18,13 @@
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.46",
+    "@ai-sdk/google": "^3.0.42",
     "@ai-sdk/openai": "^3.0.30",
     "@ai-sdk/react": "^3.0.96",
     "@base-ui/react": "^1.2.0",
     "@eslee/auth": "workspace:*",
     "@eslee/db": "workspace:*",
+    "@openrouter/ai-sdk-provider": "^2.2.3",
     "@t3-oss/env-nextjs": "^0.11.1",
     "@tanstack/react-query": "catalog:",
     "@tiptap/core": "^2.27.2",

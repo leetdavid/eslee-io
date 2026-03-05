@@ -1,8 +1,8 @@
-import { and, eq, lte, sql } from "drizzle-orm";
+import { and, eq, inArray, lte, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
-import { studyProgress } from "@/server/db/schema";
+import { clipVocabulary, studyProgress } from "@/server/db/schema";
 
 export const studyRouter = createTRPCRouter({
   getDueCards: protectedProcedure
@@ -21,6 +21,69 @@ export const studyRouter = createTRPCRouter({
         where: and(
           eq(studyProgress.userId, ctx.session.user.id),
           lte(studyProgress.nextReview, now),
+        ),
+        with: {
+          vocabulary: true,
+        },
+        orderBy: [studyProgress.nextReview],
+        limit,
+      });
+
+      return items;
+    }),
+
+  getDueCardsForClip: protectedProcedure
+    .input(
+      z.object({
+        clipId: z.string().uuid(),
+        limit: z.number().min(1).max(50).default(20),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const now = new Date();
+      const limit = input.limit ?? 20;
+
+      // 1. Get vocab IDs linked to this clip
+      const cvLinks = await ctx.db.query.clipVocabulary.findMany({
+        where: eq(clipVocabulary.clipId, input.clipId),
+        columns: { vocabularyId: true },
+      });
+
+      const vocabIds = cvLinks.map((l) => l.vocabularyId);
+
+      if (vocabIds.length === 0) {
+        return [];
+      }
+
+      // 2. Ensure all those vocab IDs exist in study progress
+      // Initialize them if they don't
+      const existingProgress = await ctx.db.query.studyProgress.findMany({
+        where: and(
+          eq(studyProgress.userId, ctx.session.user.id),
+          inArray(studyProgress.vocabularyId, vocabIds),
+        ),
+        columns: { vocabularyId: true },
+      });
+
+      const existingIds = new Set(existingProgress.map((e) => e.vocabularyId));
+      const newIds = vocabIds.filter((id) => !existingIds.has(id));
+
+      if (newIds.length > 0) {
+        await ctx.db.insert(studyProgress).values(
+          newIds.map((vocabId) => ({
+            userId: ctx.session.user.id,
+            vocabularyId: vocabId,
+            nextReview: now,
+          })),
+        );
+      }
+
+      // 3. Find due cards
+      const items = await ctx.db.query.studyProgress.findMany({
+        where: and(
+          eq(studyProgress.userId, ctx.session.user.id),
+          lte(studyProgress.nextReview, now),
+          inArray(studyProgress.vocabularyId, vocabIds),
         ),
         with: {
           vocabulary: true,

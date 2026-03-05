@@ -1,15 +1,33 @@
 import { anthropic } from "@ai-sdk/anthropic";
+import { google } from "@ai-sdk/google";
 import { openai } from "@ai-sdk/openai";
 
 export const models = {
-  "gpt-4o": openai("gpt-5"),
-  "gpt-4o-mini": openai("gpt-4o-mini"),
-  "claude-sonnet-4-5": anthropic("claude-sonnet-4-5"),
+  "gemini-3.1-pro-preview": {
+    name: "Gemini 3.1 Pro Preview",
+    model: google("gemini-3.1-pro-preview"),
+  },
+  "gemini-3-flash-preview": {
+    name: "Gemini 3 Flash Preview",
+    model: google("gemini-3-flash-preview"),
+  },
+  "gpt-5.2": {
+    name: "GPT 5.2",
+    model: openai("gpt-5.2"),
+  },
+  "claude-sonnet-4.5": {
+    name: "Claude Sonnet 4.5",
+    model: anthropic("claude-4-5-sonnet-latest"),
+  },
+  "claude-haiku-4.5": {
+    name: "Claude Haiku 4.5",
+    model: anthropic("claude-4-5-haiku-latest"),
+  },
 } as const;
 
 export type ModelId = keyof typeof models;
 
-export const defaultModel: ModelId = "gpt-4o-mini";
+export const defaultModel: ModelId = "gemini-3-flash-preview";
 
 export function getSystemPrompt(userLanguage: "en" | "ko" = "en") {
   const langName = userLanguage === "ko" ? "Korean" : "English";

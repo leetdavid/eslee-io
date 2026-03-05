@@ -1,9 +1,19 @@
 "use client";
 
+import { defaultModel, models } from "@/lib/ai";
+import { type JLPTLevel, JLPT_LEVELS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 import { useCompletion } from "@ai-sdk/react";
-import { BookOpen, ClipboardList, GraduationCap, MessageSquare, Sparkles } from "lucide-react";
+import {
+  BookOpen,
+  ClipboardList,
+  FilePlus,
+  GraduationCap,
+  MessageSquare,
+  Sparkles,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 const aiTools = [
@@ -29,17 +39,25 @@ const aiTools = [
 ] as const;
 
 export default function AIPage() {
+  const router = useRouter();
   const [selectedTool, setSelectedTool] = useState<string>("reading");
   const [topic, setTopic] = useState("");
   const [jlptLevel, setJlptLevel] = useState("");
   const [userLanguage, setUserLanguage] = useState<"en" | "ko">("en");
-  const [model, setModel] = useState("gpt-4o-mini");
+  const [model, setModel] = useState<string>(defaultModel);
 
   const { completion, isLoading, complete } = useCompletion({
     api: "/api/ai/generate",
   });
 
   const saveGeneration = api.ai.saveGeneration.useMutation();
+  const createClip = api.clip.create.useMutation({
+    onSuccess: (clip) => {
+      if (clip) {
+        router.push(`/clips/${clip.id}`);
+      }
+    },
+  });
 
   const handleGenerate = async () => {
     if (!topic) return;
@@ -62,7 +80,31 @@ export default function AIPage() {
       prompt: `${selectedTool}: ${topic}`,
       response: completion,
       model,
-      type: selectedTool as "explanation" | "document" | "grammar" | "quiz",
+      type: selectedTool as "reading" | "grammar" | "vocabulary" | "quiz",
+    });
+  };
+
+  const handleSaveAsClip = () => {
+    if (!completion) return;
+
+    const tiptapJson = {
+      type: "doc",
+      content: completion.split("\n").map((line) => {
+        if (!line.trim()) {
+          return { type: "paragraph" };
+        }
+        return {
+          type: "paragraph",
+          content: [{ type: "text", text: line }],
+        };
+      }),
+    };
+
+    createClip.mutate({
+      title: `AI Generated: ${topic}`,
+      content: tiptapJson,
+      sourceLanguage: "ja",
+      jlptLevel: jlptLevel ? (jlptLevel as JLPTLevel) : undefined,
     });
   };
 
@@ -124,11 +166,11 @@ export default function AIPage() {
             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
           >
             <option value="">Any</option>
-            <option value="N5">N5 (Beginner)</option>
-            <option value="N4">N4</option>
-            <option value="N3">N3 (Intermediate)</option>
-            <option value="N2">N2</option>
-            <option value="N1">N1 (Advanced)</option>
+            {JLPT_LEVELS.map((level) => (
+              <option key={level} value={level}>
+                {level}
+              </option>
+            ))}
           </select>
         </div>
         <div className="space-y-2">
@@ -153,9 +195,11 @@ export default function AIPage() {
           onChange={(e) => setModel(e.target.value)}
           className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
         >
-          <option value="gpt-4o-mini">GPT-4o Mini</option>
-          <option value="gpt-5.2">GPT-5.2</option>
-          <option value="claude-sonnet-4-6">Claude Sonnet 4.6</option>
+          {Object.entries(models).map(([key, modelObj]) => (
+            <option key={key} value={key}>
+              {modelObj.name}
+            </option>
+          ))}
         </select>
         <button
           type="button"
@@ -178,14 +222,25 @@ export default function AIPage() {
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-medium">Generated Content</h2>
-            <button
-              type="button"
-              onClick={handleSave}
-              disabled={saveGeneration.isPending}
-              className="inline-flex h-9 items-center rounded-md border border-input bg-background px-3 text-sm hover:bg-accent"
-            >
-              {saveGeneration.isPending ? "Saving..." : "Save to History"}
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleSave}
+                disabled={saveGeneration.isPending}
+                className="inline-flex h-9 items-center rounded-md border border-input bg-background px-3 text-sm hover:bg-accent disabled:opacity-50"
+              >
+                {saveGeneration.isPending ? "Saving..." : "Save to History"}
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveAsClip}
+                disabled={createClip.isPending}
+                className="inline-flex h-9 items-center gap-1.5 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+              >
+                <FilePlus className="h-4 w-4" />
+                {createClip.isPending ? "Creating..." : "Save as Clip"}
+              </button>
+            </div>
           </div>
           <div className="rounded-lg border bg-card p-6 prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap">
             {completion}
