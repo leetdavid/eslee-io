@@ -2,7 +2,7 @@
 
 import { useSession } from "@/lib/auth-client";
 import { JLPT_LEVELS, JLPT_SOLID_COLORS } from "@/lib/constants";
-import { cn } from "@/lib/utils";
+import { cn, getClipPreview } from "@/lib/utils";
 import { api } from "@/trpc/react";
 import {
   ArrowRight,
@@ -204,20 +204,31 @@ export default function DashboardPage() {
               <Link
                 key={clip.id}
                 href={`/clips/${clip.id}`}
-                className="rounded-lg border bg-card p-4 transition-colors hover:border-primary/50"
+                className="flex flex-col justify-between rounded-lg border bg-card p-4 transition-colors hover:border-primary/50"
               >
-                <h3 className="font-medium">{clip.title ?? "Untitled"}</h3>
-                <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-                  <span className="uppercase">{clip.sourceLanguage}</span>
-                  {clip.jlptLevel && (
-                    <span className="rounded-full bg-secondary px-2 py-0.5 font-medium">
-                      {clip.jlptLevel}
-                    </span>
-                  )}
+                <div>
+                  <h3 className="font-medium">{clip.title ?? "Untitled"}</h3>
+
+                  <p className="mt-2 text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+                    {getClipPreview(clip.content) || (
+                      <span className="italic opacity-50">No content</span>
+                    )}
+                  </p>
                 </div>
-                <p className="mt-2 text-xs text-muted-foreground">
-                  {new Date(clip.createdAt).toLocaleDateString()}
-                </p>
+
+                <div className="mt-4 flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <span className="uppercase">{clip.sourceLanguage}</span>
+                    {clip.jlptLevel && (
+                      <span className="rounded-full bg-secondary px-2 py-0.5 font-medium text-secondary-foreground">
+                        {clip.jlptLevel}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {new Date(clip.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
               </Link>
             ))}
           </div>

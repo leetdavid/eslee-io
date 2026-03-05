@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { cn, getClipPreview } from "@/lib/utils";
 import { api } from "@/trpc/react";
 import { FileText, Loader2, Plus, Search, Trash2 } from "lucide-react";
 import Link from "next/link";
@@ -118,12 +118,12 @@ export default function ClipsPage() {
             <Link
               key={clip.id}
               href={`/clips/${clip.id}`}
-              className="group relative rounded-lg border border-border bg-card p-4 transition-colors hover:border-primary/50 hover:bg-accent/50"
+              className="group flex flex-col justify-between relative rounded-lg border border-border bg-card p-4 transition-colors hover:border-primary/50 hover:bg-accent/50"
             >
-              <div className="flex items-start justify-between">
+              <div className="flex items-start justify-between mb-2">
                 <div className="space-y-1">
                   <h3 className="font-medium leading-none">{clip.title ?? "Untitled"}</h3>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground pt-1">
                     <span className="uppercase">{clip.sourceLanguage}</span>
                     {clip.targetLanguage && (
                       <>
@@ -142,28 +142,39 @@ export default function ClipsPage() {
                       deleteClip.mutate({ id: clip.id });
                     }
                   }}
-                  className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-destructive/10 hover:text-destructive"
+                  className="opacity-0 group-hover:opacity-100 transition-opacity p-1 -mt-1 -mr-1 rounded hover:bg-destructive/10 hover:text-destructive text-muted-foreground"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
               </div>
-              {clip.jlptLevel && (
-                <span className="mt-2 inline-block rounded-full bg-secondary px-2 py-0.5 text-xs font-medium">
-                  {clip.jlptLevel}
-                </span>
-              )}
-              {clip.tags && clip.tags.length > 0 && (
-                <div className="mt-2 flex flex-wrap gap-1">
-                  {clip.tags.slice(0, 3).map((tag) => (
-                    <span key={tag} className="rounded-full bg-muted px-2 py-0.5 text-xs">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
-              <p className="mt-3 text-xs text-muted-foreground">
-                {new Date(clip.createdAt).toLocaleDateString()}
+
+              <p className="mb-4 text-sm text-muted-foreground line-clamp-3 leading-relaxed flex-1">
+                {getClipPreview(clip.content, 150) || (
+                  <span className="italic opacity-50">No content</span>
+                )}
               </p>
+
+              <div className="flex items-end justify-between mt-auto">
+                <div className="flex flex-col gap-2 items-start">
+                  {clip.jlptLevel && (
+                    <span className="inline-block rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-secondary-foreground">
+                      {clip.jlptLevel}
+                    </span>
+                  )}
+                  {clip.tags && clip.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1">
+                      {clip.tags.slice(0, 3).map((tag) => (
+                        <span key={tag} className="rounded-full bg-muted px-2 py-0.5 text-[10px]">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground shrink-0 ml-4">
+                  {new Date(clip.createdAt).toLocaleDateString()}
+                </p>
+              </div>
             </Link>
           ))}
         </div>
