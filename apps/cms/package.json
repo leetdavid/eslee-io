@@ -16,7 +16,6 @@
   "dependencies": {
     "@eslee/db": "workspace:*",
     "@eslee/payload": "workspace:*",
-    "@eslee/ui": "workspace:*",
     "@payloadcms/db-postgres": "catalog:payload",
     "@payloadcms/next": "catalog:payload",
     "@payloadcms/richtext-lexical": "catalog:payload",

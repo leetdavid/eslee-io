@@ -135,9 +135,6 @@ importers:
       '@eslee/payload':
         specifier: workspace:*
         version: link:../../packages/payload
-      '@eslee/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
       '@payloadcms/db-postgres':
         specifier: catalog:payload
         version: 3.72.0(@neondatabase/serverless@0.10.0)(@opentelemetry/api@1.9.0)(@planetscale/database@1.19.0)(@prisma/client@5.22.0)(@vercel/postgres@0.10.0(utf-8-validate@6.0.4))(better-sqlite3@12.6.2)(kysely@0.28.11)(mysql2@3.11.3)(payload@3.72.0(bufferutil@4.1.0)(graphql@16.12.0)(typescript@5.6.3)(utf-8-validate@6.0.4))(postgres@3.4.5)

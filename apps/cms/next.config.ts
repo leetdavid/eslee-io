@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  transpilePackages: ["@eslee/ui", "@eslee/db"],
+  transpilePackages: ["@eslee/db"],
 };
 
 export default withPayload(nextConfig);
