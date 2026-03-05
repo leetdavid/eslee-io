@@ -4,19 +4,21 @@ import { z } from "zod";
 
 import type { JLPTLevel } from "@/lib/constants";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import type { db } from "@/server/db";
 import { clipVocabulary, clips, vocabulary } from "@/server/db/schema";
 
 /** Minimal validation for Tiptap JSON — must be an object with a content array. */
 const tiptapContentSchema = z.record(z.string(), z.unknown());
 
 /** Safely extracts raw text from a Tiptap JSON node recursively */
-// biome-ignore lint/suspicious/noExplicitAny: recursive unconstrained node
-function extractTextFromContent(node: any): string {
+function extractTextFromContent(node: unknown): string {
   if (!node) return "";
   if (typeof node === "string") return node;
-  if (node.text) return node.text as string;
   if (Array.isArray(node)) return node.map(extractTextFromContent).join(" ");
-  if (node.content) return extractTextFromContent(node.content);
+  if (typeof node === "object") {
+    if ("text" in node) return node.text as string;
+    if ("content" in node) return extractTextFromContent(node.content);
+  }
   return "";
 }
 
@@ -70,9 +72,8 @@ function extractVocabularyFromContent(content: any): ExtractedVocab[] {
 }
 
 /** Synchronizes extracted vocabulary into the DB and creates junction records */
-// biome-ignore lint/suspicious/noExplicitAny: generic DB client wrapper
 async function syncClipVocabulary(
-  db: any,
+  ctxDb: typeof db,
   userId: string,
   clipId: string,
   content: unknown,
@@ -81,7 +82,7 @@ async function syncClipVocabulary(
   const extracted = extractVocabularyFromContent(content);
 
   // Always clear existing junction entries for this clip
-  await db.delete(clipVocabulary).where(eq(clipVocabulary.clipId, clipId));
+  await ctxDb.delete(clipVocabulary).where(eq(clipVocabulary.clipId, clipId));
 
   if (extracted.length === 0) return;
 
@@ -90,7 +91,7 @@ async function syncClipVocabulary(
   const words = uniqueExtracted.map((v) => v.word);
 
   // Find existing vocabulary for this user
-  const existingVocab = await db.query.vocabulary.findMany({
+  const existingVocab = await ctxDb.query.vocabulary.findMany({
     where: and(eq(vocabulary.userId, userId), inArray(vocabulary.word, words)),
   });
 
@@ -101,7 +102,7 @@ async function syncClipVocabulary(
   let newVocabRecords: { id: string; word: string }[] = [];
 
   if (missingVocab.length > 0) {
-    newVocabRecords = await db
+    newVocabRecords = await ctxDb
       .insert(vocabulary)
       .values(
         missingVocab.map((v) => ({
@@ -135,7 +136,7 @@ async function syncClipVocabulary(
     .filter((e) => e !== null);
 
   if (junctionEntries.length > 0) {
-    await db.insert(clipVocabulary).values(junctionEntries);
+    await ctxDb.insert(clipVocabulary).values(junctionEntries);
   }
 }
 

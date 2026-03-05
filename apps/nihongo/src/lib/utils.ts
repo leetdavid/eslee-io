@@ -5,12 +5,14 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function extractTextFromContent(node: any): string {
+export function extractTextFromContent(node: unknown): string {
   if (!node) return "";
   if (typeof node === "string") return node;
-  if (node.text) return node.text as string;
   if (Array.isArray(node)) return node.map(extractTextFromContent).join(" ");
-  if (node.content) return extractTextFromContent(node.content);
+  if (typeof node === "object") {
+    if ("text" in node) return node.text as string;
+    if ("content" in node) return extractTextFromContent(node.content);
+  }
   return "";
 }
 
