@@ -2,7 +2,7 @@
 
 import { cn, getClipPreview } from "@/lib/utils";
 import { api } from "@/trpc/react";
-import { FileText, Loader2, Plus, Search, Trash2 } from "lucide-react";
+import { BookOpen, FileText, Loader2, Plus, Search, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -45,23 +45,35 @@ export default function ClipsPage() {
           <h1 className="text-2xl font-bold tracking-tight">Clips</h1>
           <p className="text-sm text-muted-foreground">Your saved Japanese text clips</p>
         </div>
-        <button
-          type="button"
-          onClick={handleCreateClip}
-          disabled={createClip.isPending}
-          className={cn(
-            "inline-flex h-10 items-center gap-2 rounded-md bg-primary px-4 py-2",
-            "text-sm font-medium text-primary-foreground",
-            "hover:bg-primary/90 transition-colors disabled:opacity-50",
-          )}
-        >
-          {createClip.isPending ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Plus className="h-4 w-4" />
-          )}
-          New Clip
-        </button>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/clips/reader"
+            className={cn(
+              "inline-flex h-10 items-center gap-2 rounded-md border border-input bg-background px-4 py-2",
+              "text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
+            )}
+          >
+            <BookOpen className="h-4 w-4" />
+            Reader
+          </Link>
+          <button
+            type="button"
+            onClick={handleCreateClip}
+            disabled={createClip.isPending}
+            className={cn(
+              "inline-flex h-10 items-center gap-2 rounded-md bg-primary px-4 py-2",
+              "text-sm font-medium text-primary-foreground",
+              "hover:bg-primary/90 transition-colors disabled:opacity-50",
+            )}
+          >
+            {createClip.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Plus className="h-4 w-4" />
+            )}
+            New Clip
+          </button>
+        </div>
       </div>
 
       {/* Search */}
@@ -172,7 +184,7 @@ export default function ClipsPage() {
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground shrink-0 ml-4">
-                  {new Date(clip.createdAt).toLocaleDateString()}
+                  {new Date(clip.createdAt).toISOString().substring(0, 10)}
                 </p>
               </div>
             </Link>

@@ -1,7 +1,7 @@
 "use client";
 
 import { signOut, useSession } from "@/lib/auth-client";
-import { LogOut, Moon, Sun, User } from "lucide-react";
+import { LogOut, Moon, Search, Sun, User } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 
@@ -18,7 +18,19 @@ export function Header() {
 
   return (
     <header className="flex h-14 items-center justify-between border-b px-6">
-      <div />
+      <div>
+        <button
+          type="button"
+          onClick={() => document.dispatchEvent(new CustomEvent("open-command-menu"))}
+          className="inline-flex h-9 items-center gap-2 rounded-md border border-input bg-background px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+        >
+          <Search className="h-4 w-4" />
+          <span>Search...</span>
+          <kbd className="pointer-events-none ml-2 inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+            <span className="text-xs">⌘</span>K
+          </kbd>
+        </button>
+      </div>
 
       <div className="flex items-center gap-3">
         <button

@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@/lib/utils";
 import Image from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
 import Underline from "@tiptap/extension-underline";
@@ -19,6 +20,8 @@ interface EditorProps {
   onChange?: (content: JSONContent) => void;
   placeholder?: string;
   editable?: boolean;
+  editorClassName?: string;
+  className?: string;
 }
 
 export function Editor({
@@ -26,6 +29,8 @@ export function Editor({
   onChange,
   placeholder = "Start writing your Japanese text here...",
   editable = true,
+  editorClassName,
+  className,
 }: EditorProps) {
   const editor = useEditor({
     extensions: [
@@ -47,21 +52,23 @@ export function Editor({
     },
     editorProps: {
       attributes: {
-        class: "tiptap prose prose-sm dark:prose-invert max-w-none focus:outline-none",
+        class:
+          editorClassName ||
+          "tiptap prose prose-sm dark:prose-invert max-w-none focus:outline-none",
       },
     },
   });
 
   if (!editor) {
     return (
-      <div className="rounded-md border border-input bg-background p-4">
+      <div className={cn("rounded-md border border-input bg-background p-4", className)}>
         <div className="h-[300px] animate-pulse rounded bg-muted" />
       </div>
     );
   }
 
   return (
-    <div className="rounded-md border border-input bg-background relative">
+    <div className={cn("rounded-md border border-input bg-background relative", className)}>
       {editable && <EditorToolbar editor={editor} />}
       <TranslationBubble editor={editor} />
       <EditorContent editor={editor} />

@@ -161,4 +161,35 @@ Provide ONLY the translation. Do not include any explanations, romanization, or 
         });
       }
     }),
+
+  ocrImage: protectedProcedure
+    .input(z.object({ imageBase64: z.string() }))
+    .mutation(async ({ input }) => {
+      try {
+        const { text } = await generateText({
+          model: models[defaultModel].model,
+          system:
+            "You are an expert OCR tool. Extract all Japanese text from the image. Maintain the original formatting, paragraph breaks, and layout as much as possible. Do NOT output any conversational text, markdown formatting, or explanations. ONLY output the Japanese text.",
+          messages: [
+            {
+              role: "user",
+              content: [
+                {
+                  type: "image",
+                  image: input.imageBase64,
+                },
+              ],
+            },
+          ],
+        });
+
+        return { text: text.trim() };
+      } catch (error) {
+        console.error("OCR generation error:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to extract text from image",
+        });
+      }
+    }),
 });

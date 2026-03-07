@@ -4,7 +4,7 @@ import { api } from "@/trpc/react";
 import { BubbleMenu } from "@tiptap/react";
 import type { Editor } from "@tiptap/react";
 import { Languages, Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface TranslationBubbleProps {
   editor: Editor;
@@ -12,9 +12,13 @@ interface TranslationBubbleProps {
 
 export function TranslationBubble({ editor }: TranslationBubbleProps) {
   const [selectedText, setSelectedText] = useState("");
+  const [debouncedText, setDebouncedText] = useState("");
   const [translation, setTranslation] = useState<string | null>(null);
 
-  const translateMutation = api.ai.translate.useMutation({
+  const selectedTextRef = useRef(selectedText);
+  selectedTextRef.current = selectedText;
+
+  const { mutate, reset, isPending, isError } = api.ai.translate.useMutation({
     onSuccess: (data) => {
       setTranslation(data.translation);
     },
@@ -25,17 +29,19 @@ export function TranslationBubble({ editor }: TranslationBubbleProps) {
     const handleSelectionUpdate = () => {
       const { from, to } = editor.state.selection;
       if (from === to) {
-        setSelectedText("");
-        setTranslation(null);
-        translateMutation.reset();
+        if (selectedTextRef.current !== "") {
+          setSelectedText("");
+          setTranslation(null);
+          reset();
+        }
         return;
       }
 
       const text = editor.state.doc.textBetween(from, to, " ");
-      if (text !== selectedText) {
+      if (text !== selectedTextRef.current) {
         setSelectedText(text);
         setTranslation(null);
-        translateMutation.reset();
+        reset();
       }
     };
 
@@ -43,20 +49,23 @@ export function TranslationBubble({ editor }: TranslationBubbleProps) {
     return () => {
       editor.off("selectionUpdate", handleSelectionUpdate);
     };
-  }, [editor, selectedText, translateMutation]);
+  }, [editor, reset]);
 
-  // Debounce the translation request
+  // Debounce the text selection
   useEffect(() => {
-    if (!selectedText.trim()) return;
-
     const timeout = setTimeout(() => {
-      if (!translation && !translateMutation.isPending) {
-        translateMutation.mutate({ text: selectedText, targetLanguage: "en" });
-      }
-    }, 500); // 500ms debounce
+      setDebouncedText(selectedText);
+    }, 750); // 750ms debounce
 
     return () => clearTimeout(timeout);
-  }, [selectedText, translation, translateMutation]);
+  }, [selectedText]);
+
+  // Trigger translation when debounced text changes
+  useEffect(() => {
+    if (debouncedText.trim() && !translation) {
+      mutate({ text: debouncedText, targetLanguage: "en" });
+    }
+  }, [debouncedText, mutate, translation]);
 
   return (
     <BubbleMenu
@@ -77,14 +86,14 @@ export function TranslationBubble({ editor }: TranslationBubbleProps) {
         Translation
       </div>
       <div className="text-sm">
-        {translateMutation.isPending && !translation ? (
+        {isPending && !translation ? (
           <div className="flex items-center gap-2 text-muted-foreground py-1">
             <Loader2 className="h-4 w-4 animate-spin" />
             <span>Translating...</span>
           </div>
         ) : translation ? (
           <p className="leading-relaxed">{translation}</p>
-        ) : translateMutation.isError ? (
+        ) : isError ? (
           <p className="text-destructive">Failed to translate.</p>
         ) : null}
       </div>

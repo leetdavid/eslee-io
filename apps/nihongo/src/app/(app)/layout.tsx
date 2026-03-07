@@ -1,3 +1,4 @@
+import { CommandMenu } from "@/components/command-menu";
 import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
 import { TRPCReactProvider } from "@/trpc/react";
@@ -16,6 +17,7 @@ export default function AppLayout({
           <main className="flex-1 overflow-y-auto p-6">{children}</main>
         </div>
       </div>
+      <CommandMenu />
     </TRPCReactProvider>
   );
 }
