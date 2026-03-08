@@ -36,7 +36,7 @@ export const auth = betterAuth({
       maxAge: 5 * 60, // 5 minutes
     },
   },
-  trustedOrigins: [env.BETTER_AUTH_URL],
+  trustedOrigins: [env.BETTER_AUTH_URL, "https://**.eslee.io", "https://eslee.io"],
 });
 
 export type Session = typeof auth.$Infer.Session;
