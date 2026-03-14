@@ -61,10 +61,10 @@ export function ClipsMobileView() {
         data?.items.map((clip) => (
           <div
             key={clip.id}
-            className="flex h-full w-full shrink-0 snap-center flex-col items-center justify-center p-4"
+            className="flex h-full w-full shrink-0 snap-center flex-col items-center justify-center p-2 sm:p-4"
           >
-            <div className="relative flex h-full w-full flex-col overflow-hidden rounded-3xl border bg-card p-6 shadow-xl">
-              <div className="mb-4 flex shrink-0 items-center justify-between">
+            <div className="relative flex h-full w-full flex-col overflow-hidden rounded-3xl border bg-card py-6 shadow-xl">
+              <div className="mb-4 flex shrink-0 items-center justify-between px-6">
                 <h2 className="font-bold text-xl">{clip.title || "Untitled"}</h2>
                 <div className="flex items-center gap-2">
                   <button
@@ -81,25 +81,23 @@ export function ClipsMobileView() {
                 <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-8 bg-gradient-to-b from-card to-transparent" />
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-8 bg-gradient-to-t from-card to-transparent" />
 
-                <div className="scrollbar-hide h-full overflow-y-auto py-6 pr-2">
-                  <div className="flex min-h-full flex-col">
-                    <div
-                      className="my-auto transition-all duration-200"
-                      style={
-                        {
-                          "--editor-font-size": `${1.5 * textScale}rem`,
-                          fontSize: "var(--editor-font-size)",
-                        } as React.CSSProperties
-                      }
-                    >
-                      <Editor
-                        content={clip.content as JSONContent}
-                        onChange={() => {}}
-                        editable={false}
-                        className="!p-0 border-none bg-transparent"
-                        editorClassName="tiptap prose dark:prose-invert max-w-none focus:outline-none text-[length:var(--editor-font-size)] leading-relaxed"
-                      />
-                    </div>
+                <div className="scrollbar-hide h-full overflow-y-auto py-6">
+                  <div
+                    className="my-auto transition-all duration-200"
+                    style={
+                      {
+                        "--editor-font-size": `${1.5 * textScale}rem`,
+                        fontSize: "var(--editor-font-size)",
+                      } as React.CSSProperties
+                    }
+                  >
+                    <Editor
+                      content={clip.content as JSONContent}
+                      onChange={() => {}}
+                      editable={false}
+                      className="border-none bg-transparent p-0!"
+                      editorClassName="tiptap prose dark:prose-invert max-w-none focus:outline-none text-[length:var(--editor-font-size)] leading-relaxed"
+                    />
                   </div>
                 </div>
               </div>
