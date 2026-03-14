@@ -24,10 +24,10 @@
   "devDependencies": {
     "@eslee/tailwind-config": "workspace:*",
     "@eslee/tsconfig": "workspace:*",
+    "@tailwindcss/postcss": "catalog:",
     "@types/node": "catalog:node",
     "@types/react": "catalog:react19",
     "@types/react-dom": "catalog:react19",
-    "autoprefixer": "^10.4.19",
     "postcss": "^8.4.39",
     "tailwindcss": "catalog:",
     "typescript": "catalog:"
