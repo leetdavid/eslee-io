@@ -17,28 +17,28 @@ const backgroundColors = [
     value: "bg-black",
     text: "text-white",
     border: "border-white/20",
-    gradient: "bg-gradient-to-t from-black/80 via-black/40 to-transparent",
+    gradient: "bg-linear-to-t from-black/80 via-black/40 to-transparent",
   },
   {
     name: "White",
     value: "bg-white",
     text: "text-black",
     border: "border-black/20",
-    gradient: "bg-gradient-to-t from-white/80 via-white/40 to-transparent",
+    gradient: "bg-linear-to-t from-white/80 via-white/40 to-transparent",
   },
   {
     name: "Grey",
     value: "bg-neutral-800",
     text: "text-white",
     border: "border-white/20",
-    gradient: "bg-gradient-to-t from-neutral-800/80 via-neutral-800/40 to-transparent",
+    gradient: "bg-linear-to-t from-neutral-800/80 via-neutral-800/40 to-transparent",
   },
   {
     name: "Beige",
     value: "bg-[#e5e5e0]",
     text: "text-black",
     border: "border-black/20",
-    gradient: "bg-gradient-to-t from-[#e5e5e0]/80 via-[#e5e5e0]/40 to-transparent",
+    gradient: "bg-linear-to-t from-[#e5e5e0]/80 via-[#e5e5e0]/40 to-transparent",
   },
 ];
 
