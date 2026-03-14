@@ -53,7 +53,7 @@
   },
   "devDependencies": {
     "@eslee/tsconfig": "workspace:*",
-    "@tailwindcss/postcss": "^4.2.1",
+    "@tailwindcss/postcss": "catalog:",
     "@types/node": "catalog:node",
     "@types/pg": "^8.11.0",
     "@types/react": "catalog:react19",
@@ -61,7 +61,7 @@
     "dotenv-cli": "catalog:",
     "drizzle-kit": "catalog:",
     "postcss": "^8.4.39",
-    "tailwindcss": "^4.2.1",
+    "tailwindcss": "catalog:",
     "typescript": "catalog:"
   }
 }
