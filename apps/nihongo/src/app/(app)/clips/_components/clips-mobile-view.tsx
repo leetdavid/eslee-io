@@ -1,14 +1,19 @@
 "use client";
 
 import type { JSONContent } from "@tiptap/react";
-import { Edit3, Loader2, Plus } from "lucide-react";
+import { Edit3, Loader2, Minus, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { Editor } from "@/components/editor/editor";
 import { api } from "@/trpc/react";
 
 export function ClipsMobileView() {
   const router = useRouter();
   const { data, isLoading } = api.clip.getAll.useQuery();
+  const [textScale, setTextScale] = useState(1);
+
+  const handleZoomIn = () => setTextScale((s) => Math.min(Number((s * 1.2).toFixed(2)), 3));
+  const handleZoomOut = () => setTextScale((s) => Math.max(Number((s * 0.8).toFixed(2)), 0.5));
 
   const createClip = api.clip.create.useMutation({
     onSuccess: (clip) => {
@@ -72,14 +77,55 @@ export function ClipsMobileView() {
                 </div>
               </div>
 
-              <div className="scrollbar-hide min-h-0 flex-1 overflow-y-auto pr-2 text-2xl leading-relaxed">
-                <Editor
-                  content={clip.content as JSONContent}
-                  onChange={() => {}}
-                  editable={false}
-                  className="!p-0 border-none bg-transparent"
-                  editorClassName="tiptap prose prose-sm dark:prose-invert lg:prose-xl max-w-none focus:outline-none"
-                />
+              <div className="relative min-h-0 flex-1">
+                <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-8 bg-gradient-to-b from-card to-transparent" />
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-8 bg-gradient-to-t from-card to-transparent" />
+
+                <div className="scrollbar-hide h-full overflow-y-auto py-6 pr-2">
+                  <div className="flex min-h-full flex-col">
+                    <div
+                      className="my-auto transition-all duration-200"
+                      style={
+                        {
+                          "--editor-font-size": `${1.5 * textScale}rem`,
+                          fontSize: "var(--editor-font-size)",
+                        } as React.CSSProperties
+                      }
+                    >
+                      <Editor
+                        content={clip.content as JSONContent}
+                        onChange={() => {}}
+                        editable={false}
+                        className="!p-0 border-none bg-transparent"
+                        editorClassName="tiptap prose dark:prose-invert max-w-none focus:outline-none text-[length:var(--editor-font-size)] leading-relaxed"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 flex shrink-0 items-center justify-center gap-6 border-t pt-4">
+                <button
+                  type="button"
+                  onClick={handleZoomOut}
+                  disabled={textScale <= 0.5}
+                  className="rounded-full bg-accent p-3 transition-colors hover:bg-accent/80 disabled:opacity-50"
+                  aria-label="Decrease text size"
+                >
+                  <Minus className="h-5 w-5 text-accent-foreground" />
+                </button>
+                <span className="w-16 text-center font-medium text-muted-foreground">
+                  {Math.round(textScale * 100)}%
+                </span>
+                <button
+                  type="button"
+                  onClick={handleZoomIn}
+                  disabled={textScale >= 3}
+                  className="rounded-full bg-accent p-3 transition-colors hover:bg-accent/80 disabled:opacity-50"
+                  aria-label="Increase text size"
+                >
+                  <Plus className="h-5 w-5 text-accent-foreground" />
+                </button>
               </div>
             </div>
           </div>
