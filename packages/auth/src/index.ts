@@ -1,7 +1,6 @@
+import { db } from "@eslee/db/client";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-
-import { db } from "@eslee/db/client";
 
 import { env } from "./env";
 
