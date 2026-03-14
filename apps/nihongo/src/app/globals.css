@@ -154,6 +154,8 @@
     font-size: 0.5em;
     color: hsl(var(--muted-foreground));
     font-weight: 400;
+    user-select: none;
+    -webkit-user-select: none;
   }
 
   /* JLPT level vocabulary highlight colors */

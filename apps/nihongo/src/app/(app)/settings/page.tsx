@@ -1,14 +1,24 @@
 "use client";
 
+import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { signOut, useSession } from "@/lib/auth-client";
+import { LANGUAGES } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { api } from "@/trpc/react";
 
 export default function SettingsPage() {
   const router = useRouter();
   const { data: session } = useSession();
-  const [nativeLanguage, setNativeLanguage] = useState<"en" | "ko">("en");
+  const utils = api.useUtils();
+
+  const { data: settings, isLoading } = api.user.getSettings.useQuery();
+
+  const updateSettings = api.user.updateSettings.useMutation({
+    onSuccess: () => {
+      void utils.user.getSettings.invalidate();
+    },
+  });
 
   const handleSignOut = async () => {
     await signOut();
@@ -23,7 +33,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8">
+    <div className="mx-auto max-w-2xl space-y-8 p-4 md:p-6 lg:p-8">
       <div>
         <h1 className="font-bold text-2xl tracking-tight">Settings</h1>
         <p className="text-muted-foreground text-sm">Manage your account and preferences</p>
@@ -69,21 +79,31 @@ export default function SettingsPage() {
         </div>
         <div className="space-y-4 p-6">
           <div className="space-y-2">
-            <label htmlFor="native-lang" className="font-medium text-sm">
-              Native Language
+            <label htmlFor="target-lang" className="font-medium text-sm">
+              Target Language
             </label>
             <p className="text-muted-foreground text-xs">
-              Used for AI explanations and translations
+              Default language used for translations and AI explanations
             </p>
-            <select
-              id="native-lang"
-              value={nativeLanguage}
-              onChange={(e) => setNativeLanguage(e.target.value as "en" | "ko")}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-            >
-              <option value="en">English</option>
-              <option value="ko">Korean (한국어)</option>
-            </select>
+            {isLoading ? (
+              <div className="flex h-10 items-center justify-center rounded-md border border-input bg-muted px-3 py-2">
+                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+              </div>
+            ) : (
+              <select
+                id="target-lang"
+                value={settings?.targetLanguage ?? "en"}
+                onChange={(e) => updateSettings.mutate({ targetLanguage: e.target.value })}
+                disabled={updateSettings.isPending}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm disabled:opacity-50"
+              >
+                {LANGUAGES.map((lang) => (
+                  <option key={lang.value} value={lang.value}>
+                    {lang.label}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
           <div className="space-y-2">
             <label htmlFor="study-lang" className="font-medium text-sm">

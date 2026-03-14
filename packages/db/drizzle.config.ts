@@ -11,4 +11,5 @@ export default {
   dialect: "postgresql",
   dbCredentials: { url: databaseUrl },
   casing: "snake_case",
+  tablesFilter: ["user", "session", "account", "verification"],
 } satisfies Config;

@@ -3,6 +3,7 @@
 import type { Editor } from "@tiptap/react";
 import {
   Bold,
+  ChevronDown,
   Heading1,
   Heading2,
   Heading3,
@@ -12,13 +13,16 @@ import {
   Languages,
   List,
   ListOrdered,
+  Loader2,
   Quote,
   Type,
   Underline,
   Volume2,
+  WandSparkles,
 } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { ButtonGroup } from "@/components/ui/button-group";
 import {
   Dialog,
   DialogClose,
@@ -27,9 +31,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { JLPT_LEVELS } from "@/lib/constants";
+import { JLPT_LEVELS, LANGUAGES } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { api } from "@/trpc/react";
 
 interface ToolbarProps {
   editor: Editor;
@@ -82,6 +93,101 @@ export function EditorToolbar({ editor }: ToolbarProps) {
   const [vocabData, setVocabData] = useState({ word: "", reading: "", meaning: "", jlptLevel: "" });
   const [imageUrl, setImageUrl] = useState("");
   const [audioData, setAudioData] = useState({ label: "", src: "" });
+
+  const utils = api.useUtils();
+  const { data: userSettings } = api.user.getSettings.useQuery();
+  const updateSettings = api.user.updateSettings.useMutation({
+    onSuccess: () => {
+      void utils.user.getSettings.invalidate();
+    },
+  });
+
+  const isFullDocRef = useRef(false);
+  const translateSelectionRef = useRef<{ from: number; to: number } | null>(null);
+
+  const translateText = api.ai.translate.useMutation({
+    onSuccess: (data) => {
+      const selection = translateSelectionRef.current;
+      const insertPos = selection ? selection.to : editor.state.doc.content.size;
+
+      editor
+        .chain()
+        .focus()
+        .insertContentAt(insertPos, [
+          { type: "paragraph", content: [{ type: "text", text: data.translation }] },
+        ])
+        .run();
+
+      translateSelectionRef.current = null;
+    },
+    onError: (error) => {
+      alert(`Failed to translate text: ${error.message}`);
+      translateSelectionRef.current = null;
+    },
+  });
+
+  const handleTranslate = (languageCode?: string) => {
+    const { from, to } = editor.state.selection;
+    const isFullDoc = from === to;
+
+    let contentToProcess = "";
+
+    if (isFullDoc) {
+      contentToProcess = editor.state.doc.textContent;
+      if (!contentToProcess.trim()) {
+        alert("The document is empty.");
+        return;
+      }
+      translateSelectionRef.current = null;
+    } else {
+      contentToProcess = editor.state.doc.textBetween(from, to, "\n");
+      if (!contentToProcess.trim()) {
+        alert("The selected text is empty.");
+        return;
+      }
+      translateSelectionRef.current = { from, to };
+    }
+
+    const targetLang = languageCode ?? userSettings?.targetLanguage ?? "en";
+    translateText.mutate({ text: contentToProcess, targetLanguage: targetLang });
+  };
+
+  const addAutoFurigana = api.ai.addFurigana.useMutation({
+    onSuccess: (data) => {
+      if (isFullDocRef.current) {
+        editor.chain().focus().setContent(data.html).run();
+      } else {
+        editor.chain().focus().insertContent(data.html).run();
+      }
+    },
+    onError: (error) => {
+      alert(`Failed to generate furigana: ${error.message}`);
+    },
+  });
+
+  const handleAutoFurigana = () => {
+    const { from, to } = editor.state.selection;
+    const isFullDoc = from === to;
+    isFullDocRef.current = isFullDoc;
+
+    let contentToProcess = "";
+
+    if (isFullDoc) {
+      contentToProcess = editor.getHTML();
+      if (!editor.state.doc.textContent.trim()) {
+        alert("The document is empty. Please add some Japanese text first.");
+        return;
+      }
+    } else {
+      contentToProcess = editor.state.doc.textBetween(from, to, "\n");
+      if (!contentToProcess.trim()) {
+        alert("The selected text is empty.");
+        return;
+      }
+    }
+
+    addAutoFurigana.mutate({ text: contentToProcess });
+  };
 
   const handleAddFurigana = (e: React.FormEvent) => {
     e.preventDefault();
@@ -221,6 +327,17 @@ export function EditorToolbar({ editor }: ToolbarProps) {
         <ToolbarButton onClick={() => setIsFuriganaOpen(true)} title="Add Furigana (Ctrl+R)">
           <Type className="h-4 w-4" />
         </ToolbarButton>
+        <ToolbarButton
+          onClick={handleAutoFurigana}
+          disabled={addAutoFurigana.isPending}
+          title="Auto Furigana (AI)"
+        >
+          {addAutoFurigana.isPending ? (
+            <Loader2 className="h-4 w-4 animate-spin text-primary" />
+          ) : (
+            <WandSparkles className="h-4 w-4 text-primary" />
+          )}
+        </ToolbarButton>
         <ToolbarButton onClick={openVocabDialog} title="Highlight Vocabulary">
           <Highlighter className="h-4 w-4" />
         </ToolbarButton>
@@ -228,12 +345,50 @@ export function EditorToolbar({ editor }: ToolbarProps) {
         <ToolbarSeparator />
 
         {/* Media & Blocks */}
-        <ToolbarButton
-          onClick={() => editor.chain().focus().insertTranslationBlock().run()}
-          title="Insert Translation Block"
-        >
-          <Languages className="h-4 w-4" />
-        </ToolbarButton>
+        <ButtonGroup>
+          <ToolbarButton
+            onClick={() => handleTranslate()}
+            disabled={translateText.isPending}
+            title="Translate Text (Appends to bottom)"
+          >
+            {translateText.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Languages className="h-4 w-4" />
+            )}
+          </ToolbarButton>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-6 rounded-l-none border-l bg-background px-0 hover:bg-accent focus-visible:ring-1 focus-visible:ring-ring"
+                disabled={translateText.isPending}
+              >
+                <ChevronDown className="h-3 w-3 text-muted-foreground" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {LANGUAGES.map((lang) => (
+                <DropdownMenuItem
+                  key={lang.value}
+                  onClick={() => {
+                    if (userSettings?.targetLanguage !== lang.value) {
+                      updateSettings.mutate({ targetLanguage: lang.value });
+                    }
+                    handleTranslate(lang.value);
+                  }}
+                  className="flex items-center justify-between"
+                >
+                  {lang.label}
+                  {userSettings?.targetLanguage === lang.value && (
+                    <span className="h-2 w-2 rounded-full bg-primary" />
+                  )}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </ButtonGroup>
         <ToolbarButton onClick={() => setIsImageOpen(true)} title="Insert Image">
           <ImageIcon className="h-4 w-4" />
         </ToolbarButton>
