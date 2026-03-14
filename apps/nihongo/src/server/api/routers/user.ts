@@ -1,8 +1,8 @@
+import { user } from "@eslee/db/schema";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
-import { user } from "@eslee/db/schema";
 
 export const userRouter = createTRPCRouter({
   getSettings: protectedProcedure.query(async ({ ctx }) => {

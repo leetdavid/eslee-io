@@ -18,7 +18,8 @@
       "!**/build",
       "!**/public",
       "!**/*-types.ts",
-      "!**/src/components/ui"
+      "!**/src/components/ui",
+      "!**/drizzle/meta"
     ]
   },
   "linter": {
