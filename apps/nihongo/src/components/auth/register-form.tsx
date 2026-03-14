@@ -1,10 +1,10 @@
 "use client";
 
-import { signUp } from "@/lib/auth-client";
-import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { signUp } from "@/lib/auth-client";
+import { cn } from "@/lib/utils";
 
 export function RegisterForm() {
   const router = useRouter();
@@ -29,7 +29,7 @@ export function RegisterForm() {
       setError(result.error.message ?? "Failed to create account");
       setLoading(false);
     } else {
-      router.push("/dashboard");
+      router.push("/clips");
       router.refresh();
     }
   };
@@ -38,7 +38,7 @@ export function RegisterForm() {
     <div className="space-y-6">
       <form onSubmit={handleRegister} className="space-y-4">
         <div className="space-y-2">
-          <label htmlFor="name" className="text-sm font-medium leading-none">
+          <label htmlFor="name" className="font-medium text-sm leading-none">
             Name
           </label>
           <input
@@ -57,7 +57,7 @@ export function RegisterForm() {
           />
         </div>
         <div className="space-y-2">
-          <label htmlFor="email" className="text-sm font-medium leading-none">
+          <label htmlFor="email" className="font-medium text-sm leading-none">
             Email
           </label>
           <input
@@ -76,7 +76,7 @@ export function RegisterForm() {
           />
         </div>
         <div className="space-y-2">
-          <label htmlFor="password" className="text-sm font-medium leading-none">
+          <label htmlFor="password" className="font-medium text-sm leading-none">
             Password
           </label>
           <input
@@ -95,13 +95,13 @@ export function RegisterForm() {
             )}
           />
         </div>
-        {error && <p className="text-sm text-destructive">{error}</p>}
+        {error && <p className="text-destructive text-sm">{error}</p>}
         <button
           type="submit"
           disabled={loading}
           className={cn(
             "inline-flex h-10 w-full items-center justify-center rounded-md bg-primary px-4 py-2",
-            "text-sm font-medium text-primary-foreground",
+            "font-medium text-primary-foreground text-sm",
             "ring-offset-background transition-colors",
             "hover:bg-primary/90",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
@@ -112,7 +112,7 @@ export function RegisterForm() {
         </button>
       </form>
 
-      <p className="text-center text-sm text-muted-foreground">
+      <p className="text-center text-muted-foreground text-sm">
         Already have an account?{" "}
         <Link href="/login" className="font-medium text-primary underline-offset-4 hover:underline">
           Sign in

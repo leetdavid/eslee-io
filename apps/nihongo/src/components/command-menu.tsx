@@ -1,5 +1,9 @@
 "use client";
 
+import { FileText, Loader2, Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import {
   Command,
   CommandDialog,
@@ -11,10 +15,6 @@ import {
   CommandSeparator,
 } from "@/components/ui/command";
 import { api } from "@/trpc/react";
-import { FileText, Image as ImageIcon, Loader2, Plus } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
 
 export function CommandMenu() {
   const [open, setOpen] = useState(false);
@@ -51,24 +51,6 @@ export function CommandMenu() {
     },
   });
 
-  const ocrImage = api.ai.ocrImage.useMutation({
-    onSuccess: (data) => {
-      const paragraphs = data.text.split("\n").map((p) => ({
-        type: "paragraph",
-        content: p.trim() ? [{ type: "text", text: p }] : undefined,
-      }));
-
-      createClip.mutate({
-        title: "From Image",
-        content: { type: "doc", content: paragraphs },
-        sourceLanguage: "ja",
-      });
-    },
-    onError: (error) => {
-      toast.error(`Failed to extract text: ${error.message}`);
-    },
-  });
-
   const handleCreateClip = () => {
     createClip.mutate({
       title: "Untitled Clip",
@@ -77,47 +59,8 @@ export function CommandMenu() {
     });
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith("image/")) {
-      toast.error("Please upload an image file");
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const base64String = event.target?.result as string;
-      toast.loading("Extracting text from image...", { id: "ocr-toast" });
-
-      // Need to clean up toast on success/error, so let's update mutations
-      ocrImage.mutate(
-        { imageBase64: base64String },
-        {
-          onSettled: () => {
-            toast.dismiss("ocr-toast");
-          },
-        },
-      );
-    };
-    reader.readAsDataURL(file);
-
-    // reset input
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
-
   return (
     <CommandDialog open={open} onOpenChange={setOpen}>
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={handleFileUpload}
-        accept="image/*"
-        className="hidden"
-      />
       <Command>
         <CommandInput placeholder="Type a command or search..." />
         <CommandList>
@@ -125,27 +68,15 @@ export function CommandMenu() {
           <CommandGroup heading="Actions">
             <CommandItem
               onSelect={handleCreateClip}
-              disabled={createClip.isPending || ocrImage.isPending}
+              disabled={createClip.isPending}
               className="flex items-center gap-2"
             >
-              {createClip.isPending && !ocrImage.isPending ? (
+              {createClip.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 <Plus className="h-4 w-4" />
               )}
               New Clip
-            </CommandItem>
-            <CommandItem
-              onSelect={() => fileInputRef.current?.click()}
-              disabled={createClip.isPending || ocrImage.isPending}
-              className="flex items-center gap-2"
-            >
-              {ocrImage.isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <ImageIcon className="h-4 w-4" />
-              )}
-              Create Clip from Image (OCR)
             </CommandItem>
           </CommandGroup>
           <CommandSeparator />
@@ -160,7 +91,6 @@ export function CommandMenu() {
               <FileText />
               Clips
             </CommandItem>
-            {/* Add more navigation here if needed */}
           </CommandGroup>
         </CommandList>
       </Command>

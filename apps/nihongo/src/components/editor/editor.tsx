@@ -1,19 +1,18 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import Image from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
 import Underline from "@tiptap/extension-underline";
-import { EditorContent, useEditor } from "@tiptap/react";
 import type { JSONContent } from "@tiptap/react";
+import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import { cn } from "@/lib/utils";
 
 import { AudioAnnotation } from "./extensions/audio-annotation";
 import { Furigana } from "./extensions/furigana";
 import { TranslationBlock } from "./extensions/translation-block";
 import { VocabularyHighlight } from "./extensions/vocabulary-highlight";
 import { EditorToolbar } from "./toolbar";
-import { TranslationBubble } from "./translation-bubble";
 
 interface EditorProps {
   content?: JSONContent;
@@ -68,9 +67,8 @@ export function Editor({
   }
 
   return (
-    <div className={cn("rounded-md border border-input bg-background relative", className)}>
+    <div className={cn("relative rounded-md border border-input bg-background", className)}>
       {editable && <EditorToolbar editor={editor} />}
-      <TranslationBubble editor={editor} />
       <EditorContent editor={editor} />
     </div>
   );

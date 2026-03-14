@@ -1,4 +1,4 @@
-import { Node, mergeAttributes } from "@tiptap/core";
+import { mergeAttributes, Node } from "@tiptap/core";
 
 export interface AudioAnnotationOptions {
   HTMLAttributes: Record<string, string>;
@@ -7,10 +7,7 @@ export interface AudioAnnotationOptions {
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
     audioAnnotation: {
-      insertAudioAnnotation: (attrs: {
-        src: string;
-        label?: string;
-      }) => ReturnType;
+      insertAudioAnnotation: (attrs: { src: string; label?: string }) => ReturnType;
     };
   }
 }

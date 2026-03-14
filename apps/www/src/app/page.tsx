@@ -1,12 +1,12 @@
+import Markdown from "react-markdown";
 import { siteConfig } from "@/config/site";
 import { resume } from "@/data/resume";
-import Markdown from "react-markdown";
 
 export default function Home() {
   return (
-    <main className="min-h-screen px-4 py-8 md:py-16 max-w-3xl mx-auto flex flex-col gap-16 lowercase selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black">
+    <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-16 px-4 py-8 lowercase selection:bg-black selection:text-white md:py-16 dark:selection:bg-white dark:selection:text-black">
       {/* Header */}
-      <header className="flex justify-end items-baseline">
+      <header className="flex items-baseline justify-end">
         <nav className="flex gap-4">
           {Object.entries(siteConfig.links).map(([key, href]) => (
             <a
@@ -14,7 +14,7 @@ export default function Home() {
               href={href}
               target="_blank"
               rel="noreferrer"
-              className="text-sm font-medium hover:text-muted-foreground transition-colors"
+              className="font-medium text-sm transition-colors hover:text-muted-foreground"
             >
               {key}
             </a>
@@ -24,17 +24,17 @@ export default function Home() {
 
       {/* Hero */}
       <section className="space-y-6">
-        <h1 className="text-4xl md:text-6xl font-bold tracking-tighter leading-none mb-8">
+        <h1 className="mb-8 font-bold text-4xl leading-none tracking-tighter md:text-6xl">
           David E. S. Lee
         </h1>
-        <div className="text-lg text-muted-foreground max-w-lg leading-relaxed prose prose-neutral dark:prose-invert prose-p:leading-relaxed prose-a:font-medium prose-a:text-foreground prose-a:underline prose-a:underline-offset-4 prose-a:decoration-border hover:prose-a:decoration-foreground prose-a:transition-all">
+        <div className="prose prose-neutral dark:prose-invert max-w-lg prose-a:font-medium prose-a:text-foreground text-lg text-muted-foreground leading-relaxed prose-p:leading-relaxed prose-a:underline prose-a:decoration-border prose-a:underline-offset-4 prose-a:transition-all hover:prose-a:decoration-foreground">
           <Markdown
             components={{
               a: ({ node, ...props }) => (
                 <a
                   target="_blank"
                   rel="noreferrer"
-                  className="font-medium text-foreground underline underline-offset-4 decoration-border hover:decoration-foreground transition-all"
+                  className="font-medium text-foreground underline decoration-border underline-offset-4 transition-all hover:decoration-foreground"
                   {...props}
                 />
               ),
@@ -47,34 +47,34 @@ export default function Home() {
 
       {/* Experience */}
       <section>
-        <h3 className="font-bold text-sm mb-6 text-muted-foreground">experience</h3>
-        <ul className="flex flex-col border-t border-border">
+        <h3 className="mb-6 font-bold text-muted-foreground text-sm">experience</h3>
+        <ul className="flex flex-col border-border border-t">
           {resume.experience.map((job) => (
             <li key={`${job.company}-${job.start}`} className="group">
-              <div className="flex flex-col py-4 border-b border-border space-y-2">
-                <div className="flex justify-between items-baseline">
-                  <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2">
+              <div className="flex flex-col space-y-2 border-border border-b py-4">
+                <div className="flex items-baseline justify-between">
+                  <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-2">
                     {job.url ? (
                       <a
                         href={job.url}
                         target="_blank"
                         rel="noreferrer"
-                        className="font-bold text-lg underline underline-offset-4 decoration-border hover:decoration-foreground transition-all"
+                        className="font-bold text-lg underline decoration-border underline-offset-4 transition-all hover:decoration-foreground"
                       >
                         {job.company}
                       </a>
                     ) : (
                       <span className="font-bold text-lg">{job.company}</span>
                     )}
-                    <span className="text-sm text-muted-foreground sm:before:content-['-'] sm:before:mr-2">
+                    <span className="text-muted-foreground text-sm sm:before:mr-2 sm:before:content-['-']">
                       {job.role}
                     </span>
                   </div>
-                  <span className="font-mono text-xs text-muted-foreground tabular-nums shrink-0 ml-4">
+                  <span className="ml-4 shrink-0 font-mono text-muted-foreground text-xs tabular-nums">
                     {job.start} — {job.end}
                   </span>
                 </div>
-                <p className="text-sm text-muted-foreground max-w-xl leading-relaxed">
+                <p className="max-w-xl text-muted-foreground text-sm leading-relaxed">
                   {job.description}
                 </p>
               </div>
@@ -85,29 +85,29 @@ export default function Home() {
 
       {/* Education */}
       <section>
-        <h3 className="font-bold text-sm mb-6 text-muted-foreground">education</h3>
-        <ul className="flex flex-col border-t border-border">
+        <h3 className="mb-6 font-bold text-muted-foreground text-sm">education</h3>
+        <ul className="flex flex-col border-border border-t">
           {resume.education.map((edu) => (
             <li key={edu.school}>
-              <div className="flex justify-between items-baseline py-4 border-b border-border">
-                <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2">
+              <div className="flex items-baseline justify-between border-border border-b py-4">
+                <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-2">
                   {edu.url ? (
                     <a
                       href={edu.url}
                       target="_blank"
                       rel="noreferrer"
-                      className="font-bold text-lg underline underline-offset-4 decoration-border hover:decoration-foreground transition-all"
+                      className="font-bold text-lg underline decoration-border underline-offset-4 transition-all hover:decoration-foreground"
                     >
                       {edu.school}
                     </a>
                   ) : (
                     <span className="font-bold text-lg">{edu.school}</span>
                   )}
-                  <span className="text-sm text-muted-foreground sm:before:content-['-'] sm:before:mr-2">
+                  <span className="text-muted-foreground text-sm sm:before:mr-2 sm:before:content-['-']">
                     {edu.degree}
                   </span>
                 </div>
-                <span className="font-mono text-xs text-muted-foreground tabular-nums">
+                <span className="font-mono text-muted-foreground text-xs tabular-nums">
                   {edu.year}
                 </span>
               </div>
@@ -118,10 +118,10 @@ export default function Home() {
 
       {/* Skills */}
       <section>
-        <h3 className="font-bold text-sm mb-4 text-muted-foreground">skills</h3>
+        <h3 className="mb-4 font-bold text-muted-foreground text-sm">skills</h3>
         <div className="flex flex-wrap gap-x-6 gap-y-2">
           {resume.skills.map((skill) => (
-            <span key={skill} className="text-sm font-medium">
+            <span key={skill} className="font-medium text-sm">
               {skill}
             </span>
           ))}

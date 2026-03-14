@@ -1,23 +1,23 @@
 "use client";
 
 import { Button as ButtonPrimitive } from "@base-ui/react/button";
-import { type VariantProps, cva } from "class-variance-authority";
+import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap border-2 text-sm font-bold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center whitespace-nowrap border-2 font-bold text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground border-primary hover:bg-background hover:text-foreground",
+          "border-primary bg-primary text-primary-foreground hover:bg-background hover:text-foreground",
         destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90 border-destructive",
+          "border-destructive bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline: "border-input bg-background hover:bg-accent hover:text-accent-foreground",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80 border-secondary",
-        ghost: "hover:bg-accent hover:text-accent-foreground border-transparent",
-        link: "text-primary underline-offset-4 hover:underline border-transparent",
+        secondary: "border-secondary bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ghost: "border-transparent hover:bg-accent hover:text-accent-foreground",
+        link: "border-transparent text-primary underline-offset-4 hover:underline",
       },
       size: {
         default: "h-12 px-6 py-2",

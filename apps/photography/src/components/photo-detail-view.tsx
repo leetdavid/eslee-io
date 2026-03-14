@@ -1,11 +1,11 @@
 "use client";
-import { getImageUrl } from "@/lib/cms-utils";
-import { cn } from "@/lib/utils";
 import type { Photo } from "@eslee/payload";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { useTheme } from "next-themes";
 import Image from "next/image";
+import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { getImageUrl } from "@/lib/cms-utils";
+import { cn } from "@/lib/utils";
 
 interface PhotoDetailViewProps {
   photo: Photo;
@@ -73,7 +73,7 @@ export function PhotoDetailView({ photo }: PhotoDetailViewProps) {
       )}
     >
       {/* Image Container */}
-      <div className="relative h-full w-full p-0 md:p-8 flex items-center justify-center">
+      <div className="relative flex h-full w-full items-center justify-center p-0 md:p-8">
         <Image
           src={imageUrl}
           alt={title || "Photo"}
@@ -89,9 +89,9 @@ export function PhotoDetailView({ photo }: PhotoDetailViewProps) {
       {showInfo && (
         <div
           className={cn(
-            "absolute inset-x-0 bottom-0 h-2/5 pointer-events-none",
+            "pointer-events-none absolute inset-x-0 bottom-0 h-2/5",
             "transition-opacity duration-500",
-            "animate-in fade-in duration-500",
+            "fade-in animate-in duration-500",
             activeColor.gradient,
           )}
         />
@@ -100,7 +100,7 @@ export function PhotoDetailView({ photo }: PhotoDetailViewProps) {
       {/* Controls & Info */}
       <div
         className={cn(
-          "absolute bottom-6 left-6 md:bottom-10 md:left-10 z-10 max-w-md",
+          "absolute bottom-6 left-6 z-10 max-w-md md:bottom-10 md:left-10",
           activeColor.text,
         )}
       >
@@ -117,7 +117,7 @@ export function PhotoDetailView({ photo }: PhotoDetailViewProps) {
           >
             {showInfo ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
           </button>
-          <div className="h-4 w-px bg-current opacity-20 mx-1" />
+          <div className="mx-1 h-4 w-px bg-current opacity-20" />
           {backgroundColors.map((color) => (
             <button
               key={color.name}
@@ -128,7 +128,7 @@ export function PhotoDetailView({ photo }: PhotoDetailViewProps) {
                 color.value,
                 color.border,
                 activeColor.name === color.name
-                  ? "ring-2 ring-offset-2 scale-110 ring-current"
+                  ? "scale-110 ring-2 ring-current ring-offset-2"
                   : "opacity-60 hover:opacity-100",
               )}
               title={`Set background to ${color.name}`}
@@ -142,13 +142,13 @@ export function PhotoDetailView({ photo }: PhotoDetailViewProps) {
 
         {/* EXIF Data */}
         {showInfo && (
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-3">
+          <div className="fade-in slide-in-from-bottom-4 animate-in space-y-3 duration-500">
             <div>
-              <h1 className="font-mono text-lg md:text-xl font-bold uppercase tracking-tight">
+              <h1 className="font-bold font-mono text-lg uppercase tracking-tight md:text-xl">
                 {title || "Untitled"}
               </h1>
               {captureDate && (
-                <p className="font-mono text-[10px] uppercase opacity-60 mt-1">
+                <p className="mt-1 font-mono text-[10px] uppercase opacity-60">
                   {new Date(captureDate).toLocaleDateString("en-US", {
                     year: "numeric",
                     month: "long",
@@ -159,7 +159,7 @@ export function PhotoDetailView({ photo }: PhotoDetailViewProps) {
             </div>
 
             {settings && (
-              <div className="grid grid-cols-2 gap-x-8 gap-y-1 font-mono text-xs opacity-80 border-t border-current/20 pt-3">
+              <div className="grid grid-cols-2 gap-x-8 gap-y-1 border-current/20 border-t pt-3 font-mono text-xs opacity-80">
                 {settings.cameraModel && <div className="col-span-2">{settings.cameraModel}</div>}
                 {settings.lens && <div className="col-span-2 opacity-80">{settings.lens}</div>}
 

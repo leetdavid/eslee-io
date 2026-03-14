@@ -12,11 +12,7 @@ export const metadata: Metadata = {
     "Learn Japanese with interactive clips, furigana support, and AI-powered study tools",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
       lang="en"

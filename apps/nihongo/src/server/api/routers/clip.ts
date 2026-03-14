@@ -5,7 +5,7 @@ import { z } from "zod";
 import type { JLPTLevel } from "@/lib/constants";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import type { db } from "@/server/db";
-import { clipVocabulary, clips, vocabulary } from "@/server/db/schema";
+import { clips, clipVocabulary, vocabulary } from "@/server/db/schema";
 
 /** Minimal validation for Tiptap JSON — must be an object with a content array. */
 const tiptapContentSchema = z.record(z.string(), z.unknown());

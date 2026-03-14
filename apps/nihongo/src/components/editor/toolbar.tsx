@@ -1,18 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { JLPT_LEVELS } from "@/lib/constants";
-import { cn } from "@/lib/utils";
-import { api } from "@/trpc/react";
 import type { Editor } from "@tiptap/react";
 import {
   Bold,
@@ -25,14 +12,24 @@ import {
   Languages,
   List,
   ListOrdered,
-  Loader2,
   Quote,
   Type,
   Underline,
   Volume2,
-  WandSparkles,
 } from "lucide-react";
-import { useRef, useState } from "react";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { JLPT_LEVELS } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 
 interface ToolbarProps {
   editor: Editor;
@@ -85,45 +82,6 @@ export function EditorToolbar({ editor }: ToolbarProps) {
   const [vocabData, setVocabData] = useState({ word: "", reading: "", meaning: "", jlptLevel: "" });
   const [imageUrl, setImageUrl] = useState("");
   const [audioData, setAudioData] = useState({ label: "", src: "" });
-
-  const isFullDocRef = useRef(false);
-
-  const addAutoFurigana = api.ai.addFurigana.useMutation({
-    onSuccess: (data) => {
-      if (isFullDocRef.current) {
-        editor.chain().focus().setContent(data.html).run();
-      } else {
-        editor.chain().focus().insertContent(data.html).run();
-      }
-    },
-    onError: (error) => {
-      alert(`Failed to generate furigana: ${error.message}`);
-    },
-  });
-
-  const handleAutoFurigana = () => {
-    const { from, to } = editor.state.selection;
-    const isFullDoc = from === to;
-    isFullDocRef.current = isFullDoc;
-
-    let contentToProcess = "";
-
-    if (isFullDoc) {
-      contentToProcess = editor.getHTML();
-      if (!editor.state.doc.textContent.trim()) {
-        alert("The document is empty. Please add some Japanese text first.");
-        return;
-      }
-    } else {
-      contentToProcess = editor.state.doc.textBetween(from, to, "\n");
-      if (!contentToProcess.trim()) {
-        alert("The selected text is empty.");
-        return;
-      }
-    }
-
-    addAutoFurigana.mutate({ text: contentToProcess });
-  };
 
   const handleAddFurigana = (e: React.FormEvent) => {
     e.preventDefault();
@@ -183,7 +141,7 @@ export function EditorToolbar({ editor }: ToolbarProps) {
 
   return (
     <>
-      <div className="flex flex-wrap items-center gap-0.5 border-b border-input p-2">
+      <div className="flex flex-wrap items-center gap-0.5 border-input border-b p-2">
         {/* Text formatting */}
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleBold().run()}
@@ -263,17 +221,6 @@ export function EditorToolbar({ editor }: ToolbarProps) {
         <ToolbarButton onClick={() => setIsFuriganaOpen(true)} title="Add Furigana (Ctrl+R)">
           <Type className="h-4 w-4" />
         </ToolbarButton>
-        <ToolbarButton
-          onClick={handleAutoFurigana}
-          disabled={addAutoFurigana.isPending}
-          title="Auto Furigana (AI)"
-        >
-          {addAutoFurigana.isPending ? (
-            <Loader2 className="h-4 w-4 animate-spin text-primary" />
-          ) : (
-            <WandSparkles className="h-4 w-4 text-primary" />
-          )}
-        </ToolbarButton>
         <ToolbarButton onClick={openVocabDialog} title="Highlight Vocabulary">
           <Highlighter className="h-4 w-4" />
         </ToolbarButton>
@@ -303,7 +250,7 @@ export function EditorToolbar({ editor }: ToolbarProps) {
               <DialogTitle>Add Furigana</DialogTitle>
             </DialogHeader>
             <div className="py-4">
-              <label htmlFor="furigana" className="text-sm font-medium">
+              <label htmlFor="furigana" className="font-medium text-sm">
                 Reading
               </label>
               <Input
@@ -316,7 +263,11 @@ export function EditorToolbar({ editor }: ToolbarProps) {
               />
             </div>
             <DialogFooter>
-              <DialogClose render={<Button type="button" variant="outline" />}>Cancel</DialogClose>
+              <DialogClose asChild>
+                <Button type="button" variant="outline">
+                  Cancel
+                </Button>
+              </DialogClose>
               <Button type="submit">Add Furigana</Button>
             </DialogFooter>
           </form>
@@ -329,9 +280,9 @@ export function EditorToolbar({ editor }: ToolbarProps) {
             <DialogHeader>
               <DialogTitle>Highlight Vocabulary</DialogTitle>
             </DialogHeader>
-            <div className="py-4 space-y-3">
+            <div className="space-y-3 py-4">
               <div>
-                <label htmlFor="vocab-word" className="text-sm font-medium">
+                <label htmlFor="vocab-word" className="font-medium text-sm">
                   Word
                 </label>
                 <Input
@@ -344,7 +295,7 @@ export function EditorToolbar({ editor }: ToolbarProps) {
                 />
               </div>
               <div>
-                <label htmlFor="vocab-reading" className="text-sm font-medium">
+                <label htmlFor="vocab-reading" className="font-medium text-sm">
                   Reading (Furigana)
                 </label>
                 <Input
@@ -356,7 +307,7 @@ export function EditorToolbar({ editor }: ToolbarProps) {
                 />
               </div>
               <div>
-                <label htmlFor="vocab-meaning" className="text-sm font-medium">
+                <label htmlFor="vocab-meaning" className="font-medium text-sm">
                   Meaning
                 </label>
                 <Input
@@ -368,7 +319,7 @@ export function EditorToolbar({ editor }: ToolbarProps) {
                 />
               </div>
               <div>
-                <label htmlFor="vocab-level" className="text-sm font-medium mb-1.5 block">
+                <label htmlFor="vocab-level" className="mb-1.5 block font-medium text-sm">
                   JLPT Level
                 </label>
                 <select
@@ -387,7 +338,11 @@ export function EditorToolbar({ editor }: ToolbarProps) {
               </div>
             </div>
             <DialogFooter>
-              <DialogClose render={<Button type="button" variant="outline" />}>Cancel</DialogClose>
+              <DialogClose asChild>
+                <Button type="button" variant="outline">
+                  Cancel
+                </Button>
+              </DialogClose>
               <Button type="submit" disabled={!vocabData.word || !vocabData.meaning}>
                 Highlight
               </Button>
@@ -403,7 +358,7 @@ export function EditorToolbar({ editor }: ToolbarProps) {
               <DialogTitle>Insert Image</DialogTitle>
             </DialogHeader>
             <div className="py-4">
-              <label htmlFor="image-url" className="text-sm font-medium">
+              <label htmlFor="image-url" className="font-medium text-sm">
                 Image URL
               </label>
               <Input
@@ -416,7 +371,11 @@ export function EditorToolbar({ editor }: ToolbarProps) {
               />
             </div>
             <DialogFooter>
-              <DialogClose render={<Button type="button" variant="outline" />}>Cancel</DialogClose>
+              <DialogClose asChild>
+                <Button type="button" variant="outline">
+                  Cancel
+                </Button>
+              </DialogClose>
               <Button type="submit">Insert</Button>
             </DialogFooter>
           </form>
@@ -429,9 +388,9 @@ export function EditorToolbar({ editor }: ToolbarProps) {
             <DialogHeader>
               <DialogTitle>Insert Audio Annotation</DialogTitle>
             </DialogHeader>
-            <div className="py-4 space-y-3">
+            <div className="space-y-3 py-4">
               <div>
-                <label htmlFor="audio-label" className="text-sm font-medium">
+                <label htmlFor="audio-label" className="font-medium text-sm">
                   Label (Text to speak)
                 </label>
                 <Input
@@ -444,7 +403,7 @@ export function EditorToolbar({ editor }: ToolbarProps) {
                 />
               </div>
               <div>
-                <label htmlFor="audio-url" className="text-sm font-medium">
+                <label htmlFor="audio-url" className="font-medium text-sm">
                   Audio URL (Optional, uses TTS if empty)
                 </label>
                 <Input
@@ -457,7 +416,11 @@ export function EditorToolbar({ editor }: ToolbarProps) {
               </div>
             </div>
             <DialogFooter>
-              <DialogClose render={<Button type="button" variant="outline" />}>Cancel</DialogClose>
+              <DialogClose asChild>
+                <Button type="button" variant="outline">
+                  Cancel
+                </Button>
+              </DialogClose>
               <Button type="submit" disabled={!audioData.label}>
                 Insert
               </Button>

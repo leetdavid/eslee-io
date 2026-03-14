@@ -1,14 +1,13 @@
 "use client";
 
-import { Editor } from "@/components/editor/editor";
-import { type JLPTLevel, JLPT_LEVELS } from "@/lib/constants";
-import { cn } from "@/lib/utils";
-import { api } from "@/trpc/react";
 import type { JSONContent } from "@tiptap/react";
-import { ArrowLeft, GraduationCap, Loader2, Save } from "lucide-react";
+import { ArrowLeft, Loader2, Save } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { Editor } from "@/components/editor/editor";
+import { JLPT_LEVELS, type JLPTLevel } from "@/lib/constants";
+import { api } from "@/trpc/react";
 
 export default function ClipDetailPage() {
   const params = useParams();
@@ -87,7 +86,7 @@ export default function ClipDetailPage() {
     return (
       <div className="flex flex-col items-center py-16">
         <p className="text-muted-foreground">Clip not found</p>
-        <Link href="/clips" className="mt-4 text-sm text-primary underline">
+        <Link href="/clips" className="mt-4 text-primary text-sm underline">
           Back to clips
         </Link>
       </div>
@@ -95,7 +94,7 @@ export default function ClipDetailPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-4">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-1 items-center gap-4">
           <Link
@@ -112,35 +111,25 @@ export default function ClipDetailPage() {
               setEditedTitle(e.target.value);
               markDirty();
             }}
-            className="w-full bg-transparent px-0 text-2xl font-bold tracking-tight focus:outline-none focus:ring-0"
+            className="w-full bg-transparent px-0 font-bold text-2xl tracking-tight focus:outline-none focus:ring-0"
           />
         </div>
         <div className="flex items-center gap-2">
           {updateClip.isPending ? (
-            <div className="inline-flex h-9 items-center gap-2 px-3 text-sm text-muted-foreground">
+            <div className="inline-flex h-9 items-center gap-2 px-3 text-muted-foreground text-sm">
               <Loader2 className="h-4 w-4 animate-spin" />
               Saving...
             </div>
           ) : isDirty ? (
-            <div className="inline-flex h-9 items-center gap-2 px-3 text-sm text-muted-foreground">
+            <div className="inline-flex h-9 items-center gap-2 px-3 text-muted-foreground text-sm">
               Unsaved changes
             </div>
           ) : (
-            <div className="inline-flex h-9 items-center gap-2 px-3 text-sm text-muted-foreground">
+            <div className="inline-flex h-9 items-center gap-2 px-3 text-muted-foreground text-sm">
               <Save className="h-4 w-4" />
               Saved
             </div>
           )}
-          <Link
-            href={`/clips/${clipId}/study`}
-            className={cn(
-              "inline-flex h-9 items-center gap-2 rounded-md bg-primary px-3",
-              "text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90",
-            )}
-          >
-            <GraduationCap className="h-4 w-4" />
-            Study
-          </Link>
         </div>
       </div>
 
@@ -152,7 +141,7 @@ export default function ClipDetailPage() {
             setSourceLanguage(e.target.value as "ja" | "en" | "ko");
             markDirty();
           }}
-          className="h-8 rounded-md bg-transparent px-2 py-1 focus:outline-none hover:bg-accent"
+          className="h-8 rounded-md bg-transparent px-2 py-1 hover:bg-accent focus:outline-none"
         >
           <option value="ja">Japanese</option>
           <option value="en">English</option>
@@ -165,7 +154,7 @@ export default function ClipDetailPage() {
             setTargetLanguage(e.target.value as "ja" | "en" | "ko" | "");
             markDirty();
           }}
-          className="h-8 rounded-md bg-transparent px-2 py-1 focus:outline-none hover:bg-accent"
+          className="h-8 rounded-md bg-transparent px-2 py-1 hover:bg-accent focus:outline-none"
         >
           <option value="">None</option>
           <option value="ja">Japanese</option>
@@ -181,7 +170,7 @@ export default function ClipDetailPage() {
             setJlptLevel(e.target.value);
             markDirty();
           }}
-          className="h-8 rounded-md bg-transparent px-2 py-1 font-medium text-secondary-foreground focus:outline-none hover:bg-accent"
+          className="h-8 rounded-md bg-transparent px-2 py-1 font-medium text-secondary-foreground hover:bg-accent focus:outline-none"
         >
           <option value="">No JLPT</option>
           {JLPT_LEVELS.map((level) => (

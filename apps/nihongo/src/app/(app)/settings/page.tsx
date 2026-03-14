@@ -1,9 +1,9 @@
 "use client";
 
-import { signOut, useSession } from "@/lib/auth-client";
-import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { signOut, useSession } from "@/lib/auth-client";
+import { cn } from "@/lib/utils";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -25,8 +25,8 @@ export default function SettingsPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-8">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
-        <p className="text-sm text-muted-foreground">Manage your account and preferences</p>
+        <h1 className="font-bold text-2xl tracking-tight">Settings</h1>
+        <p className="text-muted-foreground text-sm">Manage your account and preferences</p>
       </div>
 
       {/* Profile */}
@@ -34,9 +34,9 @@ export default function SettingsPage() {
         <div className="border-b px-6 py-4">
           <h2 className="font-medium">Profile</h2>
         </div>
-        <div className="p-6 space-y-4">
+        <div className="space-y-4 p-6">
           <div className="space-y-2">
-            <label htmlFor="profile-name" className="text-sm font-medium">
+            <label htmlFor="profile-name" className="font-medium text-sm">
               Name
             </label>
             <input
@@ -48,7 +48,7 @@ export default function SettingsPage() {
             />
           </div>
           <div className="space-y-2">
-            <label htmlFor="profile-email" className="text-sm font-medium">
+            <label htmlFor="profile-email" className="font-medium text-sm">
               Email
             </label>
             <input
@@ -67,12 +67,12 @@ export default function SettingsPage() {
         <div className="border-b px-6 py-4">
           <h2 className="font-medium">Language Preferences</h2>
         </div>
-        <div className="p-6 space-y-4">
+        <div className="space-y-4 p-6">
           <div className="space-y-2">
-            <label htmlFor="native-lang" className="text-sm font-medium">
+            <label htmlFor="native-lang" className="font-medium text-sm">
               Native Language
             </label>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               Used for AI explanations and translations
             </p>
             <select
@@ -86,7 +86,7 @@ export default function SettingsPage() {
             </select>
           </div>
           <div className="space-y-2">
-            <label htmlFor="study-lang" className="text-sm font-medium">
+            <label htmlFor="study-lang" className="font-medium text-sm">
               Study Language
             </label>
             <input
@@ -102,14 +102,14 @@ export default function SettingsPage() {
 
       {/* Danger Zone */}
       <div className="rounded-lg border border-destructive/50 bg-card">
-        <div className="border-b border-destructive/50 px-6 py-4">
+        <div className="border-destructive/50 border-b px-6 py-4">
           <h2 className="font-medium text-destructive">Danger Zone</h2>
         </div>
-        <div className="p-6 space-y-4">
+        <div className="space-y-4 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">Sign Out</p>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 Sign out of your account on this device
               </p>
             </div>
@@ -125,7 +125,7 @@ export default function SettingsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">Delete Account</p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   Permanently delete your account and all data
                 </p>
               </div>
@@ -134,7 +134,7 @@ export default function SettingsPage() {
                 onClick={handleDeleteAccount}
                 className={cn(
                   "inline-flex h-9 items-center rounded-md bg-destructive px-3",
-                  "text-sm font-medium text-destructive-foreground",
+                  "font-medium text-destructive-foreground text-sm",
                   "hover:bg-destructive/90",
                 )}
               >

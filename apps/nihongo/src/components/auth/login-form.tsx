@@ -1,10 +1,10 @@
 "use client";
 
-import { signIn } from "@/lib/auth-client";
-import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { signIn } from "@/lib/auth-client";
+import { cn } from "@/lib/utils";
 
 export function LoginForm() {
   const router = useRouter();
@@ -27,7 +27,7 @@ export function LoginForm() {
       setError(result.error.message ?? "Failed to sign in");
       setLoading(false);
     } else {
-      router.push("/dashboard");
+      router.push("/clips");
       router.refresh();
     }
   };
@@ -35,7 +35,7 @@ export function LoginForm() {
   const handleSocialLogin = async (provider: "google" | "github") => {
     await signIn.social({
       provider,
-      callbackURL: "/dashboard",
+      callbackURL: "/clips",
     });
   };
 
@@ -43,7 +43,7 @@ export function LoginForm() {
     <div className="space-y-6">
       <form onSubmit={handleEmailLogin} className="space-y-4">
         <div className="space-y-2">
-          <label htmlFor="email" className="text-sm font-medium leading-none">
+          <label htmlFor="email" className="font-medium text-sm leading-none">
             Email
           </label>
           <input
@@ -62,7 +62,7 @@ export function LoginForm() {
           />
         </div>
         <div className="space-y-2">
-          <label htmlFor="password" className="text-sm font-medium leading-none">
+          <label htmlFor="password" className="font-medium text-sm leading-none">
             Password
           </label>
           <input
@@ -80,13 +80,13 @@ export function LoginForm() {
             )}
           />
         </div>
-        {error && <p className="text-sm text-destructive">{error}</p>}
+        {error && <p className="text-destructive text-sm">{error}</p>}
         <button
           type="submit"
           disabled={loading}
           className={cn(
             "inline-flex h-10 w-full items-center justify-center rounded-md bg-primary px-4 py-2",
-            "text-sm font-medium text-primary-foreground",
+            "font-medium text-primary-foreground text-sm",
             "ring-offset-background transition-colors",
             "hover:bg-primary/90",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
@@ -112,7 +112,7 @@ export function LoginForm() {
           onClick={() => handleSocialLogin("google")}
           className={cn(
             "inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4",
-            "text-sm font-medium",
+            "font-medium text-sm",
             "ring-offset-background transition-colors",
             "hover:bg-accent hover:text-accent-foreground",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
@@ -125,7 +125,7 @@ export function LoginForm() {
           onClick={() => handleSocialLogin("github")}
           className={cn(
             "inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4",
-            "text-sm font-medium",
+            "font-medium text-sm",
             "ring-offset-background transition-colors",
             "hover:bg-accent hover:text-accent-foreground",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
@@ -135,7 +135,7 @@ export function LoginForm() {
         </button>
       </div>
 
-      <p className="text-center text-sm text-muted-foreground">
+      <p className="text-center text-muted-foreground text-sm">
         Don&apos;t have an account?{" "}
         <Link
           href="/register"

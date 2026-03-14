@@ -1,7 +1,6 @@
+import type { Photo } from "@eslee/payload";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { payload } from "@/server/payload";
-
-import type { Photo } from "@eslee/payload";
 
 export const photosRouter = createTRPCRouter({
   getAll: publicProcedure.query(async () => {
