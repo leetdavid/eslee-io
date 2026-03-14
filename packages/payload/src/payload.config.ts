@@ -31,7 +31,8 @@ export const config = buildConfig({
       connectionString: process.env.DATABASE_URL || "",
     },
   }),
-  sharp,
+  // biome-ignore lint/suspicious/noExplicitAny: I know it works, the types are getting in the way here
+  sharp: sharp as any,
   plugins: [
     vercelBlobStorage({
       enabled: !!process.env.BLOB_READ_WRITE_TOKEN,
