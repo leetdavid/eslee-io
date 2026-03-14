@@ -7,7 +7,7 @@ import type { JSONContent } from "@tiptap/react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { cn } from "@/lib/utils";
-
+import { ScrollArea } from "../ui/scroll-area";
 import { AudioAnnotation } from "./extensions/audio-annotation";
 import { Furigana } from "./extensions/furigana";
 import { TranslationBlock } from "./extensions/translation-block";
@@ -61,15 +61,26 @@ export function Editor({
   if (!editor) {
     return (
       <div className={cn("rounded-md border border-input bg-background p-4", className)}>
-        <div className="h-[300px] animate-pulse rounded bg-muted" />
+        <div className="h-75 animate-pulse rounded bg-muted" />
       </div>
     );
   }
 
   return (
-    <div className={cn("relative rounded-md border border-input bg-background", className)}>
-      {editable && <EditorToolbar editor={editor} />}
-      <EditorContent editor={editor} />
+    <div
+      className={cn(
+        "relative flex h-full flex-col rounded-md border border-input bg-background",
+        className,
+      )}
+    >
+      {editable && (
+        <div className="shrink-0 border-border border-b-0">
+          <EditorToolbar editor={editor} />
+        </div>
+      )}
+      <ScrollArea className="min-h-0 flex-1 overflow-y-auto">
+        <EditorContent editor={editor} />
+      </ScrollArea>
     </div>
   );
 }

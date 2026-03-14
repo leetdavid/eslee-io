@@ -19,7 +19,16 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { JLPT_LEVELS, type JLPTLevel } from "@/lib/constants";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { JLPT_LEVELS, type JLPTLevel, LANGUAGES } from "@/lib/constants";
 import { api } from "@/trpc/react";
 
 export default function ClipDetailPage() {
@@ -97,6 +106,7 @@ export default function ClipDetailPage() {
     setIsDirty(true);
   };
 
+  // Loading State
   if (isLoading || editedContent === undefined) {
     return (
       <div className="space-y-4 p-4">
@@ -106,6 +116,7 @@ export default function ClipDetailPage() {
     );
   }
 
+  // Clip not found
   if (!clip) {
     return (
       <div className="flex flex-col items-center py-16">
@@ -118,136 +129,155 @@ export default function ClipDetailPage() {
   }
 
   return (
-    <div className="space-y-6 p-4">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-1 items-center gap-4">
-          <Link
-            href="/clips"
-            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-input bg-background transition-colors hover:bg-accent"
+    <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden p-4">
+      <div className="mx-auto flex h-full w-full max-w-5xl flex-1 flex-col gap-6 overflow-hidden">
+        <div className="flex shrink-0 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-1 items-center gap-4">
+            <Link
+              href="/clips"
+              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-input bg-background transition-colors hover:bg-accent"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Link>
+            <input
+              type="text"
+              placeholder="Untitled Clip"
+              value={editedTitle}
+              onChange={(e) => {
+                setEditedTitle(e.target.value);
+                markDirty();
+              }}
+              className="w-full bg-transparent px-0 font-bold text-2xl tracking-tight focus:outline-none focus:ring-0"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            {updateClip.isPending ? (
+              <div className="inline-flex h-9 items-center gap-2 px-3 text-muted-foreground text-sm">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Saving...
+              </div>
+            ) : isDirty ? (
+              <div className="inline-flex h-9 items-center gap-2 px-3 text-muted-foreground text-sm">
+                Unsaved changes
+              </div>
+            ) : (
+              <div className="inline-flex h-9 items-center gap-2 px-3 text-muted-foreground text-sm">
+                <Save className="h-4 w-4" />
+                Saved
+              </div>
+            )}
+
+            <div className="ml-2 h-4 w-px bg-border" />
+
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete Clip</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Are you sure you want to delete this clip? This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    onClick={() => deleteClip.mutate({ id: clipId })}
+                    disabled={deleteClip.isPending}
+                  >
+                    {deleteClip.isPending ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : null}
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        </div>
+
+        {/* Metadata & Config row */}
+        <div className="flex shrink-0 flex-wrap items-center gap-3 rounded-lg border bg-card p-2 text-sm">
+          <Select
+            value={sourceLanguage}
+            onValueChange={(value) => setSourceLanguage(value as typeof sourceLanguage)}
           >
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-          <input
-            type="text"
-            placeholder="Untitled Clip"
-            value={editedTitle}
-            onChange={(e) => {
-              setEditedTitle(e.target.value);
+            <SelectTrigger size="sm">
+              <SelectValue placeholder="From..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>From Language</SelectLabel>
+                {LANGUAGES.map((lang) => (
+                  <SelectItem key={lang.value} value={lang.value}>
+                    {lang.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+          <span className="text-muted-foreground">→</span>
+          <Select
+            value={targetLanguage}
+            onValueChange={(value) => setTargetLanguage(value as typeof targetLanguage)}
+          >
+            <SelectTrigger size="sm">
+              <SelectValue placeholder="To..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>To Language</SelectLabel>
+                {LANGUAGES.map((lang) => (
+                  <SelectItem key={lang.value} value={lang.value}>
+                    {lang.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+
+          <div className="mx-1 h-4 w-px bg-border" />
+
+          <Select
+            value={jlptLevel}
+            onValueChange={(value) => setJlptLevel(value as typeof jlptLevel)}
+          >
+            <SelectTrigger size="sm">
+              <SelectValue placeholder="JLPT Level" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>JLPT Level</SelectLabel>
+                {JLPT_LEVELS.map((level) => (
+                  <SelectItem key={level} value={level}>
+                    {level}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Editor */}
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border bg-card transition-shadow">
+          <Editor
+            content={editedContent}
+            onChange={(content) => {
+              setEditedContent(content);
               markDirty();
             }}
-            className="w-full bg-transparent px-0 font-bold text-2xl tracking-tight focus:outline-none focus:ring-0"
+            editable={true}
+            className="border-none"
           />
         </div>
-        <div className="flex items-center gap-2">
-          {updateClip.isPending ? (
-            <div className="inline-flex h-9 items-center gap-2 px-3 text-muted-foreground text-sm">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Saving...
-            </div>
-          ) : isDirty ? (
-            <div className="inline-flex h-9 items-center gap-2 px-3 text-muted-foreground text-sm">
-              Unsaved changes
-            </div>
-          ) : (
-            <div className="inline-flex h-9 items-center gap-2 px-3 text-muted-foreground text-sm">
-              <Save className="h-4 w-4" />
-              Saved
-            </div>
-          )}
-
-          <div className="ml-2 h-4 w-px bg-border" />
-
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Delete Clip</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Are you sure you want to delete this clip? This action cannot be undone.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                  onClick={() => deleteClip.mutate({ id: clipId })}
-                  disabled={deleteClip.isPending}
-                >
-                  {deleteClip.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                  Delete
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </div>
-      </div>
-
-      {/* Metadata & Config row */}
-      <div className="flex flex-wrap items-center gap-3 rounded-lg border bg-card p-2 text-sm">
-        <select
-          value={sourceLanguage}
-          onChange={(e) => {
-            setSourceLanguage(e.target.value as "ja" | "en" | "ko");
-            markDirty();
-          }}
-          className="h-8 rounded-md bg-transparent px-2 py-1 hover:bg-accent focus:outline-none"
-        >
-          <option value="ja">Japanese</option>
-          <option value="en">English</option>
-          <option value="ko">Korean</option>
-        </select>
-        <span className="text-muted-foreground">→</span>
-        <select
-          value={targetLanguage}
-          onChange={(e) => {
-            setTargetLanguage(e.target.value as "ja" | "en" | "ko" | "");
-            markDirty();
-          }}
-          className="h-8 rounded-md bg-transparent px-2 py-1 hover:bg-accent focus:outline-none"
-        >
-          <option value="">None</option>
-          <option value="ja">Japanese</option>
-          <option value="en">English</option>
-          <option value="ko">Korean</option>
-        </select>
-
-        <div className="mx-1 h-4 w-px bg-border" />
-
-        <select
-          value={jlptLevel}
-          onChange={(e) => {
-            setJlptLevel(e.target.value);
-            markDirty();
-          }}
-          className="h-8 rounded-md bg-transparent px-2 py-1 font-medium text-secondary-foreground hover:bg-accent focus:outline-none"
-        >
-          <option value="">No JLPT</option>
-          {JLPT_LEVELS.map((level) => (
-            <option key={level} value={level}>
-              {level}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Editor */}
-      <div className="overflow-hidden rounded-lg border bg-card transition-shadow focus-within:ring-1 focus-within:ring-primary">
-        <Editor
-          content={editedContent}
-          onChange={(content) => {
-            setEditedContent(content);
-            markDirty();
-          }}
-          editable={true}
-        />
       </div>
     </div>
   );

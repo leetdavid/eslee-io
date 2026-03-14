@@ -1,4 +1,4 @@
-export const JLPT_LEVELS = ["N5", "N4", "N3", "N2", "N1"] as const;
+export const JLPT_LEVELS = ["N1", "N2", "N3", "N4", "N5"] as const;
 export type JLPTLevel = (typeof JLPT_LEVELS)[number];
 
 export const JLPT_COLORS: Record<string, string> = {

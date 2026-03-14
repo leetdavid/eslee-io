@@ -1,10 +1,22 @@
 "use client";
 
 import type { JSONContent } from "@tiptap/react";
-import { Edit3, Loader2, Minus, Plus } from "lucide-react";
+import { Edit3, Loader2, Minus, Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 import { Editor } from "@/components/editor/editor";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { api } from "@/trpc/react";
 
 export function ClipsMobileView() {
@@ -30,6 +42,18 @@ export function ClipsMobileView() {
       sourceLanguage: "ja",
     });
   };
+
+  const utils = api.useUtils();
+
+  const deleteClip = api.clip.delete.useMutation({
+    onSuccess: () => {
+      toast.success("Clip deleted successfully");
+      void utils.clip.getAll.invalidate();
+    },
+    onError: (error) => {
+      toast.error(`Failed to delete clip: ${error.message}`);
+    },
+  });
 
   return (
     <div className="relative flex h-full min-h-0 w-full flex-1 snap-x snap-mandatory overflow-x-auto overflow-y-hidden text-foreground md:hidden">
@@ -74,12 +98,44 @@ export function ClipsMobileView() {
                   >
                     <Edit3 className="h-4 w-4 text-accent-foreground" />
                   </button>
+
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <button
+                        type="button"
+                        className="rounded-full bg-destructive/10 p-2 transition-colors hover:bg-destructive/20"
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Clip</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to delete this clip? This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          onClick={() => deleteClip.mutate({ id: clip.id })}
+                          disabled={deleteClip.isPending}
+                        >
+                          {deleteClip.isPending ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          ) : null}
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </div>
 
               <div className="relative min-h-0 flex-1">
-                <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-8 bg-gradient-to-b from-card to-transparent" />
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-8 bg-gradient-to-t from-card to-transparent" />
+                <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-8 bg-linear-to-b from-card to-transparent" />
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-8 bg-linear-to-t from-card to-transparent" />
 
                 <div className="scrollbar-hide h-full overflow-y-auto py-6">
                   <div
