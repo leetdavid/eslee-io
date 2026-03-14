@@ -2,7 +2,7 @@
 
 import { FileText, Loader2, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
   Command,
@@ -19,7 +19,6 @@ import { api } from "@/trpc/react";
 export function CommandMenu() {
   const [open, setOpen] = useState(false);
   const router = useRouter();
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {

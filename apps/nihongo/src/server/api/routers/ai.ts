@@ -177,6 +177,10 @@ Provide ONLY the translation. Do not include any explanations, romanization, or 
               role: "user",
               content: [
                 {
+                  type: "text",
+                  text: "Extract all Japanese text from this image.",
+                },
+                {
                   type: "image",
                   image: input.imageBase64,
                 },

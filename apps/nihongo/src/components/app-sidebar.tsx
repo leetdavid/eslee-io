@@ -1,6 +1,6 @@
 "use client";
 
-import { Brain, CircleHelpIcon, FileText, Settings } from "lucide-react";
+import { Brain, FileText, Settings } from "lucide-react";
 import Link from "next/link";
 import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
@@ -23,17 +23,17 @@ const data = {
       url: "/clips",
       icon: <FileText />,
     },
+  ],
+  navSecondary: [
+    // {
+    //   title: "Get Help",
+    //   url: "#",
+    //   icon: <CircleHelpIcon />,
+    // },
     {
       title: "Settings",
       url: "/settings",
       icon: <Settings />,
-    },
-  ],
-  navSecondary: [
-    {
-      title: "Get Help",
-      url: "#",
-      icon: <CircleHelpIcon />,
     },
   ],
 };

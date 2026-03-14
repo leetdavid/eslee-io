@@ -1,5 +1,6 @@
 "use client";
 
+import { formatDistanceToNow } from "date-fns";
 import { FileText, Loader2, Plus, Search, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -157,11 +158,7 @@ export function ClipsDesktopView() {
                   )}
                 </div>
                 <p className="ml-4 shrink-0 font-medium text-[11px] text-muted-foreground">
-                  {new Date(clip.createdAt).toLocaleDateString(undefined, {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                  })}
+                  {formatDistanceToNow(new Date(clip.createdAt), { addSuffix: true })}
                 </p>
               </div>
             </Link>

@@ -1,5 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import { and, desc, eq, ilike, inArray, lt, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, lt, or, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import type { JLPTLevel } from "@/lib/constants";
@@ -157,7 +157,14 @@ export const clipRouter = createTRPCRouter({
       const conditions = [eq(clips.userId, ctx.session.user.id)];
 
       if (input?.search) {
-        conditions.push(ilike(clips.title, `%${input.search}%`));
+        const searchTerm = `%${input.search}%`;
+        const searchCondition = or(
+          ilike(clips.title, searchTerm),
+          ilike(sql`CAST(${clips.content} AS TEXT)`, searchTerm),
+        );
+        if (searchCondition) {
+          conditions.push(searchCondition);
+        }
       }
 
       if (input?.cursor) {

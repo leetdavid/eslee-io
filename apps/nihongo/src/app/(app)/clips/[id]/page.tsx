@@ -1,17 +1,30 @@
 "use client";
 
 import type { JSONContent } from "@tiptap/react";
-import { ArrowLeft, Loader2, Save } from "lucide-react";
+import { ArrowLeft, Loader2, Save, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
 import { Editor } from "@/components/editor/editor";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import { JLPT_LEVELS, type JLPTLevel } from "@/lib/constants";
 import { api } from "@/trpc/react";
 
 export default function ClipDetailPage() {
   const params = useParams();
-  // const router = useRouter();
+  const router = useRouter();
   const clipId = params.id as string;
 
   const [editedContent, setEditedContent] = useState<JSONContent | undefined>();
@@ -42,6 +55,17 @@ export default function ClipDetailPage() {
       setIsDirty(false);
       void utils.clip.getById.invalidate({ id: clipId });
       void utils.clip.getAll.invalidate();
+    },
+  });
+
+  const deleteClip = api.clip.delete.useMutation({
+    onSuccess: () => {
+      toast.success("Clip deleted successfully");
+      void utils.clip.getAll.invalidate();
+      router.push("/clips");
+    },
+    onError: (error) => {
+      toast.error(`Failed to delete clip: ${error.message}`);
     },
   });
 
@@ -130,6 +154,39 @@ export default function ClipDetailPage() {
               Saved
             </div>
           )}
+
+          <div className="ml-2 h-4 w-px bg-border" />
+
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete Clip</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure you want to delete this clip? This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  onClick={() => deleteClip.mutate({ id: clipId })}
+                  disabled={deleteClip.isPending}
+                >
+                  {deleteClip.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
 
