@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-@plugin 'tailwindcss-animate';
+@plugin "tailwindcss-animate";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -42,8 +42,7 @@
   --radius-xl: calc(var(--radius) + 4px);
 
   --font-sans:
-    var(--font-geist-sans), "Noto Sans JP", "Noto Sans KR", ui-sans-serif,
-    system-ui, sans-serif;
+    var(--font-geist-sans), "Noto Sans JP", "Noto Sans KR", ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
   --animate-accordion-down: accordion-down 0.2s ease-out;
