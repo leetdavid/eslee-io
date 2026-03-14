@@ -17,7 +17,8 @@
       "!**/.cache",
       "!**/build",
       "!**/public",
-      "!**/*-types.ts"
+      "!**/*-types.ts",
+      "!**/src/components/ui"
     ]
   },
   "linter": {

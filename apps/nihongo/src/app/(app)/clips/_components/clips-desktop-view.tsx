@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpen, FileText, Loader2, Plus, Search, Trash2 } from "lucide-react";
+import { FileText, Loader2, Plus, Search, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";

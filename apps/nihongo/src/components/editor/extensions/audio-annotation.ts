@@ -63,7 +63,7 @@ export const AudioAnnotation = Node.create<AudioAnnotationOptions>({
   },
 
   addNodeView() {
-    return ({ node, HTMLAttributes }) => {
+    return ({ node, HTMLAttributes: _HTMLAttributes }) => {
       const dom = document.createElement("span");
       dom.classList.add("audio-annotation");
       dom.setAttribute("data-audio-annotation", "true");

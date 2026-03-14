@@ -3,7 +3,7 @@
 import type { JSONContent } from "@tiptap/react";
 import { ArrowLeft, Loader2, Save } from "lucide-react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { Editor } from "@/components/editor/editor";
 import { JLPT_LEVELS, type JLPTLevel } from "@/lib/constants";
@@ -11,7 +11,7 @@ import { api } from "@/trpc/react";
 
 export default function ClipDetailPage() {
   const params = useParams();
-  const router = useRouter();
+  // const router = useRouter();
   const clipId = params.id as string;
 
   const [editedContent, setEditedContent] = useState<JSONContent | undefined>();

@@ -17,6 +17,7 @@ export function PhotoCard({ photo }: { photo: Photo }) {
   return (
     <Dialog>
       <DialogTrigger>
+        {/** biome-ignore lint/a11y/noStaticElementInteractions: i dont want to change it */}
         <div
           className="group relative aspect-4/5 w-full overflow-hidden bg-white dark:bg-neutral-900"
           onMouseEnter={() => setIsHovered(true)}

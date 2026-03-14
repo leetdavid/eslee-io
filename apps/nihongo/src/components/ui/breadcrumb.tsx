@@ -51,6 +51,8 @@ function BreadcrumbLink({
 
 function BreadcrumbPage({ className, ...props }: React.ComponentProps<"span">) {
   return (
+    // biome-ignore lint/a11y/useFocusableInteractive: Maintained by shadcn/ui
+    // biome-ignore lint/a11y/useSemanticElements: Maintained by shadcn/ui
     <span
       data-slot="breadcrumb-page"
       role="link"
