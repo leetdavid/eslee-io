@@ -60,7 +60,6 @@
     "@types/react-dom": "catalog:react19",
     "dotenv-cli": "catalog:",
     "drizzle-kit": "catalog:",
-    "postcss": "^8.4.39",
     "tailwindcss": "catalog:",
     "typescript": "catalog:"
   }
