@@ -5,9 +5,8 @@ import StarterKit from "@tiptap/starter-kit";
 import { formatDistanceToNow } from "date-fns";
 import { ArrowRightLeft, Loader2, Save, Trash2, Volume2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { useDebounceCallback } from "usehooks-ts";
 import { AudioAnnotation } from "@/components/editor/extensions/audio-annotation";
 import { Furigana } from "@/components/editor/extensions/furigana";
 import { TranslationBlock } from "@/components/editor/extensions/translation-block";
@@ -99,8 +98,17 @@ export default function TranslatePage() {
   });
 
   // Debounced translate trigger
-  const triggerTranslation = useDebounceCallback(
-    async (text: string, srcLang: string, tgtLang: string, aiModel: string) => {
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const activeRequestIdRef = useRef<number>(0);
+
+  const triggerTranslation = (text: string, srcLang: string, tgtLang: string, aiModel: string) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = setTimeout(async () => {
+      const requestId = ++activeRequestIdRef.current;
+
       if (!text.trim()) {
         setTargetText("");
         setSourceFuriganaHtml(null);
@@ -115,44 +123,68 @@ export default function TranslatePage() {
       try {
         // 1. Check if source has Japanese, and start furigana if so
         const isSrcJa = hasJapanese(text);
-        if (isSrcJa) {
-          setIsFuriganaProcessing(true);
-          furiganaMut.mutate(
-            { text },
-            {
-              onSuccess: (data) => setSourceFuriganaHtml(data.html),
-              onError: () => setSourceFuriganaHtml(text),
-              onSettled: () => setIsFuriganaProcessing(false),
-            },
-          );
-        } else {
-          setSourceFuriganaHtml(null);
-        }
+        let sFurigana: string | null = null;
 
-        // 2. Translate
-        const result = await translateMut.mutateAsync({
+        const furiganaPromise = isSrcJa
+          ? furiganaMut
+              .mutateAsync({ text })
+              .then((res) => {
+                sFurigana = res.html;
+                if (activeRequestIdRef.current === requestId) {
+                  setSourceFuriganaHtml(sFurigana);
+                }
+              })
+              .catch(() => {
+                sFurigana = text;
+                if (activeRequestIdRef.current === requestId) {
+                  setSourceFuriganaHtml(sFurigana);
+                }
+              })
+          : Promise.resolve().then(() => {
+              if (activeRequestIdRef.current === requestId) {
+                setSourceFuriganaHtml(null);
+              }
+            });
+
+        if (isSrcJa && activeRequestIdRef.current === requestId) setIsFuriganaProcessing(true);
+
+        // 2. Translate concurrently if possible, or wait
+        const translatePromise = translateMut.mutateAsync({
           text,
           sourceLanguage: srcLang,
           targetLanguage: tgtLang,
           model: aiModel,
         });
 
+        // Wait for both to finish
+        const [_, result] = await Promise.all([furiganaPromise, translatePromise]);
+
+        if (activeRequestIdRef.current !== requestId) return;
+
+        if (isSrcJa) setIsFuriganaProcessing(false);
+
         const translated = result.translation;
         setTargetText(translated);
 
         // 3. Check if target has Japanese, and start furigana if so
         const isTgtJa = hasJapanese(translated);
-        let tFurigana = null;
+        let tFurigana: string | null = null;
+
         if (isTgtJa) {
           setIsFuriganaProcessing(true);
           try {
             const tResult = await furiganaMut.mutateAsync({ text: translated });
+            if (activeRequestIdRef.current !== requestId) return;
             tFurigana = tResult.html;
             setTargetFuriganaHtml(tFurigana);
-          } catch (e) {
-            setTargetFuriganaHtml(translated);
+          } catch (_e) {
+            if (activeRequestIdRef.current !== requestId) return;
+            tFurigana = translated;
+            setTargetFuriganaHtml(tFurigana);
           } finally {
-            setIsFuriganaProcessing(false);
+            if (activeRequestIdRef.current === requestId) {
+              setIsFuriganaProcessing(false);
+            }
           }
         } else {
           setTargetFuriganaHtml(null);
@@ -162,20 +194,23 @@ export default function TranslatePage() {
         addHistoryItem({
           sourceText: text,
           targetText: translated,
-          sourceFuriganaHtml: isSrcJa ? sourceFuriganaHtml || text : undefined, // Will be updated by the hook if it arrives later or we use the latest
-          targetFuriganaHtml: tFurigana || undefined,
+          sourceFuriganaHtml: isSrcJa && sFurigana ? sFurigana : undefined,
+          targetFuriganaHtml: isTgtJa && tFurigana ? tFurigana : undefined,
           sourceLanguage: srcLang,
           targetLanguage: tgtLang,
           model: aiModel,
         });
       } catch (_e) {
-        toast.error("Translation failed");
+        if (activeRequestIdRef.current === requestId) {
+          toast.error("Translation failed");
+        }
       } finally {
-        setIsTranslating(false);
+        if (activeRequestIdRef.current === requestId) {
+          setIsTranslating(false);
+        }
       }
-    },
-    1500,
-  );
+    }, 500);
+  };
 
   // Source text change handler with Auto-Swap logic
   const handleSourceTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
