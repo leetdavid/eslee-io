@@ -101,12 +101,12 @@ export function ClipsDesktopView({
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {data?.items.map((clip) => (
-            <Link
+            <div
               key={clip.id}
-              href={`/clips/${clip.id}`}
               className="group relative flex min-h-[160px] flex-col justify-between rounded-xl border border-border bg-card p-5 transition-colors hover:border-primary/50 hover:bg-accent/50"
             >
-              <div className="mb-3 flex items-start justify-between">
+              <Link href={`/clips/${clip.id}`} className="absolute inset-0 z-0" />
+              <div className="pointer-events-none relative z-10 mb-3 flex items-start justify-between">
                 <div className="space-y-1">
                   <h3 className="font-semibold leading-none">{clip.title ?? "Untitled"}</h3>
                   <div className="flex items-center gap-2 pt-1.5 font-medium text-muted-foreground text-xs">
@@ -120,53 +120,46 @@ export function ClipsDesktopView({
                   </div>
                 </div>
 
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                      }}
-                      className="-mt-1.5 -mr-1.5 rounded-md p-1.5 text-muted-foreground opacity-0 transition-opacity hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent onClick={(e) => e.stopPropagation()}>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Delete Clip</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Are you sure you want to delete this clip? This action cannot be undone.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel onClick={(e) => e.preventDefault()}>
-                        Cancel
-                      </AlertDialogCancel>
-                      <AlertDialogAction
-                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          onDelete(clip.id);
-                        }}
-                        disabled={isDeleting}
+                <div className="pointer-events-auto">
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <button
+                        type="button"
+                        className="-mt-1.5 -mr-1.5 rounded-md p-1.5 text-muted-foreground opacity-0 transition-opacity hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100"
                       >
-                        {isDeleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                        Delete
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Clip</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to delete this clip? This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          onClick={() => onDelete(clip.id)}
+                          disabled={isDeleting}
+                        >
+                          {isDeleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
               </div>
 
-              <p className="mb-4 line-clamp-3 flex-1 text-muted-foreground text-sm leading-relaxed">
+              <p className="pointer-events-none relative z-10 mb-4 line-clamp-3 flex-1 text-muted-foreground text-sm leading-relaxed">
                 {getClipPreview(clip.content, 150) || (
                   <span className="italic opacity-50">No content</span>
                 )}
               </p>
 
-              <div className="mt-auto flex items-end justify-between">
+              <div className="pointer-events-none relative z-10 mt-auto flex items-end justify-between">
                 <div className="flex flex-col items-start gap-2">
                   {clip.jlptLevel && (
                     <span className="inline-block rounded-full bg-secondary/80 px-2 py-0.5 font-medium text-[11px] text-secondary-foreground">
@@ -187,7 +180,7 @@ export function ClipsDesktopView({
                   {formatDistanceToNow(new Date(clip.createdAt), { addSuffix: true })}
                 </p>
               </div>
-            </Link>
+            </div>
           ))}
         </div>
       )}

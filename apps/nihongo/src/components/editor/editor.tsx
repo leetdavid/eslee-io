@@ -62,7 +62,7 @@ export function Editor({
       attributes: {
         class:
           editorClassName ||
-          "tiptap prose dark:prose-invert max-w-none focus:outline-none prose-p:my-2 prose-headings:mb-2 prose-headings:mt-4 prose-li:my-0 leading-normal text-[length:var(--editor-font-size)]",
+          "tiptap prose dark:prose-invert max-w-none focus:outline-none prose-p:my-2 prose-headings:mb-2 prose-headings:mt-4 prose-li:my-0 leading-loose text-[length:var(--editor-font-size)]",
       },
     },
   });

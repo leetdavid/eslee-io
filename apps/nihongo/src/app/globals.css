@@ -149,14 +149,21 @@
   /* Ruby text (furigana) styling */
   ruby {
     ruby-align: center;
+    ruby-position: over;
+    /* Prevent the ruby block from increasing the line height of the parent */
+    line-height: 1;
   }
 
-  ruby rt {
+  ruby::after {
+    content: attr(data-reading);
+    display: ruby-text;
     font-size: 0.5em;
     color: hsl(var(--muted-foreground));
     font-weight: 400;
     user-select: none;
     -webkit-user-select: none;
+    /* Ensure furigana doesn't take up excessive vertical space */
+    line-height: 0;
   }
 
   /* JLPT level vocabulary highlight colors */

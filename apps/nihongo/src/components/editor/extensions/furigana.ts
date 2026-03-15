@@ -16,6 +16,8 @@ declare module "@tiptap/core" {
 export const Furigana = Mark.create<FuriganaOptions>({
   name: "furigana",
 
+  inclusive: false,
+
   addOptions() {
     return {
       HTMLAttributes: {},
@@ -42,18 +44,40 @@ export const Furigana = Mark.create<FuriganaOptions>({
   },
 
   parseHTML() {
-    return [{ tag: "ruby" }];
+    return [
+      {
+        tag: "ruby",
+        getAttrs: (node) => {
+          if (node instanceof HTMLElement) {
+            // Check data attribute first, then fallback to <rt> tag
+            const dataReading = node.getAttribute("data-reading");
+            if (!dataReading) {
+              const rt = node.querySelector("rt");
+              if (rt) {
+                node.setAttribute("data-reading", rt.textContent || "");
+              }
+            }
+
+            // Remove rt and rp to prevent their text from being parsed as the ruby mark's content
+            node.querySelectorAll("rt").forEach((el) => {
+              el.remove();
+            });
+            node.querySelectorAll("rp").forEach((el) => {
+              el.remove();
+            });
+          }
+          return null;
+        },
+      },
+    ];
   },
 
   renderHTML({ HTMLAttributes, mark }) {
     const reading = mark.attrs.reading as string;
     return [
       "ruby",
-      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
-      ["span", {}, 0], // The content hole (0) must be the only child of its parent node in ProseMirror
-      ["rp", {}, "("],
-      ["rt", {}, reading],
-      ["rp", {}, ")"],
+      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, { "data-reading": reading }),
+      0,
     ];
   },
 
