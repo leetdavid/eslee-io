@@ -1,6 +1,6 @@
 "use client";
 
-import { Brain, FileText, Settings } from "lucide-react";
+import { Brain, FileText, Languages, Settings } from "lucide-react";
 import Link from "next/link";
 import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
@@ -23,6 +23,11 @@ const data = {
       title: "Clips",
       url: "/clips",
       icon: <FileText />,
+    },
+    {
+      title: "Translate",
+      url: "/translate",
+      icon: <Languages />,
     },
   ],
   navSecondary: [

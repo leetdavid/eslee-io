@@ -139,17 +139,27 @@ Output ONLY the raw HTML, nothing else. Do not use markdown formatting. Do not w
     .input(
       z.object({
         text: z.string().min(1).max(5000),
+        sourceLanguage: z.string().default("ja"),
         targetLanguage: z.string().default("en"),
+        model: z.string().optional(),
       }),
     )
     .mutation(async ({ input }) => {
       try {
         const targetLangObj = LANGUAGES.find((l) => l.value === input.targetLanguage);
-        const langName = targetLangObj ? targetLangObj.label : "English";
+        const targetLangName = targetLangObj ? targetLangObj.label : "English";
+
+        const sourceLangObj = LANGUAGES.find((l) => l.value === input.sourceLanguage);
+        const sourceLangName = sourceLangObj ? sourceLangObj.label : "Japanese";
+
+        const selectedModel =
+          input.model && input.model in models
+            ? models[input.model as keyof typeof models].model
+            : models[defaultModel].model;
 
         const { text } = await generateText({
-          model: models[defaultModel].model,
-          system: `You are an expert Japanese translator. Translate the given Japanese text to ${langName}. 
+          model: selectedModel,
+          system: `You are an expert translator. Translate the given text from ${sourceLangName} to ${targetLangName}. 
 Provide ONLY the translation. Do not include any explanations, romanization, or original text.`,
           prompt: input.text,
         });
