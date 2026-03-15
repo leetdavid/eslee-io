@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { signIn } from "@/lib/auth-client";
-import { cn } from "@/lib/utils";
 
 export function LoginForm() {
   const router = useRouter();
@@ -43,58 +45,31 @@ export function LoginForm() {
     <div className="space-y-6">
       <form onSubmit={handleEmailLogin} className="space-y-4">
         <div className="space-y-2">
-          <label htmlFor="email" className="font-medium text-sm leading-none">
-            Email
-          </label>
-          <input
+          <Label htmlFor="email">Email</Label>
+          <Input
             id="email"
             type="email"
             placeholder="you@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className={cn(
-              "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm",
-              "ring-offset-background placeholder:text-muted-foreground",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-              "disabled:cursor-not-allowed disabled:opacity-50",
-            )}
           />
         </div>
         <div className="space-y-2">
-          <label htmlFor="password" className="font-medium text-sm leading-none">
-            Password
-          </label>
-          <input
+          <Label htmlFor="password">Password</Label>
+          <Input
             id="password"
             type="password"
             placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className={cn(
-              "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm",
-              "ring-offset-background placeholder:text-muted-foreground",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-              "disabled:cursor-not-allowed disabled:opacity-50",
-            )}
           />
         </div>
         {error && <p className="text-destructive text-sm">{error}</p>}
-        <button
-          type="submit"
-          disabled={loading}
-          className={cn(
-            "inline-flex h-10 w-full items-center justify-center rounded-md bg-primary px-4 py-2",
-            "font-medium text-primary-foreground text-sm",
-            "ring-offset-background transition-colors",
-            "hover:bg-primary/90",
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-            "disabled:pointer-events-none disabled:opacity-50",
-          )}
-        >
+        <Button type="submit" className="w-full" disabled={loading}>
           {loading ? "Signing in..." : "Sign in"}
-        </button>
+        </Button>
       </form>
 
       <div className="relative">
@@ -107,32 +82,12 @@ export function LoginForm() {
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <button
-          type="button"
-          onClick={() => handleSocialLogin("google")}
-          className={cn(
-            "inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4",
-            "font-medium text-sm",
-            "ring-offset-background transition-colors",
-            "hover:bg-accent hover:text-accent-foreground",
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-          )}
-        >
+        <Button variant="outline" type="button" onClick={() => handleSocialLogin("google")}>
           Google
-        </button>
-        <button
-          type="button"
-          onClick={() => handleSocialLogin("github")}
-          className={cn(
-            "inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4",
-            "font-medium text-sm",
-            "ring-offset-background transition-colors",
-            "hover:bg-accent hover:text-accent-foreground",
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-          )}
-        >
+        </Button>
+        <Button variant="outline" type="button" onClick={() => handleSocialLogin("github")}>
           GitHub
-        </button>
+        </Button>
       </div>
 
       <p className="text-center text-muted-foreground text-sm">

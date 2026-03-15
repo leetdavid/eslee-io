@@ -3,9 +3,6 @@
 import { formatDistanceToNow } from "date-fns";
 import { FileText, Loader2, Plus, Search, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,43 +15,30 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { useCreateClip } from "@/hooks/use-create-clip";
 import { cn, getClipPreview } from "@/lib/utils";
-import { api } from "@/trpc/react";
+import type { RouterOutputs } from "@/trpc/react";
 
-export function ClipsDesktopView() {
-  const router = useRouter();
-  const [search, setSearch] = useState("");
+type ClipsData = RouterOutputs["clip"]["getAll"];
 
-  const { data, isLoading } = api.clip.getAll.useQuery(search ? { search } : undefined);
+interface ClipsDesktopViewProps {
+  data?: ClipsData;
+  isLoading: boolean;
+  search: string;
+  onSearchChange: (search: string) => void;
+  onDelete: (id: string) => void;
+  isDeleting: boolean;
+}
 
-  const deleteClip = api.clip.delete.useMutation({
-    onSuccess: () => {
-      // Refetch clips after deletion
-      toast.success("Clip deleted successfully");
-      void utils.clip.getAll.invalidate();
-    },
-    onError: (error) => {
-      toast.error(`Failed to delete clip: ${error.message}`);
-    },
-  });
-
-  const createClip = api.clip.create.useMutation({
-    onSuccess: (clip) => {
-      if (clip) {
-        router.push(`/clips/${clip.id}`);
-      }
-    },
-  });
-
-  const utils = api.useUtils();
-
-  const handleCreateClip = () => {
-    createClip.mutate({
-      title: "Untitled Clip",
-      content: { type: "doc", content: [{ type: "paragraph" }] },
-      sourceLanguage: "ja",
-    });
-  };
+export function ClipsDesktopView({
+  data,
+  isLoading,
+  search,
+  onSearchChange,
+  onDelete,
+  isDeleting,
+}: ClipsDesktopViewProps) {
+  const { handleCreateClip, isPending } = useCreateClip();
 
   return (
     <div className="hidden min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4 md:flex lg:p-6 lg:pt-6">
@@ -64,8 +48,8 @@ export function ClipsDesktopView() {
           <p className="text-muted-foreground text-sm">Your saved Japanese text clips</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button onClick={handleCreateClip} disabled={createClip.isPending}>
-            {createClip.isPending ? (
+          <Button onClick={handleCreateClip} disabled={isPending}>
+            {isPending ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
               <Plus className="mr-2 h-4 w-4" />
@@ -82,7 +66,7 @@ export function ClipsDesktopView() {
           type="text"
           placeholder="Search clips..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => onSearchChange(e.target.value)}
           className={cn(
             "flex h-10 w-full rounded-md border border-input bg-background py-2 pr-4 pl-10 text-sm",
             "placeholder:text-muted-foreground",
@@ -105,8 +89,8 @@ export function ClipsDesktopView() {
           <p className="mt-1 text-muted-foreground text-sm">
             Create your first clip to start learning Japanese
           </p>
-          <Button className="mt-4" onClick={handleCreateClip} disabled={createClip.isPending}>
-            {createClip.isPending ? (
+          <Button className="mt-4" onClick={handleCreateClip} disabled={isPending}>
+            {isPending ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
               <Plus className="mr-2 h-4 w-4" />
@@ -164,13 +148,11 @@ export function ClipsDesktopView() {
                         className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                         onClick={(e) => {
                           e.preventDefault();
-                          deleteClip.mutate({ id: clip.id });
+                          onDelete(clip.id);
                         }}
-                        disabled={deleteClip.isPending}
+                        disabled={isDeleting}
                       >
-                        {deleteClip.isPending ? (
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        ) : null}
+                        {isDeleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                         Delete
                       </AlertDialogAction>
                     </AlertDialogFooter>

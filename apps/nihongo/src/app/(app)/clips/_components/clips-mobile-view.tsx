@@ -4,7 +4,6 @@ import type { JSONContent } from "@tiptap/react";
 import { Edit3, Loader2, Minus, Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { toast } from "sonner";
 import { Editor } from "@/components/editor/editor";
 import {
   AlertDialog,
@@ -17,57 +16,35 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { api } from "@/trpc/react";
+import { useCreateClip } from "@/hooks/use-create-clip";
+import type { RouterOutputs } from "@/trpc/react";
 
-export function ClipsMobileView() {
+type ClipsData = RouterOutputs["clip"]["getAll"];
+
+interface ClipsMobileViewProps {
+  data?: ClipsData;
+  isLoading: boolean;
+  onDelete: (id: string) => void;
+  isDeleting: boolean;
+}
+
+export function ClipsMobileView({ data, isLoading, onDelete, isDeleting }: ClipsMobileViewProps) {
   const router = useRouter();
-  const { data, isLoading } = api.clip.getAll.useQuery();
   const [textScale, setTextScale] = useState(1);
+  const { handleCreateClip, isPending } = useCreateClip();
 
   const handleZoomIn = () => setTextScale((s) => Math.min(Number((s + 0.1).toFixed(2)), 3));
   const handleZoomOut = () => setTextScale((s) => Math.max(Number((s - 0.1).toFixed(2)), 0.5));
-
-  const createClip = api.clip.create.useMutation({
-    onSuccess: (clip) => {
-      if (clip) {
-        router.push(`/clips/${clip.id}`);
-      }
-    },
-  });
-
-  const handleCreateClip = () => {
-    createClip.mutate({
-      title: "Untitled Clip",
-      content: { type: "doc", content: [{ type: "paragraph" }] },
-      sourceLanguage: "ja",
-    });
-  };
-
-  const utils = api.useUtils();
-
-  const deleteClip = api.clip.delete.useMutation({
-    onSuccess: () => {
-      toast.success("Clip deleted successfully");
-      void utils.clip.getAll.invalidate();
-    },
-    onError: (error) => {
-      toast.error(`Failed to delete clip: ${error.message}`);
-    },
-  });
 
   return (
     <div className="relative flex h-full min-h-0 w-full flex-1 snap-x snap-mandatory overflow-x-auto overflow-y-hidden text-foreground md:hidden">
       <button
         type="button"
         onClick={handleCreateClip}
-        disabled={createClip.isPending}
+        disabled={isPending}
         className="fixed right-6 bottom-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105 active:scale-95 disabled:opacity-50"
       >
-        {createClip.isPending ? (
-          <Loader2 className="h-6 w-6 animate-spin" />
-        ) : (
-          <Plus className="h-6 w-6" />
-        )}
+        {isPending ? <Loader2 className="h-6 w-6 animate-spin" /> : <Plus className="h-6 w-6" />}
       </button>
 
       {isLoading ? (
@@ -119,12 +96,10 @@ export function ClipsMobileView() {
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
                           className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                          onClick={() => deleteClip.mutate({ id: clip.id })}
-                          disabled={deleteClip.isPending}
+                          onClick={() => onDelete(clip.id)}
+                          disabled={isDeleting}
                         >
-                          {deleteClip.isPending ? (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          ) : null}
+                          {isDeleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                           Delete
                         </AlertDialogAction>
                       </AlertDialogFooter>
