@@ -12,6 +12,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { api } from "@/trpc/react";
 
@@ -26,6 +27,7 @@ export function NavMain({
 }) {
   const router = useRouter();
   const utils = api.useUtils();
+  const { isMobile, setOpenMobile } = useSidebar();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isProcessingImage, setIsProcessingImage] = useState(false);
 
@@ -72,6 +74,7 @@ export function NavMain({
   });
 
   const handleCreateClip = () => {
+    if (isMobile) setOpenMobile(false);
     createClip.mutate({
       title: "Untitled Clip",
       content: { type: "doc", content: [{ type: "paragraph" }] },
@@ -151,7 +154,10 @@ export function NavMain({
             />
             <Button
               size="icon"
-              onClick={() => fileInputRef.current?.click()}
+              onClick={() => {
+                if (isMobile) setOpenMobile(false);
+                fileInputRef.current?.click();
+              }}
               disabled={createClip.isPending || isProcessingImage}
               className="size-8 disabled:opacity-50 group-data-[collapsible=icon]:opacity-0"
               variant="outline"
@@ -169,7 +175,7 @@ export function NavMain({
         <SidebarMenu>
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
-              <Link href={item.url}>
+              <Link href={item.url} onClick={() => isMobile && setOpenMobile(false)}>
                 <SidebarMenuButton tooltip={item.title}>
                   {item.icon}
                   <span>{item.title}</span>

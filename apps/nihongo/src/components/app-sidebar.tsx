@@ -13,6 +13,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { useSession } from "@/lib/auth-client";
 
@@ -40,6 +41,7 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: session } = useSession();
+  const { isMobile, setOpenMobile } = useSidebar();
 
   const user = {
     name: session?.user?.name ?? "User",
@@ -53,7 +55,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" className="data-[slot=sidebar-menu-button]">
-              <Link href="/clips" className="flex cursor-pointer items-center gap-2">
+              <Link
+                href="/clips"
+                onClick={() => isMobile && setOpenMobile(false)}
+                className="flex cursor-pointer items-center gap-2"
+              >
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                   <Brain className="size-5" />
                 </div>

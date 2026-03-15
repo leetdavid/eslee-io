@@ -43,11 +43,12 @@ export function NavUser({
     avatar: string;
   };
 }) {
-  const { isMobile } = useSidebar();
+  const { isMobile, setOpenMobile } = useSidebar();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
 
   const handleSignOut = async () => {
+    if (isMobile) setOpenMobile(false);
     await signOut();
     router.push("/login");
     router.refresh();
@@ -99,7 +100,12 @@ export function NavUser({
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem onClick={() => router.push("/settings")}>
+              <DropdownMenuItem
+                onClick={() => {
+                  if (isMobile) setOpenMobile(false);
+                  router.push("/settings");
+                }}
+              >
                 <CircleUserRoundIcon />
                 Account Settings
               </DropdownMenuItem>

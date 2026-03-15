@@ -22,6 +22,8 @@ interface EditorProps {
   editable?: boolean;
   editorClassName?: string;
   className?: string;
+  textScale?: number;
+  onTextScaleChange?: (scale: number | ((prev: number) => number)) => void;
 }
 
 export function Editor({
@@ -31,8 +33,12 @@ export function Editor({
   editable = true,
   editorClassName,
   className,
+  textScale: externalTextScale,
+  onTextScaleChange: externalOnTextScaleChange,
 }: EditorProps) {
-  const [textScale, setTextScale] = useState(1);
+  const [internalTextScale, setInternalTextScale] = useState(1);
+  const textScale = externalTextScale ?? internalTextScale;
+  const setTextScale = externalOnTextScaleChange ?? setInternalTextScale;
 
   const editor = useEditor({
     extensions: [

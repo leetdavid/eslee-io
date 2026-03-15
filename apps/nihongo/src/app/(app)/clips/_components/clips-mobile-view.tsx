@@ -138,19 +138,12 @@ export function ClipsMobileView() {
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-8 bg-linear-to-t from-card to-transparent" />
 
                 <div className="scrollbar-hide h-full overflow-y-auto py-6">
-                  <div
-                    className="my-auto transition-all duration-200"
-                    style={
-                      {
-                        "--editor-font-size": `${1.5 * textScale}rem`,
-                        fontSize: "var(--editor-font-size)",
-                      } as React.CSSProperties
-                    }
-                  >
+                  <div className="my-auto transition-all duration-200">
                     <Editor
                       content={clip.content as JSONContent}
                       onChange={() => {}}
                       editable={false}
+                      textScale={textScale * 1.5}
                       className="border-none bg-transparent p-0!"
                       editorClassName="tiptap prose dark:prose-invert max-w-none focus:outline-none prose-p:my-2 prose-headings:mb-2 prose-headings:mt-4 prose-li:my-0 leading-normal text-[length:var(--editor-font-size)]"
                     />
