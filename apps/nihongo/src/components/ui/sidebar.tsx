@@ -92,8 +92,9 @@ function SidebarProvider({
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === SIDEBAR_KEYBOARD_SHORTCUT && (event.metaKey || event.ctrlKey)) {
-        event.preventDefault();
-        toggleSidebar();
+        // Disabled since it interferes with text editor's bold shortcut
+        // event.preventDefault();
+        // toggleSidebar();
       }
     };
 
