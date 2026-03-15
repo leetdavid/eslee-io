@@ -4,7 +4,7 @@ import type { JSONContent } from "@tiptap/react";
 import { ArrowLeft, Loader2, Save, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Editor } from "@/components/editor/editor";
 import {
@@ -48,6 +48,13 @@ export default function ClipDetailPage() {
 
   const { data: clip, isLoading } = api.clip.getById.useQuery({ id: clipId });
 
+  // Save on unmount if dirty
+  const isDirtyRef = useRef(isDirty);
+
+  useEffect(() => {
+    isDirtyRef.current = isDirty;
+  }, [isDirty]);
+
   // When clip data loads for the first time, populate state.
   useEffect(() => {
     if (clip && editedContent === undefined && !isDirty) {
@@ -62,6 +69,7 @@ export default function ClipDetailPage() {
   const updateClip = api.clip.update.useMutation({
     onSuccess: () => {
       setIsDirty(false);
+      isDirtyRef.current = false;
       void utils.clip.getById.invalidate({ id: clipId });
       void utils.clip.getAll.invalidate();
     },
@@ -81,6 +89,9 @@ export default function ClipDetailPage() {
   const handleSave = useCallback(() => {
     if (!editedContent) return;
 
+    setIsDirty(false);
+    isDirtyRef.current = false;
+
     updateClip.mutate({
       id: clipId,
       title: editedTitle || undefined,
@@ -91,13 +102,26 @@ export default function ClipDetailPage() {
     });
   }, [clipId, editedTitle, editedContent, sourceLanguage, targetLanguage, jlptLevel, updateClip]);
 
+  const handleSaveRef = useRef(handleSave);
+  useEffect(() => {
+    handleSaveRef.current = handleSave;
+  }, [handleSave]);
+
+  useEffect(() => {
+    return () => {
+      if (isDirtyRef.current) {
+        handleSaveRef.current();
+      }
+    };
+  }, []);
+
   // Auto-save on debounce
   useEffect(() => {
     if (!isDirty || !editedContent) return;
 
     const timeout = setTimeout(() => {
       handleSave();
-    }, 1500);
+    }, 500);
 
     return () => clearTimeout(timeout);
   }, [isDirty, editedContent, handleSave]);
@@ -133,12 +157,18 @@ export default function ClipDetailPage() {
       <div className="mx-auto flex h-full w-full max-w-5xl flex-1 flex-col gap-6 overflow-hidden">
         <div className="flex shrink-0 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-1 items-center gap-4">
-            <Link
-              href="/clips"
+            <button
+              type="button"
+              onClick={() => {
+                if (isDirty) {
+                  handleSave();
+                }
+                router.push("/clips");
+              }}
               className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-input bg-background transition-colors hover:bg-accent"
             >
               <ArrowLeft className="h-4 w-4" />
-            </Link>
+            </button>
             <input
               type="text"
               placeholder="Untitled Clip"
