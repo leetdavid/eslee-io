@@ -6,6 +6,7 @@ import Underline from "@tiptap/extension-underline";
 import type { JSONContent } from "@tiptap/react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "../ui/scroll-area";
 import { AudioAnnotation } from "./extensions/audio-annotation";
@@ -31,6 +32,8 @@ export function Editor({
   editorClassName,
   className,
 }: EditorProps) {
+  const [textScale, setTextScale] = useState(1);
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -53,7 +56,7 @@ export function Editor({
       attributes: {
         class:
           editorClassName ||
-          "tiptap prose prose-sm dark:prose-invert max-w-none focus:outline-none",
+          "tiptap prose dark:prose-invert max-w-none focus:outline-none prose-p:my-2 prose-headings:mb-2 prose-headings:mt-4 prose-li:my-0 leading-normal text-[length:var(--editor-font-size)]",
       },
     },
   });
@@ -72,10 +75,15 @@ export function Editor({
         "relative flex h-full flex-col rounded-md border border-input bg-background",
         className,
       )}
+      style={
+        {
+          "--editor-font-size": `${1 * textScale}rem`,
+        } as React.CSSProperties
+      }
     >
       {editable && (
-        <div className="shrink-0 border-border border-b-0">
-          <EditorToolbar editor={editor} />
+        <div className="shrink-0 border-border border-b">
+          <EditorToolbar editor={editor} textScale={textScale} onTextScaleChange={setTextScale} />
         </div>
       )}
       <ScrollArea className="min-h-0 flex-1 overflow-y-auto">

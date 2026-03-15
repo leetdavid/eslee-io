@@ -1,109 +1,124 @@
 # ESLEE-IO Monorepo - Agent Guidelines
 
-This repository is a TypeScript monorepo managed with **PNPM** and **Turborepo**. It contains applications and shared packages for the `.eslee.io` domain.
+This repository is a TypeScript monorepo managed with **PNPM** and **Turborepo**. It contains applications and shared packages for the `.eslee.io` domain. You must read and follow these guidelines carefully when making changes.
 
 ## 1. Build, Lint, and Verify
 
 ### Core Commands
-
-Run these commands from the root directory.
-
-- **Install Dependencies:** `pnpm install`
-- **Build All:** `pnpm build` (Runs `turbo run build`)
+Run these commands from the monorepo root directory:
+- **Install Dependencies:** `pnpm install` (Always use PNPM, never npm or yarn)
+- **Build All:** `pnpm build` (Runs `turbo run build` across all packages)
 - **Development Server:** `pnpm dev` (Runs `turbo watch dev`)
 - **Check (Lint+Format):** `pnpm check` (Runs `biome check .`)
 - **Fix Issues:** `pnpm check:fix` (Runs `biome check --write .`)
 - **Type Checking:** `pnpm typecheck` (Runs `tsc` across workspaces)
 
 ### Running Verification for a Single Package
-
 To run commands for a specific package (e.g., `@eslee/www`), use the filter flag `-F`:
-
 ```bash
-# Typecheck only the web app
 pnpm turbo run typecheck -F @eslee/www
-
-# Build only the api package
 pnpm turbo run build -F @eslee/api
 ```
 
-### Tests
+### Testing (Vitest)
+This repository uses **Vitest** for testing. All test files should be placed alongside the source files being tested (e.g., `src/components/Button.test.tsx`).
+- **Run all tests:** `pnpm test` (Runs `turbo run test`)
+- **Run tests in a specific package:** `pnpm turbo run test -F @eslee/db`
+- **Run a single test file (Preferred for targeted validation):**
+  When iterating on a specific feature, you should isolate test runs to the relevant file:
+  ```bash
+  # Option 1: Navigate to the package
+  cd apps/www
+  pnpm vitest run path/to/specific.test.ts
 
-**Note:** There are currently no unit test files (`*.test.ts`, `*.spec.ts`) in the repository.
-If adding tests:
-
-- Use **Vitest** (recommended for Vite/Next.js ecosystem) or Jest.
-- Place test files alongside source files (e.g., `src/foo.test.ts`).
-- Add a `test` script to the package's `package.json`.
+  # Option 2: Run via Turbo from the root (passing arguments)
+  pnpm turbo run test -F <package-name> -- path/to/specific.test.ts
+  ```
 
 ## 2. Code Style & Conventions
 
-### General
+**General Philosophy:** Avoid code explosion. Write only the necessary amount of code required, but prioritize readability and ease of debugging over extreme conciseness.
 
-- **Language:** TypeScript (Strict mode enabled).
-- **Package Manager:** PNPM (do not use npm or yarn).
-- **Linting & Formatting:** **Biome** (do not use ESLint or Prettier).
-  - Run `pnpm check:fix` to format code and fix lint errors.
-  - Imports are automatically organized by Biome.
+### Formatting & Linting
+- **Language:** TypeScript (Strict mode enabled). Ensure explicit typings for complex structures.
+- **Linting & Formatting:** Handled entirely by **Biome** (do not use ESLint or Prettier). Always run `pnpm check:fix` after modifications.
 
 ### Imports
-
 - **Absolute Imports:** Use the `@` alias for local imports within `src/` directories.
   - _Good:_ `import { api } from "@/trpc/server";`
   - _Bad:_ `import { api } from "../../trpc/server";`
-- **External Packages:** Import standard packages normally.
-- **Monorepo Packages:** Import shared packages by their name (e.g., `@eslee/db`, `@eslee/api`).
+- **Monorepo Packages:** Import shared packages by their name (e.g., `@eslee/db`, `@eslee/api`). Do not use relative paths across package boundaries.
 
-### Database (Drizzle ORM)
-
-- Located in `packages/db`.
-- **Schemas:** Define tables in `packages/db/src/schema.ts` using `pgTable`.
-- **Naming:**
-  - Tables: `snake_case` in DB, PascalCase variable in TS (e.g., `export const Post = pgTable("post", ...)`).
-  - Columns: `camelCase` in TS definition.
-- **Migrations:** Managed via Drizzle Kit. Run `pnpm db:push` to sync schema to DB during dev.
-
-### API (tRPC)
-
-- Located in `packages/api`.
-- **Routers:** Defined in `src/router/`.
-- **Procedures:** Use `publicProcedure` or `protectedProcedure`.
-- **Validation:** Use `zod` for input validation.
-- **Pattern:**
-  ```ts
-  export const exampleRouter = {
-    hello: publicProcedure
-      .input(z.object({ text: z.string() }))
-      .query(({ input }) => {
-        return { greeting: `Hello ${input.text}` };
-      }),
-  } satisfies TRPCRouterRecord;
-  ```
-
-### Frontend (Next.js)
-
-- Located in `apps/www`.
-- **Framework:** Next.js 14+ (App Router).
-- **Styling:** Tailwind CSS.
-- **Components:** Functional components with explicit return types is optional but prop types are required.
-- **Data Fetching:** Use `api` (tRPC client) for server/client data fetching.
-  - Server Components: `void api.post.all.prefetch();` then `<HydrateClient>`.
-  - Client Components: `const { data } = api.post.all.useQuery();`.
+### Naming Conventions
+- **Variables & Functions:** `camelCase` (e.g., `fetchUserData`).
+- **React Components, Types, Classes:** `PascalCase` (e.g., `UserProfile`, `UserDTO`).
+- **Database Tables:** Use `snake_case` in the DB but define them using `PascalCase` in TS Drizzle definitions (e.g., `export const UserProfile = pgTable("user_profile", ...)`).
 
 ### Error Handling
+- **API (tRPC):** Throw explicit `TRPCError` with appropriate standard codes (`NOT_FOUND`, `UNAUTHORIZED`, `BAD_REQUEST`).
+- **UI:** Use React Error Boundaries (or Next.js `error.tsx`) to catch rendering errors.
+- **Forms/Actions:** Gracefully handle server action failures without crashing the application. Display Zod validation errors directly within the UI.
 
-- **API:** Throw `TRPCError` with appropriate codes (`NOT_FOUND`, `UNAUTHORIZED`).
-- **UI:** Use React Error Boundaries (or Next.js `error.tsx`).
-- **Forms:** Display validation errors from Zod directly in the UI.
+## 3. Tech Stack Specifics
 
-## 3. Workflow for New Features
+### Database (Drizzle ORM)
+- Located in `packages/db`. Define tables in `packages/db/src/schema.ts` using `pgTable`.
+- Always run `pnpm db:push` to sync schema to the local DB during development after making schema changes.
 
-1.  **Database:** Add/Modify schema in `@eslee/db`. Run `pnpm db:push`.
-2.  **API:** Expose new data via tRPC routers in `@eslee/api`.
-3.  **UI:** Consume the API in `@eslee/www` or other apps using the tRPC hooks.
+### API (tRPC)
+- Located in `packages/api`.
+- Use `publicProcedure` for unauthenticated routes and `protectedProcedure` for authenticated routes.
+- Validate inputs rigorously using Zod.
 
-## 4. Agent Instructions
+### Frontend (Next.js)
+- Framework: Next.js 14+ (App Router). Styling: Tailwind CSS.
+- **Data Fetching:** Use `api` (tRPC client).
+  - Server Components: `void api.post.all.prefetch();` followed by `<HydrateClient>`.
+  - Client Components: `const { data } = api.post.all.useQuery();`.
+- **Components:** Default to Server Components. Use `'use client'` only when React hooks (useState, useForm) or browser APIs are required. 
 
-- **Check Existing:** Before adding dependencies, check `package.json` in the specific workspace.
-- **Code Generation:** When generating code, follow existing patterns found in `src/` files.
-- **Safety:** Always run `pnpm typecheck` after making structural changes to ensure no breaking contract changes.
+## 4. Payload CMS Integration (Critical Rules)
+
+If working on Payload CMS functionality, you must follow these rules defined in the `.cursor/rules/`:
+
+### Critical Security Patterns
+1. **Local API Access Control (CRITICAL SECURITY):**
+   By default, the Local API (`payload.find()`, `payload.create()`, etc.) bypasses access control (`overrideAccess: true`). If operating on behalf of a user, you **MUST** enforce permissions:
+   ```typescript
+   // SECURE: Enforces user's permissions
+   await payload.find({ collection: 'posts', user: req.user, overrideAccess: false })
+   ```
+2. **Transaction Safety:**
+   Always thread the `req` object through nested operations in hooks. Omitting `req` breaks database transaction atomicity.
+   ```typescript
+   // ATOMIC:
+   await req.payload.update({ id, collection: 'posts', data, req }) 
+   ```
+3. **Prevent Infinite Hook Loops:**
+   Hooks triggering operations that trigger the same hooks will cause infinite loops. Use `req.context` flags to bypass:
+   ```typescript
+   if (context.skipHooks) return;
+   await req.payload.update({ /*...*/ context: { skipHooks: true }, req })
+   ```
+
+### Field & Component Patterns
+4. **Type Generation:**
+   Always run `pnpm generate:types` and `pnpm generate:importmap` after modifying collection schemas.
+5. **Plugins & Admin Components:**
+   - Use the double arrow (currying) pattern for plugins: `(options) => (config) => modifiedConfig`.
+   - Component config paths must be relative to `admin.importMap.baseDir` and resolve correctly without breaking the build.
+   - All custom components are Server Components by default. Use `'use client'` only when needed, and remember client components can only accept serializable props.
+6. **Field Type Guards:**
+   - Use Payload's built-in type guards for safe runtime checking: `fieldAffectsData(field)`, `fieldHasSubFields(field)`, `fieldIsArrayType(field)`, etc.
+
+### Advanced Access Control
+7. **Best Practices:**
+   - Start with a restrictive "Default Deny" policy.
+   - For collection-level access, avoid N+1 queries. Return query constraints (e.g., `{ isPublic: { equals: true } }`) instead of performing async lookups when possible.
+   - Cache expensive lookups in `req.context` to avoid redundant database calls.
+
+## 5. Standard Workflow for New Features
+1. **Database:** Add/modify Drizzle schema in `@eslee/db` or Payload Collections. Run migrations (`pnpm db:push` / `pnpm generate:types`).
+2. **API:** Expose data via tRPC routers in `@eslee/api` or Payload custom endpoints.
+3. **UI:** Consume the API in Next.js apps using tRPC hooks or Server Components.
+4. **Safety Verification:** Before finalizing, ensure `pnpm typecheck` passes and write/run a targeted Vitest test for the new logic.

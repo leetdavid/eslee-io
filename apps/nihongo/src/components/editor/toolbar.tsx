@@ -14,6 +14,8 @@ import {
   List,
   ListOrdered,
   Loader2,
+  Minus,
+  Plus,
   Quote,
   Type,
   Underline,
@@ -44,6 +46,8 @@ import { api } from "@/trpc/react";
 
 interface ToolbarProps {
   editor: Editor;
+  textScale?: number;
+  onTextScaleChange?: (scale: number | ((prev: number) => number)) => void;
 }
 
 function ToolbarButton({
@@ -81,7 +85,7 @@ function ToolbarSeparator() {
   return <div className="mx-1 h-6 w-px bg-border" />;
 }
 
-export function EditorToolbar({ editor }: ToolbarProps) {
+export function EditorToolbar({ editor, textScale, onTextScaleChange }: ToolbarProps) {
   // Dialog states
   const [isFuriganaOpen, setIsFuriganaOpen] = useState(false);
   const [isVocabOpen, setIsVocabOpen] = useState(false);
@@ -395,6 +399,33 @@ export function EditorToolbar({ editor }: ToolbarProps) {
         <ToolbarButton onClick={() => setIsAudioOpen(true)} title="Insert Audio Annotation">
           <Volume2 className="h-4 w-4" />
         </ToolbarButton>
+
+        {textScale !== undefined && onTextScaleChange !== undefined && (
+          <>
+            <ToolbarSeparator />
+            <div className="flex items-center gap-1 pl-1">
+              <ToolbarButton
+                onClick={() =>
+                  onTextScaleChange((s) => Math.max(Number((s - 0.1).toFixed(2)), 0.5))
+                }
+                disabled={textScale <= 0.5}
+                title="Decrease font size"
+              >
+                <Minus className="h-4 w-4" />
+              </ToolbarButton>
+              <span className="w-10 text-center font-medium text-muted-foreground text-xs">
+                {Math.round(textScale * 100)}%
+              </span>
+              <ToolbarButton
+                onClick={() => onTextScaleChange((s) => Math.min(Number((s + 0.1).toFixed(2)), 3))}
+                disabled={textScale >= 3}
+                title="Increase font size"
+              >
+                <Plus className="h-4 w-4" />
+              </ToolbarButton>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Dialogs */}

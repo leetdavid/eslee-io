@@ -24,8 +24,8 @@ export function ClipsMobileView() {
   const { data, isLoading } = api.clip.getAll.useQuery();
   const [textScale, setTextScale] = useState(1);
 
-  const handleZoomIn = () => setTextScale((s) => Math.min(Number((s * 1.2).toFixed(2)), 3));
-  const handleZoomOut = () => setTextScale((s) => Math.max(Number((s * 0.8).toFixed(2)), 0.5));
+  const handleZoomIn = () => setTextScale((s) => Math.min(Number((s + 0.1).toFixed(2)), 3));
+  const handleZoomOut = () => setTextScale((s) => Math.max(Number((s - 0.1).toFixed(2)), 0.5));
 
   const createClip = api.clip.create.useMutation({
     onSuccess: (clip) => {
@@ -152,7 +152,7 @@ export function ClipsMobileView() {
                       onChange={() => {}}
                       editable={false}
                       className="border-none bg-transparent p-0!"
-                      editorClassName="tiptap prose dark:prose-invert max-w-none focus:outline-none text-[length:var(--editor-font-size)] leading-relaxed"
+                      editorClassName="tiptap prose dark:prose-invert max-w-none focus:outline-none prose-p:my-2 prose-headings:mb-2 prose-headings:mt-4 prose-li:my-0 leading-normal text-[length:var(--editor-font-size)]"
                     />
                   </div>
                 </div>

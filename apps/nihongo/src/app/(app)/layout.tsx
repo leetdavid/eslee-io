@@ -16,7 +16,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         }
       >
         <AppSidebar variant="inset" />
-        <SidebarInset className="flex h-svh max-h-svh flex-1 flex-col overflow-hidden">
+        <SidebarInset className="flex h-svh flex-1 flex-col overflow-hidden md:peer-data-[variant=inset]:h-[calc(100svh-theme(spacing.4))]">
           <SiteHeader />
           <main className="flex min-h-0 flex-1 flex-col overflow-hidden bg-background text-foreground">
             {children}
