@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
 export type TranslationHistoryItem = {
@@ -18,45 +19,59 @@ export function useTranslationHistory() {
     [],
   );
 
-  const addHistoryItem = (newItem: Omit<TranslationHistoryItem, "id" | "timestamp">) => {
-    setHistory((prev) => {
-      // Don't add if it's the exact same as the most recent item
-      if (
-        prev.length > 0 &&
-        prev[0]?.sourceText === newItem.sourceText &&
-        prev[0]?.targetLanguage === newItem.targetLanguage &&
-        prev[0]?.sourceLanguage === newItem.sourceLanguage
-      ) {
-        // Update the existing item with new target text / furigana if it changed
-        const newHistory = [...prev];
-        if (newHistory[0]) {
-          newHistory[0] = {
-            ...newHistory[0],
-            ...newItem,
-            timestamp: Date.now(),
-          };
+  const addHistoryItem = useCallback(
+    (newItem: Omit<TranslationHistoryItem, "id" | "timestamp">) => {
+      setHistory((prev) => {
+        const lastItem = prev[0];
+
+        // Update the existing item if it's the exact same, OR if it appears the user is just continuing to type/edit the same thought
+        if (lastItem) {
+          const isExactMatch =
+            lastItem.sourceText === newItem.sourceText &&
+            lastItem.targetLanguage === newItem.targetLanguage &&
+            lastItem.sourceLanguage === newItem.sourceLanguage;
+
+          const isContinuingToType =
+            (newItem.sourceText.startsWith(lastItem.sourceText) ||
+              lastItem.sourceText.startsWith(newItem.sourceText)) &&
+            lastItem.targetLanguage === newItem.targetLanguage &&
+            lastItem.sourceLanguage === newItem.sourceLanguage &&
+            Date.now() - lastItem.timestamp < 2 * 60 * 1000; // 2 minutes window
+
+          if (isExactMatch || isContinuingToType) {
+            const newHistory = [...prev];
+            newHistory[0] = {
+              ...lastItem,
+              ...newItem,
+              timestamp: Date.now(),
+            };
+            return newHistory;
+          }
         }
-        return newHistory;
-      }
 
-      const item: TranslationHistoryItem = {
-        ...newItem,
-        id: crypto.randomUUID(),
-        timestamp: Date.now(),
-      };
+        const item: TranslationHistoryItem = {
+          ...newItem,
+          id: crypto.randomUUID(),
+          timestamp: Date.now(),
+        };
 
-      // Keep only the last 50 items
-      return [item, ...prev].slice(0, 50);
-    });
-  };
+        // Keep only the last 50 items
+        return [item, ...prev].slice(0, 50);
+      });
+    },
+    [setHistory],
+  );
 
-  const removeHistoryItem = (id: string) => {
-    setHistory((prev) => prev.filter((item) => item.id !== id));
-  };
+  const removeHistoryItem = useCallback(
+    (id: string) => {
+      setHistory((prev) => prev.filter((item) => item.id !== id));
+    },
+    [setHistory],
+  );
 
-  const clearHistory = () => {
+  const clearHistory = useCallback(() => {
     setHistory([]);
-  };
+  }, [setHistory]);
 
   return {
     history,
