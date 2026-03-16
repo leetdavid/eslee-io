@@ -2,8 +2,8 @@
 
 import type { JSONContent } from "@tiptap/react";
 import { Edit3, Loader2, Minus, Plus, Trash2 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { Editor } from "@/components/editor/editor";
 import {
   AlertDialog,
@@ -28,16 +28,69 @@ interface ClipsMobileViewProps {
   isDeleting: boolean;
 }
 
-export function ClipsMobileView({ data, isLoading, onDelete, isDeleting }: ClipsMobileViewProps) {
+function ClipsMobileViewInner({ data, isLoading, onDelete, isDeleting }: ClipsMobileViewProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
   const [textScale, setTextScale] = useState(1);
   const { handleCreateClip, isPending } = useCreateClip();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const hasScrolledToInitial = useRef(false);
 
   const handleZoomIn = () => setTextScale((s) => Math.min(Number((s + 0.1).toFixed(2)), 3));
   const handleZoomOut = () => setTextScale((s) => Math.max(Number((s - 0.1).toFixed(2)), 0.5));
 
+  useEffect(() => {
+    if (!hasScrolledToInitial.current && data?.items && data.items.length > 0) {
+      const initialClipId = searchParams.get("clipId");
+      if (initialClipId) {
+        const activeElement = document.getElementById(`clip-${initialClipId}`);
+        if (activeElement) {
+          activeElement.scrollIntoView({ behavior: "auto", inline: "center" });
+        }
+      }
+      hasScrolledToInitial.current = true;
+    }
+  }, [data, searchParams]);
+
+  useEffect(() => {
+    if (!containerRef.current || !data?.items) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const clipId = entry.target.getAttribute("data-clip-id");
+            if (clipId) {
+              const currentParams = new URLSearchParams(window.location.search);
+              if (currentParams.get("clipId") !== clipId) {
+                currentParams.set("clipId", clipId);
+                const newUrl = `${pathname}?${currentParams.toString()}`;
+                window.history.replaceState(null, "", newUrl);
+              }
+            }
+          }
+        });
+      },
+      {
+        root: containerRef.current,
+        threshold: 0.6,
+      },
+    );
+
+    const clipElements = containerRef.current.querySelectorAll("[data-clip-id]");
+    clipElements.forEach((el) => {
+      observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, [data, pathname]);
+
   return (
-    <div className="relative flex h-full min-h-0 w-full flex-1 snap-x snap-mandatory overflow-x-auto overflow-y-hidden text-foreground md:hidden">
+    <div
+      ref={containerRef}
+      className="relative flex h-full min-h-0 w-full flex-1 snap-x snap-mandatory overflow-x-auto overflow-y-hidden text-foreground md:hidden"
+    >
       <button
         type="button"
         onClick={handleCreateClip}
@@ -62,6 +115,8 @@ export function ClipsMobileView({ data, isLoading, onDelete, isDeleting }: Clips
         data?.items.map((clip) => (
           <div
             key={clip.id}
+            id={`clip-${clip.id}`}
+            data-clip-id={clip.id}
             className="flex h-full w-full shrink-0 snap-center flex-col items-center justify-center p-2 sm:p-4"
           >
             <div className="relative flex h-full w-full flex-col overflow-hidden rounded-3xl border bg-card py-6 shadow-xl">
@@ -154,5 +209,19 @@ export function ClipsMobileView({ data, isLoading, onDelete, isDeleting }: Clips
         ))
       )}
     </div>
+  );
+}
+
+export function ClipsMobileView(props: ClipsMobileViewProps) {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex h-full w-full shrink-0 items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      }
+    >
+      <ClipsMobileViewInner {...props} />
+    </Suspense>
   );
 }
