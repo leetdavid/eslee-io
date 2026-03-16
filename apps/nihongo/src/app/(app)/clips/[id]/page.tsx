@@ -67,11 +67,46 @@ export default function ClipDetailPage() {
   }, [clip, editedContent, isDirty]);
 
   const updateClip = api.clip.update.useMutation({
+    onMutate: async (newClip) => {
+      await utils.clip.getAll.cancel();
+      await utils.clip.getById.cancel({ id: clipId });
+
+      const previousGetAll = utils.clip.getAll.getData(undefined);
+
+      utils.clip.getAll.setData(undefined, (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          items: old.items.map((item) =>
+            item.id === clipId
+              ? {
+                  ...item,
+                  title: newClip.title !== undefined ? newClip.title : item.title,
+                  content: newClip.content !== undefined ? newClip.content : item.content,
+                  sourceLanguage: newClip.sourceLanguage ?? item.sourceLanguage,
+                  targetLanguage: newClip.targetLanguage ?? item.targetLanguage,
+                  jlptLevel: newClip.jlptLevel ?? item.jlptLevel,
+                }
+              : item,
+          ),
+        };
+      });
+
+      return { previousGetAll };
+    },
+    onError: (err, _newClip, context) => {
+      if (context?.previousGetAll) {
+        utils.clip.getAll.setData(undefined, context.previousGetAll);
+      }
+      toast.error(`Failed to save clip: ${err.message}`);
+    },
+    onSettled: () => {
+      void utils.clip.getById.invalidate({ id: clipId });
+      void utils.clip.getAll.invalidate();
+    },
     onSuccess: () => {
       setIsDirty(false);
       isDirtyRef.current = false;
-      void utils.clip.getById.invalidate({ id: clipId });
-      void utils.clip.getAll.invalidate();
     },
   });
 
@@ -163,7 +198,7 @@ export default function ClipDetailPage() {
                 if (isDirty) {
                   handleSave();
                 }
-                router.push("/clips");
+                router.push(`/clips?clipId=${clipId}`);
               }}
               className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-input bg-background transition-colors hover:bg-accent"
             >
