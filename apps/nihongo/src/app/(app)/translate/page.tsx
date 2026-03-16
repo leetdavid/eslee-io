@@ -3,10 +3,11 @@
 import { generateJSON } from "@tiptap/html";
 import StarterKit from "@tiptap/starter-kit";
 import { formatDistanceToNow } from "date-fns";
-import { ArrowRightLeft, Loader2, Save, Trash2, Volume2 } from "lucide-react";
+import { ArrowRightLeft, Copy, Loader2, Save, Trash2, Volume2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useDebounceValue } from "usehooks-ts";
 import { AudioAnnotation } from "@/components/editor/extensions/audio-annotation";
 import { Furigana } from "@/components/editor/extensions/furigana";
 import { TranslationBlock } from "@/components/editor/extensions/translation-block";
@@ -97,161 +98,137 @@ export default function TranslatePage() {
     },
   });
 
-  // Debounced translate trigger
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const activeRequestIdRef = useRef<number>(0);
+  // Just debounce the text input directly. 800ms is a good balance.
+  const [debouncedText] = useDebounceValue(sourceText, 800);
 
-  const triggerTranslation = (text: string, srcLang: string, tgtLang: string, aiModel: string) => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
+  // Trigger translation when debounced text or settings change
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Mutators and history items cause infinite loops if included
+  useEffect(() => {
+    if (!debouncedText.trim()) {
+      setTargetText("");
+      setSourceFuriganaHtml(null);
+      setTargetFuriganaHtml(null);
+      setIsTranslating(false);
+      setIsFuriganaProcessing(false);
+      return;
     }
 
-    timeoutRef.current = setTimeout(async () => {
-      const requestId = ++activeRequestIdRef.current;
+    let isSubscribed = true;
 
-      if (!text.trim()) {
-        setTargetText("");
-        setSourceFuriganaHtml(null);
-        setTargetFuriganaHtml(null);
-        setIsTranslating(false);
-        setIsFuriganaProcessing(false);
-        return;
-      }
-
+    const runTranslation = async () => {
       setIsTranslating(true);
-
       try {
-        // 1. Check if source has Japanese, and start furigana if so
-        const isSrcJa = hasJapanese(text);
+        const isSrcJa = hasJapanese(debouncedText);
         let sFurigana: string | null = null;
 
-        const furiganaPromise = isSrcJa
-          ? furiganaMut
-              .mutateAsync({ text })
-              .then((res) => {
-                sFurigana = res.html;
-                if (activeRequestIdRef.current === requestId) {
-                  setSourceFuriganaHtml(sFurigana);
-                }
-              })
-              .catch(() => {
-                sFurigana = text;
-                if (activeRequestIdRef.current === requestId) {
-                  setSourceFuriganaHtml(sFurigana);
-                }
-              })
-          : Promise.resolve().then(() => {
-              if (activeRequestIdRef.current === requestId) {
-                setSourceFuriganaHtml(null);
-              }
-            });
+        if (isSrcJa && isSubscribed) setIsFuriganaProcessing(true);
 
-        if (isSrcJa && activeRequestIdRef.current === requestId) setIsFuriganaProcessing(true);
+        // 1. Fire translations and furigana independently
+        const furiganaTask = isSrcJa
+          ? furiganaMut.mutateAsync({ text: debouncedText }).catch(() => null)
+          : Promise.resolve(null);
 
-        // 2. Translate concurrently if possible, or wait
-        const translatePromise = translateMut.mutateAsync({
-          text,
-          sourceLanguage: srcLang,
-          targetLanguage: tgtLang,
-          model: aiModel,
+        const translateTask = translateMut.mutateAsync({
+          text: debouncedText,
+          sourceLanguage: sourceLang,
+          targetLanguage: targetLang,
+          model: model,
         });
 
-        // Wait for both to finish
-        const [_, result] = await Promise.all([furiganaPromise, translatePromise]);
+        // 2. Wait for translation (priority)
+        const tResult = await translateTask;
 
-        if (activeRequestIdRef.current !== requestId) return;
+        if (!isSubscribed) return;
 
-        if (isSrcJa) setIsFuriganaProcessing(false);
-
-        const translated = result.translation;
+        const translated = tResult.translation;
         setTargetText(translated);
 
-        // 3. Check if target has Japanese, and start furigana if so
+        // 3. Wait for source furigana
+        const sResult = await furiganaTask;
+        if (isSubscribed) {
+          if (sResult?.html) {
+            sFurigana = sResult.html;
+            setSourceFuriganaHtml(sFurigana);
+          } else if (isSrcJa) {
+            sFurigana = debouncedText;
+            setSourceFuriganaHtml(sFurigana);
+          } else {
+            setSourceFuriganaHtml(null);
+          }
+          setIsFuriganaProcessing(false); // Source furigana done
+        }
+
+        // 4. Target furigana
         const isTgtJa = hasJapanese(translated);
         let tFurigana: string | null = null;
 
-        if (isTgtJa) {
+        if (isTgtJa && isSubscribed) {
           setIsFuriganaProcessing(true);
           try {
-            const tResult = await furiganaMut.mutateAsync({ text: translated });
-            if (activeRequestIdRef.current !== requestId) return;
-            tFurigana = tResult.html;
-            setTargetFuriganaHtml(tFurigana);
-          } catch (_e) {
-            if (activeRequestIdRef.current !== requestId) return;
-            tFurigana = translated;
-            setTargetFuriganaHtml(tFurigana);
-          } finally {
-            if (activeRequestIdRef.current === requestId) {
-              setIsFuriganaProcessing(false);
+            const tgtResult = await furiganaMut.mutateAsync({ text: translated });
+            if (isSubscribed) {
+              tFurigana = tgtResult.html;
+              setTargetFuriganaHtml(tFurigana);
             }
+          } catch (_e) {
+            if (isSubscribed) {
+              tFurigana = translated;
+              setTargetFuriganaHtml(tFurigana);
+            }
+          } finally {
+            if (isSubscribed) setIsFuriganaProcessing(false);
           }
-        } else {
+        } else if (isSubscribed) {
           setTargetFuriganaHtml(null);
         }
 
-        // 4. Save to history
-        addHistoryItem({
-          sourceText: text,
-          targetText: translated,
-          sourceFuriganaHtml: isSrcJa && sFurigana ? sFurigana : undefined,
-          targetFuriganaHtml: isTgtJa && tFurigana ? tFurigana : undefined,
-          sourceLanguage: srcLang,
-          targetLanguage: tgtLang,
-          model: aiModel,
-        });
-      } catch (_e) {
-        if (activeRequestIdRef.current === requestId) {
-          toast.error("Translation failed");
+        // 5. Save to history
+        if (isSubscribed) {
+          addHistoryItem({
+            sourceText: debouncedText,
+            targetText: translated,
+            sourceFuriganaHtml: isSrcJa && sFurigana ? sFurigana : undefined,
+            targetFuriganaHtml: isTgtJa && tFurigana ? tFurigana : undefined,
+            sourceLanguage: sourceLang,
+            targetLanguage: targetLang,
+            model: model,
+          });
+        }
+      } catch (err) {
+        if (isSubscribed) {
+          console.error("Translation error:", err);
+          toast.error(`Translation failed`);
         }
       } finally {
-        if (activeRequestIdRef.current === requestId) {
+        if (isSubscribed) {
           setIsTranslating(false);
+          setIsFuriganaProcessing(false);
         }
       }
-    }, 500);
-  };
+    };
+
+    runTranslation();
+
+    return () => {
+      isSubscribed = false;
+    };
+  }, [debouncedText, sourceLang, targetLang, model]);
 
   // Source text change handler with Auto-Swap logic
   const handleSourceTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newText = e.target.value;
     setSourceText(newText);
 
-    let currentSrcLang = sourceLang;
-    let currentTgtLang = targetLang;
-
-    // Auto-swap logic
-    if (newText.trim().length > 0) {
+    // Auto-swap logic (only triggers if we have at least a few characters to prevent jumping on 1 letter)
+    if (newText.trim().length > 3) {
       const containsJa = hasJapanese(newText);
-      if (containsJa && currentSrcLang !== "ja") {
-        // Swap to make source JA
-        if (currentTgtLang === "ja") {
-          currentTgtLang = currentSrcLang;
-        } else if (currentSrcLang === "en") {
-          currentTgtLang = "en";
-        }
-        currentSrcLang = "ja";
-        setSourceLang(currentSrcLang);
-        setTargetLang(currentTgtLang);
-      } else if (!containsJa && currentSrcLang === "ja" && newText.length > 3) {
-        // Auto swap from JA to default if it's purely english/other
-        // Only trigger if we have a bit of text to avoid swapping on first english keystroke
-        if (currentTgtLang !== "ja") {
-          currentSrcLang = currentTgtLang;
-          currentTgtLang = "ja";
-          setSourceLang(currentSrcLang);
-          setTargetLang(currentTgtLang);
-        }
+      if (containsJa && sourceLang !== "ja") {
+        setTargetLang(sourceLang === "en" ? "en" : sourceLang);
+        setSourceLang("ja");
+      } else if (!containsJa && sourceLang === "ja") {
+        setSourceLang(targetLang !== "ja" ? targetLang : "en");
+        setTargetLang("ja");
       }
-    }
-
-    triggerTranslation(newText, currentSrcLang, currentTgtLang, model);
-  };
-
-  // Update translation if languages/model change
-  const forceRetranslate = (sLang: string, tLang: string, m: string) => {
-    if (sourceText.trim()) {
-      triggerTranslation(sourceText, sLang, tLang, m);
     }
   };
 
@@ -264,7 +241,6 @@ export default function TranslatePage() {
     setTargetText(sourceText);
     setSourceFuriganaHtml(targetFuriganaHtml);
     setTargetFuriganaHtml(sourceFuriganaHtml);
-    forceRetranslate(newSrc, newTgt, model);
   };
 
   const handleTurnIntoClip = () => {
@@ -306,13 +282,7 @@ export default function TranslatePage() {
       {/* Header */}
       <div className="flex shrink-0 flex-wrap items-center justify-between gap-4 border-b p-4 lg:px-6">
         <div className="flex items-center gap-2">
-          <Select
-            value={sourceLang}
-            onValueChange={(val) => {
-              setSourceLang(val);
-              forceRetranslate(val, targetLang, model);
-            }}
-          >
+          <Select value={sourceLang} onValueChange={setSourceLang}>
             <SelectTrigger className="w-[140px]">
               <SelectValue placeholder="Source" />
             </SelectTrigger>
@@ -329,13 +299,7 @@ export default function TranslatePage() {
             <ArrowRightLeft className="h-4 w-4" />
           </Button>
 
-          <Select
-            value={targetLang}
-            onValueChange={(val) => {
-              setTargetLang(val);
-              forceRetranslate(sourceLang, val, model);
-            }}
-          >
+          <Select value={targetLang} onValueChange={setTargetLang}>
             <SelectTrigger className="w-[140px]">
               <SelectValue placeholder="Target" />
             </SelectTrigger>
@@ -350,13 +314,7 @@ export default function TranslatePage() {
 
           <div className="mx-2 hidden h-6 w-px bg-border sm:block" />
 
-          <Select
-            value={model}
-            onValueChange={(val) => {
-              setModel(val);
-              forceRetranslate(sourceLang, targetLang, val);
-            }}
-          >
+          <Select value={model} onValueChange={setModel}>
             <SelectTrigger className="hidden w-[180px] sm:flex">
               <SelectValue placeholder="AI Model" />
             </SelectTrigger>
@@ -397,6 +355,18 @@ export default function TranslatePage() {
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8"
+                onClick={() => {
+                  navigator.clipboard.writeText(sourceText);
+                  toast.success("Copied to clipboard");
+                }}
+                disabled={!sourceText}
+              >
+                <Copy className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
                 onClick={() => speak(sourceText, sourceLang)}
                 disabled={!sourceText}
               >
@@ -430,6 +400,18 @@ export default function TranslatePage() {
               )}
             </div>
             <div className="flex gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => {
+                  navigator.clipboard.writeText(targetText);
+                  toast.success("Copied to clipboard");
+                }}
+                disabled={!targetText}
+              >
+                <Copy className="h-4 w-4" />
+              </Button>
               <Button
                 variant="ghost"
                 size="icon"
