@@ -159,7 +159,7 @@ export function EditorToolbar({ editor, textScale, onTextScaleChange }: ToolbarP
   const addAutoFurigana = api.ai.addFurigana.useMutation({
     onSuccess: (data) => {
       if (isFullDocRef.current) {
-        editor.chain().focus().setContent(data.html).run();
+        editor.chain().focus().setContent(data.html, true).run();
       } else {
         editor.chain().focus().insertContent(data.html).run();
       }
