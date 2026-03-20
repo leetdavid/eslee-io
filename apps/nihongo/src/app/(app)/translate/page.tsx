@@ -54,6 +54,16 @@ function speak(text: string, langCode: string) {
   window.speechSynthesis.speak(utterance);
 }
 
+function getTextSizeClass(text: string) {
+  if (!text) return "text-3xl md:text-4xl leading-tight";
+  const length = text.length;
+  const lines = text.split("\n").length;
+
+  if (length < 40 && lines <= 2) return "text-3xl md:text-4xl leading-tight";
+  if (length < 100 && lines <= 4) return "text-2xl md:text-3xl leading-snug";
+  return "text-lg md:text-xl leading-relaxed";
+}
+
 export default function TranslatePage() {
   const router = useRouter();
   // const utils = api.useUtils();
@@ -76,12 +86,15 @@ export default function TranslatePage() {
   const [isTranslating, setIsTranslating] = useState(false);
   const [isFuriganaProcessing, setIsFuriganaProcessing] = useState(false);
 
+  const [hasInitializedTarget, setHasInitializedTarget] = useState(false);
+
   // Initialize from settings if available
   useEffect(() => {
-    if (userSettings?.targetLanguage && targetLang === "en") {
+    if (userSettings?.targetLanguage && !hasInitializedTarget) {
       setTargetLang(userSettings.targetLanguage);
+      setHasInitializedTarget(true);
     }
-  }, [userSettings, targetLang]);
+  }, [userSettings, hasInitializedTarget]);
 
   // Mutations
   const translateMut = api.ai.translate.useMutation();
@@ -379,10 +392,12 @@ export default function TranslatePage() {
               value={sourceText}
               onChange={handleSourceTextChange}
               placeholder="Type or paste text here to translate..."
-              className="min-h-[120px] flex-1 resize-none border-none bg-none p-0 text-xl shadow-none focus-visible:ring-0 dark:bg-transparent"
+              className={`min-h-[120px] flex-1 resize-none border-none bg-none p-0 shadow-none transition-all duration-200 focus-visible:ring-0 dark:bg-transparent ${getTextSizeClass(sourceText)}`}
             />
             {sourceFuriganaHtml && (
-              <div className="prose dark:prose-invert mt-4 max-w-none rounded-md border bg-muted/10 p-4 text-lg">
+              <div
+                className={`prose dark:prose-invert mt-4 max-w-none rounded-md border bg-muted/10 p-4 transition-all duration-200 ${getTextSizeClass(sourceText)}`}
+              >
                 {/* biome-ignore lint/security/noDangerouslySetInnerHtml: Need to render HTML from API */}
                 <div dangerouslySetInnerHTML={{ __html: sourceFuriganaHtml }} />
               </div>
@@ -425,12 +440,18 @@ export default function TranslatePage() {
           </div>
           <div className="flex min-h-0 flex-1 flex-col gap-4 p-4">
             {targetFuriganaHtml ? (
-              <div className="prose dark:prose-invert max-w-none flex-1 rounded-md bg-transparent text-lg">
+              <div
+                className={`prose dark:prose-invert max-w-none flex-1 rounded-md bg-transparent transition-all duration-200 ${getTextSizeClass(sourceText)}`}
+              >
                 {/* biome-ignore lint/security/noDangerouslySetInnerHtml: Need to render HTML from API */}
                 <div dangerouslySetInnerHTML={{ __html: targetFuriganaHtml }} />
               </div>
             ) : (
-              <div className="flex-1 whitespace-pre-wrap text-lg">{targetText}</div>
+              <div
+                className={`flex-1 whitespace-pre-wrap transition-all duration-200 ${getTextSizeClass(sourceText)}`}
+              >
+                {targetText}
+              </div>
             )}
           </div>
         </div>
