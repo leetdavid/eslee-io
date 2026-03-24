@@ -17,6 +17,7 @@ export default function Icon() {
         fontSize: 22,
         color: "white",
         fontWeight: 700,
+        paddingBottom: 1,
       }}
     >
       よ
