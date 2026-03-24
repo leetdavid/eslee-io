@@ -13,7 +13,7 @@ locals {
       content = "af5be78ee6612dfd.vercel-dns-017.com."
     }
     nihongo = {
-      name    = "nihongo.eslee.io"
+      name    = "yomi.eslee.io"
       content = "e71f9da8a0e9527d.vercel-dns-017.com."
     }
   }
