@@ -1,10 +1,11 @@
 "use client";
 
-import { Brain, FileText, Languages, Settings } from "lucide-react";
+import { FileText, Languages, Settings } from "lucide-react";
 import Link from "next/link";
 import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
 import { NavUser } from "@/components/nav-user";
+import { YomiLogo } from "@/components/yomi-logo";
 import {
   Sidebar,
   SidebarContent,
@@ -65,13 +66,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 onClick={() => isMobile && setOpenMobile(false)}
                 className="flex cursor-pointer items-center gap-2"
               >
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                  <Brain className="size-5" />
-                </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">Nihongo</span>
-                  <span className="truncate text-xs">Clips &amp; Learning</span>
-                </div>
+                <YomiLogo showWordmark />
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

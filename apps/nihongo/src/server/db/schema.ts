@@ -13,15 +13,15 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
-export const createTable = pgTableCreator((name) => `nihongo_${name}`);
+export const createTable = pgTableCreator((name) => `yomi_${name}`);
 
 // ---------------------------------------------------------------------------
 // Enums
 // ---------------------------------------------------------------------------
 
-export const languageEnum = pgEnum("nihongo_language", ["ja", "en", "ko"]);
-export const jlptLevelEnum = pgEnum("nihongo_jlpt_level", ["N5", "N4", "N3", "N2", "N1"]);
-export const aiTypeEnum = pgEnum("nihongo_ai_type", ["reading", "grammar", "vocabulary", "quiz"]);
+export const languageEnum = pgEnum("yomi_language", ["ja", "en", "ko"]);
+export const jlptLevelEnum = pgEnum("yomi_jlpt_level", ["N5", "N4", "N3", "N2", "N1"]);
+export const aiTypeEnum = pgEnum("yomi_ai_type", ["reading", "grammar", "vocabulary", "quiz"]);
 
 // ---------------------------------------------------------------------------
 // Clips
@@ -46,8 +46,8 @@ export const clips = createTable(
       .$onUpdate(() => new Date()),
   },
   (table) => ({
-    userIdIdx: index("clip_user_id_idx").on(table.userId),
-    createdAtIdx: index("clip_created_at_idx").on(table.createdAt),
+    userIdIdx: index("yomi_clip_user_id_idx").on(table.userId),
+    createdAtIdx: index("yomi_clip_created_at_idx").on(table.createdAt),
   }),
 );
 
@@ -77,8 +77,8 @@ export const vocabulary = createTable(
       .$onUpdate(() => new Date()),
   },
   (table) => ({
-    userIdIdx: index("vocab_user_id_idx").on(table.userId),
-    wordIdx: index("vocab_word_idx").on(table.word),
+    userIdIdx: index("yomi_vocab_user_id_idx").on(table.userId),
+    wordIdx: index("yomi_vocab_word_idx").on(table.word),
   }),
 );
 
@@ -103,8 +103,8 @@ export const clipVocabulary = createTable(
     position: integer("position").notNull().default(0),
   },
   (table) => ({
-    clipIdIdx: index("cv_clip_id_idx").on(table.clipId),
-    vocabularyIdIdx: index("cv_vocabulary_id_idx").on(table.vocabularyId),
+    clipIdIdx: index("yomi_cv_clip_id_idx").on(table.clipId),
+    vocabularyIdIdx: index("yomi_cv_vocabulary_id_idx").on(table.vocabularyId),
   }),
 );
 
@@ -144,9 +144,9 @@ export const studyProgress = createTable(
       .$onUpdate(() => new Date()),
   },
   (table) => ({
-    userIdIdx: index("sp_user_id_idx").on(table.userId),
-    nextReviewIdx: index("sp_next_review_idx").on(table.nextReview),
-    vocabIdIdx: index("sp_vocab_id_idx").on(table.vocabularyId),
+    userIdIdx: index("yomi_sp_user_id_idx").on(table.userId),
+    nextReviewIdx: index("yomi_sp_next_review_idx").on(table.nextReview),
+    vocabIdIdx: index("yomi_sp_vocab_id_idx").on(table.vocabularyId),
   }),
 );
 
@@ -176,8 +176,8 @@ export const aiGenerations = createTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => ({
-    userIdIdx: index("ai_user_id_idx").on(table.userId),
-    typeIdx: index("ai_type_idx").on(table.type),
+    userIdIdx: index("yomi_ai_user_id_idx").on(table.userId),
+    typeIdx: index("yomi_ai_type_idx").on(table.type),
   }),
 );
 

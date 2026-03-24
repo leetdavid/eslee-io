@@ -7,7 +7,7 @@ import { Toaster } from "sonner";
 import "@/app/globals.css";
 
 export const metadata: Metadata = {
-  title: "Nihongo - Japanese Language Learning",
+  title: "Yomi - Japanese Language Learning",
   description:
     "Learn Japanese with interactive clips, furigana support, and AI-powered study tools",
 };
