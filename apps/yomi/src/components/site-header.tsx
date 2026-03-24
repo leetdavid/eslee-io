@@ -12,7 +12,7 @@ export function SiteHeader() {
     ? "Clips"
     : pathname.startsWith("/settings")
       ? "Settings"
-      : "Nihongo";
+      : "Yomi";
 
   return (
     <header className="flex h-(--header-height) shrink-0 items-center justify-between gap-2 border-b bg-background px-4 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height) lg:px-6">

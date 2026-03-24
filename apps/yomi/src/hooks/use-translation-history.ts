@@ -15,7 +15,7 @@ export type TranslationHistoryItem = {
 
 export function useTranslationHistory() {
   const [history, setHistory] = useLocalStorage<TranslationHistoryItem[]>(
-    "nihongo-translation-history",
+    "yomi-translation-history",
     [],
   );
 
