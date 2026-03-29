@@ -1,0 +1,25 @@
+<svg width="160" height="52" viewBox="0 0 160 52" xmlns="http://www.w3.org/2000/svg">
+  <!-- Icon: rounded square -->
+  <rect x="2" y="2" width="48" height="48" rx="12" fill="#18181b"/>
+  <!-- よ character -->
+  <text
+    x="26" y="26"
+    font-family="'Noto Sans JP', 'Hiragana Kaku Gothic ProN', 'Yu Gothic', 'MS Gothic', serif"
+    font-size="26" font-weight="700" fill="#fafafa"
+    text-anchor="middle" dominant-baseline="central"
+  >よ</text>
+
+  <!-- Wordmark -->
+  <text
+    x="62" y="21"
+    font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+    font-size="19" font-weight="600" fill="#18181b"
+    dominant-baseline="central"
+  >yomi</text>
+  <text
+    x="62" y="39"
+    font-family="'Noto Sans JP', 'Hiragana Kaku Gothic ProN', 'Yu Gothic', serif"
+    font-size="12" fill="#71717a"
+    dominant-baseline="central"
+  >よみ</text>
+</svg>

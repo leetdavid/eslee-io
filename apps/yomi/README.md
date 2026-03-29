@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/leetdavid/eslee-io/main/apps/yomi/public/yomi-logo.svg" alt="Yomi logo" height="52" />
+</p>
+
 # Yomi
 
 Yomi is an AI-powered Japanese language learning tool. Paste or type Japanese text and get instant translations (Japanese ↔ English or Japanese ↔ Korean), automatic furigana (kanji reading annotations), and vocabulary extraction. Save your translations as **clips** — bilingual study cards you can revisit, edit, and build a vocabulary list from.
