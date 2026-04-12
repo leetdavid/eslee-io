@@ -1,6 +1,6 @@
 "use client";
 
-import { FileText, Languages, Settings } from "lucide-react";
+import { BookOpen, FileText, Languages, Settings } from "lucide-react";
 import Link from "next/link";
 import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
@@ -24,6 +24,11 @@ const data = {
       title: "Clips",
       url: "/clips",
       icon: <FileText />,
+    },
+    {
+      title: "Charts",
+      url: "/charts",
+      icon: <BookOpen />,
     },
     {
       title: "Translate",

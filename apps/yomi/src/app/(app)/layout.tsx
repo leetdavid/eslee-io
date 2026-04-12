@@ -2,6 +2,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { CommandMenu } from "@/components/command-menu";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { VoiceChatButton } from "@/components/voice-chat/voice-chat-button";
 import { TRPCReactProvider } from "@/trpc/react";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -24,6 +25,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </SidebarInset>
       </SidebarProvider>
       <CommandMenu />
+      <VoiceChatButton />
     </TRPCReactProvider>
   );
 }
