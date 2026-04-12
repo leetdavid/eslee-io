@@ -20,6 +20,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
+import { api } from "@/trpc/react";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -33,9 +34,12 @@ Your role:
 - Use です/ます form by default; adjust politeness level as the learner progresses
 - Keep responses concise and conversational — 2 to 4 sentences
 
-When the user speaks or writes English, gently encourage Japanese: 「日本語でも試してみましょう！」
+When the user speaks or writes English, gently encourage Japanese: 「日本語でも試してみましょう！」.
+However, not all users are proficient enough to understand that, so speaking English for absolute beginners is acceptable.
 
-Start by greeting the user warmly in Japanese and asking how they'd like to practice today.`;
+Start by greeting the user warmly in Japanese and asking how they'd like to practice today.
+
+You have access to a tool called add_clip. Use it to save any Japanese word, phrase, or sentence that would be valuable for the user to study later — for example after correcting them, introducing new vocabulary, or when they ask to save something.`;
 
 const VOICE_OPTIONS = [
   { value: "alloy", label: "Alloy" },
@@ -68,6 +72,8 @@ interface VoiceChatSettings {
   systemPrompt: string;
 }
 
+type ToolCallHandler = (name: string, args: Record<string, unknown>) => Promise<string>;
+
 const DEFAULT_SETTINGS: VoiceChatSettings = {
   voice: "shimmer",
   systemPrompt: DEFAULT_SYSTEM_PROMPT,
@@ -77,7 +83,7 @@ const DEFAULT_SETTINGS: VoiceChatSettings = {
 // Internal hook: manages WebRTC + DataChannel lifecycle
 // ---------------------------------------------------------------------------
 
-function useRealtimeSession(settings: VoiceChatSettings) {
+function useRealtimeSession(settings: VoiceChatSettings, onToolCall: ToolCallHandler) {
   const [status, setStatus] = useState<ConnectionStatus>("idle");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -89,11 +95,12 @@ function useRealtimeSession(settings: VoiceChatSettings) {
   const audioElRef = useRef<HTMLAudioElement | null>(null);
   const pendingMsgIdRef = useRef<string | null>(null);
   const pendingTextRef = useRef<string | null>(null);
-  // Keep settings accessible in callbacks without triggering re-creation
+  const pendingToolArgsRef = useRef<Record<string, string>>({});
+  // Keep settings and callbacks accessible without triggering re-creation
   const settingsRef = useRef(settings);
-  useEffect(() => {
-    settingsRef.current = settings;
-  }, [settings]);
+  useEffect(() => { settingsRef.current = settings; }, [settings]);
+  const onToolCallRef = useRef<ToolCallHandler>(onToolCall);
+  useEffect(() => { onToolCallRef.current = onToolCall; }, [onToolCall]);
 
   const sendEvent = useCallback((event: object) => {
     if (dcRef.current?.readyState === "open") {
@@ -113,6 +120,7 @@ function useRealtimeSession(settings: VoiceChatSettings) {
       audioElRef.current.srcObject = null;
     }
     pendingMsgIdRef.current = null;
+    pendingToolArgsRef.current = {};
     setIsSpeaking(false);
     setIsAiSpeaking(false);
   }, []);
@@ -135,6 +143,34 @@ function useRealtimeSession(settings: VoiceChatSettings) {
                 prefix_padding_ms: 300,
               },
               modalities: ["text", "audio"],
+              tools: [
+                {
+                  type: "function",
+                  name: "add_clip",
+                  description:
+                    "Save a Japanese word, phrase, or sentence as a study clip for the user to review later in Yomi.",
+                  parameters: {
+                    type: "object",
+                    properties: {
+                      text: {
+                        type: "string",
+                        description: "The Japanese text to save (word, phrase, or sentence)",
+                      },
+                      title: {
+                        type: "string",
+                        description: "Brief descriptive title for the clip (optional)",
+                      },
+                      jlpt_level: {
+                        type: "string",
+                        enum: ["N5", "N4", "N3", "N2", "N1"],
+                        description: "JLPT difficulty level of the content (optional)",
+                      },
+                    },
+                    required: ["text"],
+                  },
+                },
+              ],
+              tool_choice: "auto",
             },
           });
           setStatus("active");
@@ -158,15 +194,28 @@ function useRealtimeSession(settings: VoiceChatSettings) {
           break;
         }
 
-        case "input_audio_buffer.speech_started":
+        case "input_audio_buffer.speech_started": {
+          const { item_id } = msg as { item_id: string };
           setIsSpeaking(true);
+          setMessages((prev) => [...prev, { id: item_id, role: "user", text: "", pending: true }]);
           break;
+        }
 
         case "input_audio_buffer.speech_stopped":
           setIsSpeaking(false);
           break;
 
-        case "response.output_audio_transcript.delta": {
+        case "conversation.item.input_audio_transcription.completed": {
+          const { item_id, transcript } = msg as { item_id: string; transcript: string };
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === item_id ? { ...m, text: transcript.trim(), pending: false } : m,
+            ),
+          );
+          break;
+        }
+
+        case "response.audio_transcript.delta": {
           const { delta, item_id } = msg as { delta: string; item_id: string };
           if (pendingMsgIdRef.current !== item_id) {
             pendingMsgIdRef.current = item_id;
@@ -183,13 +232,54 @@ function useRealtimeSession(settings: VoiceChatSettings) {
           break;
         }
 
-        case "response.output_audio_transcript.done": {
+        case "response.audio_transcript.done": {
           const { item_id } = msg as { item_id: string };
           pendingMsgIdRef.current = null;
           setIsAiSpeaking(false);
-          setMessages((prev) =>
-            prev.map((m) => (m.id === item_id ? { ...m, pending: false } : m)),
-          );
+          setMessages((prev) => prev.map((m) => (m.id === item_id ? { ...m, pending: false } : m)));
+          break;
+        }
+
+        case "response.function_call_arguments.delta": {
+          const { call_id, delta } = msg as { call_id: string; delta: string };
+          pendingToolArgsRef.current[call_id] = (pendingToolArgsRef.current[call_id] ?? "") + delta;
+          break;
+        }
+
+        case "response.function_call_arguments.done": {
+          const { call_id, name, arguments: argsStr } = msg as {
+            call_id: string;
+            name: string;
+            arguments: string;
+          };
+          delete pendingToolArgsRef.current[call_id];
+          let args: Record<string, unknown> = {};
+          try {
+            args = JSON.parse(argsStr) as Record<string, unknown>;
+          } catch {
+            // malformed args — proceed with empty
+          }
+          void onToolCallRef
+            .current(name, args)
+            .then((output) => {
+              sendEvent({
+                type: "conversation.item.create",
+                item: { type: "function_call_output", call_id, output },
+              });
+              sendEvent({ type: "response.create" });
+            })
+            .catch((err: unknown) => {
+              const errMsg = err instanceof Error ? err.message : "Tool call failed";
+              sendEvent({
+                type: "conversation.item.create",
+                item: {
+                  type: "function_call_output",
+                  call_id,
+                  output: JSON.stringify({ error: errMsg }),
+                },
+              });
+              sendEvent({ type: "response.create" });
+            });
           break;
         }
 
@@ -244,10 +334,7 @@ function useRealtimeSession(settings: VoiceChatSettings) {
 
       // 6. ICE failure detection
       pc.oniceconnectionstatechange = () => {
-        if (
-          pc.iceConnectionState === "failed" ||
-          pc.iceConnectionState === "disconnected"
-        ) {
+        if (pc.iceConnectionState === "failed" || pc.iceConnectionState === "disconnected") {
           toast.error("Voice connection lost");
           cleanup();
           setStatus("error");
@@ -269,7 +356,9 @@ function useRealtimeSession(settings: VoiceChatSettings) {
       await pc.setLocalDescription(offer);
 
       // 9. Exchange SDP with OpenAI
-      const sdpRes = await fetch("https://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview", {
+      const sdpRes = await fetch(
+        "https://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview",
+        {
           method: "POST",
           headers: {
             Authorization: `Bearer ${ephemeralKey}`,
@@ -320,10 +409,7 @@ function useRealtimeSession(settings: VoiceChatSettings) {
       const trimmed = text.trim();
       if (!trimmed) return;
 
-      setMessages((prev) => [
-        ...prev,
-        { id: crypto.randomUUID(), role: "user", text: trimmed },
-      ]);
+      setMessages((prev) => [...prev, { id: crypto.randomUUID(), role: "user", text: trimmed }]);
 
       if (status !== "active") {
         pendingTextRef.current = trimmed;
@@ -396,7 +482,7 @@ function StatusBadge({
   }
   if (isSpeaking) {
     return (
-      <Badge className="gap-1.5 bg-green-500 text-xs text-white hover:bg-green-500">
+      <Badge className="gap-1.5 bg-green-500 text-white text-xs hover:bg-green-500">
         <span className="size-1.5 animate-pulse rounded-full bg-white" />
         Listening
       </Badge>
@@ -404,14 +490,14 @@ function StatusBadge({
   }
   if (isAiSpeaking) {
     return (
-      <Badge className="gap-1.5 bg-blue-500 text-xs text-white hover:bg-blue-500">
+      <Badge className="gap-1.5 bg-blue-500 text-white text-xs hover:bg-blue-500">
         <span className="size-1.5 animate-pulse rounded-full bg-white" />
         Speaking
       </Badge>
     );
   }
   return (
-    <Badge className="gap-1.5 bg-green-500 text-xs text-white hover:bg-green-500">
+    <Badge className="gap-1.5 bg-green-500 text-white text-xs hover:bg-green-500">
       <span className="size-1.5 rounded-full bg-white" />
       Connected
     </Badge>
@@ -463,17 +549,14 @@ function SettingsPanel({
     <ScrollArea className="min-h-0 flex-1">
       <div className="flex flex-col gap-5 p-4">
         {isConnected && (
-          <p className="rounded-md bg-muted px-3 py-2 text-xs text-muted-foreground">
+          <p className="rounded-md bg-muted px-3 py-2 text-muted-foreground text-xs">
             Changes take effect on the next session.
           </p>
         )}
 
         <div className="flex flex-col gap-1.5">
           <Label className="text-xs">Voice</Label>
-          <Select
-            value={settings.voice}
-            onValueChange={(v) => onChange({ voice: v as VoiceId })}
-          >
+          <Select value={settings.voice} onValueChange={(v) => onChange({ voice: v as VoiceId })}>
             <SelectTrigger className="w-full">
               <SelectValue />
             </SelectTrigger>
@@ -498,7 +581,7 @@ function SettingsPanel({
           <button
             type="button"
             onClick={() => onChange({ systemPrompt: DEFAULT_SYSTEM_PROMPT })}
-            className="self-start text-xs text-muted-foreground underline-offset-2 hover:underline"
+            className="self-start text-muted-foreground text-xs underline-offset-2 hover:underline"
           >
             Reset to default
           </button>
@@ -553,15 +636,9 @@ function PanelContents({
       <div className="flex shrink-0 items-center justify-between border-b px-4 py-3">
         <div className="flex items-center gap-2">
           <Mic className="h-4 w-4 text-primary" />
-          <span className="text-sm font-semibold">
-            {showSettings ? "Settings" : "Yomi Sensei"}
-          </span>
+          <span className="font-semibold text-sm">{showSettings ? "Settings" : "Yomi Sensei"}</span>
           {!showSettings && (
-            <StatusBadge
-              status={status}
-              isSpeaking={isSpeaking}
-              isAiSpeaking={isAiSpeaking}
-            />
+            <StatusBadge status={status} isSpeaking={isSpeaking} isAiSpeaking={isAiSpeaking} />
           )}
         </div>
         <div className="flex items-center gap-1">
@@ -682,6 +759,35 @@ export function VoiceChatButton() {
   const isMobile = useIsMobile();
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
+  const createClip = api.clip.create.useMutation();
+  const utils = api.useUtils();
+
+  const handleToolCall = useCallback<ToolCallHandler>(
+    async (name, args) => {
+      if (name === "add_clip") {
+        const { text, title, jlpt_level } = args as {
+          text: string;
+          title?: string;
+          jlpt_level?: "N5" | "N4" | "N3" | "N2" | "N1";
+        };
+        await createClip.mutateAsync({
+          title: title ?? "",
+          content: {
+            type: "doc",
+            content: [{ type: "paragraph", content: [{ type: "text", text }] }],
+          },
+          sourceLanguage: "ja",
+          jlptLevel: jlpt_level,
+        });
+        void utils.clip.getAll.invalidate();
+        toast.success("Clip saved!");
+        return JSON.stringify({ success: true });
+      }
+      return JSON.stringify({ error: `Unknown tool: ${name}` });
+    },
+    [createClip, utils.clip.getAll],
+  );
+
   const {
     status,
     messages,
@@ -691,7 +797,7 @@ export function VoiceChatButton() {
     connect,
     disconnect,
     sendTextMessage,
-  } = useRealtimeSession(settings);
+  } = useRealtimeSession(settings, handleToolCall);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
