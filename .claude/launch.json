@@ -1,0 +1,29 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "www",
+      "runtimeExecutable": "fnm",
+      "runtimeArgs": ["exec", "--using", "20", "--", "pnpm", "--filter", "@eslee/www", "dev"],
+      "port": 3000
+    },
+    {
+      "name": "photography",
+      "runtimeExecutable": "fnm",
+      "runtimeArgs": ["exec", "--using", "20", "--", "pnpm", "--filter", "@eslee/photography", "dev"],
+      "port": 3001
+    },
+    {
+      "name": "cms",
+      "runtimeExecutable": "fnm",
+      "runtimeArgs": ["exec", "--using", "20", "--", "pnpm", "--filter", "@eslee/cms", "dev"],
+      "port": 3002
+    },
+    {
+      "name": "yomi",
+      "runtimeExecutable": "fnm",
+      "runtimeArgs": ["exec", "--using", "20", "--", "pnpm", "--filter", "@eslee/yomi", "dev"],
+      "port": 3003
+    }
+  ]
+}
