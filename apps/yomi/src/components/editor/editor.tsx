@@ -2,6 +2,10 @@
 
 import Image from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
+import Table from "@tiptap/extension-table";
+import TableCell from "@tiptap/extension-table-cell";
+import TableHeader from "@tiptap/extension-table-header";
+import TableRow from "@tiptap/extension-table-row";
 import Underline from "@tiptap/extension-underline";
 import type { JSONContent } from "@tiptap/react";
 import { EditorContent, useEditor } from "@tiptap/react";
@@ -11,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { ScrollArea } from "../ui/scroll-area";
 import { AudioAnnotation } from "./extensions/audio-annotation";
 import { Furigana } from "./extensions/furigana";
+import { TableMarkdownPaste } from "./extensions/table-markdown-paste";
 import { TranslationBlock } from "./extensions/translation-block";
 import { VocabularyHighlight } from "./extensions/vocabulary-highlight";
 import { EditorToolbar } from "./toolbar";
@@ -52,6 +57,11 @@ export function Editor({
       VocabularyHighlight,
       TranslationBlock,
       AudioAnnotation,
+      Table.configure({ resizable: true }),
+      TableRow,
+      TableHeader,
+      TableCell,
+      TableMarkdownPaste,
     ],
     content,
     editable,

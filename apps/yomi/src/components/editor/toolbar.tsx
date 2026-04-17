@@ -17,6 +17,7 @@ import {
   Minus,
   Plus,
   Quote,
+  Table2,
   Type,
   Underline,
   Volume2,
@@ -37,6 +38,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
@@ -91,12 +93,14 @@ export function EditorToolbar({ editor, textScale, onTextScaleChange }: ToolbarP
   const [isVocabOpen, setIsVocabOpen] = useState(false);
   const [isImageOpen, setIsImageOpen] = useState(false);
   const [isAudioOpen, setIsAudioOpen] = useState(false);
+  const [isTableOpen, setIsTableOpen] = useState(false);
 
   // Form states
   const [furigana, setFurigana] = useState("");
   const [vocabData, setVocabData] = useState({ word: "", reading: "", meaning: "", jlptLevel: "" });
   const [imageUrl, setImageUrl] = useState("");
   const [audioData, setAudioData] = useState({ label: "", src: "" });
+  const [tableSize, setTableSize] = useState({ rows: 3, cols: 3 });
 
   const utils = api.useUtils();
   const { data: userSettings } = api.user.getSettings.useQuery();
@@ -241,6 +245,17 @@ export function EditorToolbar({ editor, textScale, onTextScaleChange }: ToolbarP
     setAudioData({ label: "", src: "" });
   };
 
+  const handleInsertTable = (e: React.FormEvent) => {
+    e.preventDefault();
+    editor
+      .chain()
+      .focus()
+      .insertTable({ rows: tableSize.rows, cols: tableSize.cols, withHeaderRow: true })
+      .run();
+    setIsTableOpen(false);
+    setTableSize({ rows: 3, cols: 3 });
+  };
+
   // When opening vocab, prepopulate word with current selection if available
   const openVocabDialog = () => {
     const selection = editor.state.selection;
@@ -324,6 +339,71 @@ export function EditorToolbar({ editor, textScale, onTextScaleChange }: ToolbarP
         >
           <Quote className="h-4 w-4" />
         </ToolbarButton>
+
+        <ToolbarSeparator />
+
+        {/* Table */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              title="Table"
+              className={cn(
+                "inline-flex h-8 w-8 items-center justify-center rounded-md text-sm transition-colors",
+                "hover:bg-accent hover:text-accent-foreground",
+                editor.isActive("table") && "bg-accent text-accent-foreground",
+              )}
+            >
+              <Table2 className="h-4 w-4" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            <DropdownMenuItem onClick={() => setIsTableOpen(true)}>Insert Table…</DropdownMenuItem>
+            {editor.isActive("table") && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => editor.chain().focus().addRowBefore().run()}
+                >
+                  Add Row Above
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => editor.chain().focus().addRowAfter().run()}
+                >
+                  Add Row Below
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => editor.chain().focus().deleteRow().run()}
+                >
+                  Delete Row
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => editor.chain().focus().addColumnBefore().run()}
+                >
+                  Add Column Before
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => editor.chain().focus().addColumnAfter().run()}
+                >
+                  Add Column After
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => editor.chain().focus().deleteColumn().run()}
+                >
+                  Delete Column
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => editor.chain().focus().deleteTable().run()}
+                  className="text-destructive focus:text-destructive"
+                >
+                  Delete Table
+                </DropdownMenuItem>
+              </>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         <ToolbarSeparator />
 
@@ -610,6 +690,58 @@ export function EditorToolbar({ editor, textScale, onTextScaleChange }: ToolbarP
               <Button type="submit" disabled={!audioData.label}>
                 Insert
               </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={isTableOpen} onOpenChange={setIsTableOpen}>
+        <DialogContent>
+          <form onSubmit={handleInsertTable}>
+            <DialogHeader>
+              <DialogTitle>Insert Table</DialogTitle>
+            </DialogHeader>
+            <div className="flex gap-4 py-4">
+              <div className="flex-1">
+                <label htmlFor="table-rows" className="font-medium text-sm">
+                  Rows
+                </label>
+                <Input
+                  id="table-rows"
+                  type="number"
+                  min={1}
+                  max={50}
+                  autoFocus
+                  value={tableSize.rows}
+                  onChange={(e) =>
+                    setTableSize({ ...tableSize, rows: Math.max(1, parseInt(e.target.value) || 1) })
+                  }
+                  className="mt-1.5"
+                />
+              </div>
+              <div className="flex-1">
+                <label htmlFor="table-cols" className="font-medium text-sm">
+                  Columns
+                </label>
+                <Input
+                  id="table-cols"
+                  type="number"
+                  min={1}
+                  max={20}
+                  value={tableSize.cols}
+                  onChange={(e) =>
+                    setTableSize({ ...tableSize, cols: Math.max(1, parseInt(e.target.value) || 1) })
+                  }
+                  className="mt-1.5"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button type="button" variant="outline">
+                  Cancel
+                </Button>
+              </DialogClose>
+              <Button type="submit">Insert</Button>
             </DialogFooter>
           </form>
         </DialogContent>

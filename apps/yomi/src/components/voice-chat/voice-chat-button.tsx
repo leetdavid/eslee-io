@@ -1,7 +1,7 @@
 "use client";
 
 import { Mic, MicOff, SendHorizontal, Settings, X } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
@@ -83,9 +83,12 @@ const DEFAULT_SETTINGS: VoiceChatSettings = {
 // Internal hook: manages WebRTC + DataChannel lifecycle
 // ---------------------------------------------------------------------------
 
-function useRealtimeSession(settings: VoiceChatSettings, onToolCall: ToolCallHandler) {
+function useRealtimeSession(
+  settings: VoiceChatSettings,
+  onToolCall: ToolCallHandler,
+  setMessages: React.Dispatch<React.SetStateAction<Message[]>>,
+) {
   const [status, setStatus] = useState<ConnectionStatus>("idle");
-  const [messages, setMessages] = useState<Message[]>([]);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isAiSpeaking, setIsAiSpeaking] = useState(false);
 
@@ -401,32 +404,22 @@ function useRealtimeSession(settings: VoiceChatSettings, onToolCall: ToolCallHan
   const disconnect = useCallback(() => {
     cleanup();
     setStatus("idle");
-    setMessages([]);
   }, [cleanup]);
 
-  const sendTextMessage = useCallback(
-    async (text: string) => {
-      const trimmed = text.trim();
-      if (!trimmed) return;
-
-      setMessages((prev) => [...prev, { id: crypto.randomUUID(), role: "user", text: trimmed }]);
-
-      if (status !== "active") {
-        pendingTextRef.current = trimmed;
-        await connect();
-      } else {
-        sendEvent({
-          type: "conversation.item.create",
-          item: {
-            type: "message",
-            role: "user",
-            content: [{ type: "input_text", text: trimmed }],
-          },
-        });
-        sendEvent({ type: "response.create" });
-      }
+  // Expose sendEvent so the parent can push text into an active voice session
+  const sendVoiceText = useCallback(
+    (text: string) => {
+      sendEvent({
+        type: "conversation.item.create",
+        item: {
+          type: "message",
+          role: "user",
+          content: [{ type: "input_text", text }],
+        },
+      });
+      sendEvent({ type: "response.create" });
     },
-    [status, connect, sendEvent],
+    [sendEvent],
   );
 
   useEffect(() => {
@@ -435,13 +428,12 @@ function useRealtimeSession(settings: VoiceChatSettings, onToolCall: ToolCallHan
 
   return {
     status,
-    messages,
     isSpeaking,
     isAiSpeaking,
     audioElRef,
     connect,
     disconnect,
-    sendTextMessage,
+    sendVoiceText,
   };
 }
 
@@ -677,9 +669,9 @@ function PanelContents({
               <div className="flex flex-col items-center gap-2 py-8 text-center text-muted-foreground">
                 <Mic className="h-8 w-8 opacity-30" />
                 <p className="text-sm">
-                  {status === "idle" || status === "error"
-                    ? 'Click "Start Voice Chat" to practice Japanese with Yomi Sensei'
-                    : "Connecting to Yomi Sensei…"}
+                  {status === "connecting"
+                    ? "Connecting to Yomi Sensei…"
+                    : "Type a message or tap the mic to start practicing Japanese"}
                 </p>
               </div>
             )}
@@ -694,53 +686,46 @@ function PanelContents({
       {/* Footer — hidden on settings view */}
       {!showSettings && (
         <div className="shrink-0 border-t p-3">
-          {status === "idle" || status === "error" ? (
-            <Button onClick={onConnect} className="w-full gap-2">
-              <Mic className="h-4 w-4" />
-              Start Voice Chat
+          <div className="flex items-end gap-2">
+            <Button
+              variant={status === "active" ? "destructive" : "outline"}
+              size="icon"
+              className="shrink-0"
+              onClick={status === "active" ? onDisconnect : onConnect}
+              disabled={status === "connecting"}
+              aria-label={status === "active" ? "End voice chat" : "Start voice chat"}
+            >
+              {status === "connecting" ? (
+                <Spinner />
+              ) : status === "active" ? (
+                <MicOff className="h-4 w-4" />
+              ) : (
+                <Mic className="h-4 w-4" />
+              )}
             </Button>
-          ) : (
-            <div className="flex items-end gap-2">
-              <Button
-                variant={status === "active" ? "destructive" : "outline"}
-                size="icon"
-                className="shrink-0"
-                onClick={status === "active" ? onDisconnect : onConnect}
-                disabled={status === "connecting"}
-                aria-label={status === "active" ? "End voice chat" : "Start voice chat"}
-              >
-                {status === "connecting" ? (
-                  <Spinner />
-                ) : status === "active" ? (
-                  <MicOff className="h-4 w-4" />
-                ) : (
-                  <Mic className="h-4 w-4" />
-                )}
-              </Button>
-              <Textarea
-                value={textInput}
-                onChange={(e) => onTextChange(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    onSend();
-                  }
-                }}
-                placeholder="Type in Japanese or English…"
-                className="max-h-24 min-h-0 resize-none"
-                rows={1}
-              />
-              <Button
-                size="icon"
-                className="shrink-0"
-                onClick={onSend}
-                disabled={!textInput.trim()}
-                aria-label="Send message"
-              >
-                <SendHorizontal className="h-4 w-4" />
-              </Button>
-            </div>
-          )}
+            <Textarea
+              value={textInput}
+              onChange={(e) => onTextChange(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  onSend();
+                }
+              }}
+              placeholder="Type in Japanese or English…"
+              className="max-h-24 min-h-0 resize-none"
+              rows={1}
+            />
+            <Button
+              size="icon"
+              className="shrink-0"
+              onClick={onSend}
+              disabled={!textInput.trim()}
+              aria-label="Send message"
+            >
+              <SendHorizontal className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       )}
     </div>
@@ -788,20 +773,78 @@ export function VoiceChatButton() {
     [createClip, utils.clip.getAll],
   );
 
+  const [messages, setMessages] = useState<Message[]>([]);
+  const messagesRef = useRef<Message[]>([]);
+  useEffect(() => { messagesRef.current = messages; }, [messages]);
+
   const {
     status,
-    messages,
     isSpeaking,
     isAiSpeaking,
     audioElRef,
     connect,
     disconnect,
-    sendTextMessage,
-  } = useRealtimeSession(settings, handleToolCall);
+    sendVoiceText,
+  } = useRealtimeSession(settings, handleToolCall, setMessages);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  const sendTextMessage = useCallback(
+    async (text: string) => {
+      const trimmed = text.trim();
+      if (!trimmed) return;
+
+      // If voice session is active, route through the data channel
+      if (status === "active") {
+        setMessages((prev) => [...prev, { id: crypto.randomUUID(), role: "user", text: trimmed }]);
+        sendVoiceText(trimmed);
+        return;
+      }
+
+      // Otherwise use the text chat API (no voice session needed)
+      const userMsgId = crypto.randomUUID();
+      const assistantId = crypto.randomUUID();
+      const history = messagesRef.current.map((m) => ({ role: m.role, content: m.text }));
+
+      setMessages((prev) => [
+        ...prev,
+        { id: userMsgId, role: "user", text: trimmed },
+        { id: assistantId, role: "assistant", text: "", pending: true },
+      ]);
+
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            messages: [...history, { role: "user", content: trimmed }],
+            systemPrompt: settings.systemPrompt,
+          }),
+        });
+        if (!res.ok || !res.body) throw new Error("Chat request failed");
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const chunk = decoder.decode(value, { stream: true });
+          setMessages((prev) =>
+            prev.map((m) => (m.id === assistantId ? { ...m, text: m.text + chunk } : m)),
+          );
+        }
+        setMessages((prev) =>
+          prev.map((m) => (m.id === assistantId ? { ...m, pending: false } : m)),
+        );
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "Chat failed");
+        setMessages((prev) => prev.filter((m) => m.id !== assistantId));
+      }
+    },
+    [status, sendVoiceText, settings.systemPrompt],
+  );
 
   const handleSend = async () => {
     if (!textInput.trim()) return;

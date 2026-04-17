@@ -29,7 +29,7 @@ export function SiteHeader() {
           className="inline-flex h-9 items-center gap-2 rounded-md border border-input bg-background px-3 font-medium text-muted-foreground text-sm transition-colors hover:bg-accent hover:text-accent-foreground"
         >
           <Search className="h-4 w-4" />
-          <span className="hidden sm:inline-block">Search...</span>
+          <span className="mr-0 hidden sm:inline-block lg:mr-8">Search...</span>
           <kbd className="pointer-events-none ml-2 hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-medium font-mono text-[10px] text-muted-foreground opacity-100 sm:inline-flex">
             <span className="text-xs">⌘</span>K
           </kbd>
