@@ -1,0 +1,33 @@
+{
+  "name": "@eslee/lunch",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev -p 3004 --turbopack",
+    "build": "next build",
+    "start": "next start -p 3004",
+    "lint": "biome lint .",
+    "check": "biome check .",
+    "check:fix": "biome check --write .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.453.0",
+    "next": "catalog:",
+    "react": "catalog:react19",
+    "react-dom": "catalog:react19",
+    "tailwind-merge": "^2.5.4"
+  },
+  "devDependencies": {
+    "@eslee/tsconfig": "workspace:*",
+    "@tailwindcss/postcss": "catalog:",
+    "@types/node": "catalog:node",
+    "@types/react": "catalog:react19",
+    "@types/react-dom": "catalog:react19",
+    "tailwindcss": "catalog:",
+    "typescript": "catalog:"
+  }
+}
