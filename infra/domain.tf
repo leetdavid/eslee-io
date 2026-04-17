@@ -16,6 +16,10 @@ locals {
       name    = "yomi.eslee.io"
       content = "e71f9da8a0e9527d.vercel-dns-017.com."
     }
+    lunch = {
+      name    = "lunch.eslee.io"
+      content = "a78f02d64adb40fe.vercel-dns-017.com."
+    }
   }
 }
 
