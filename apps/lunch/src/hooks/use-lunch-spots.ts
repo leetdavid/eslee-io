@@ -25,6 +25,7 @@ export const DEFAULT_SPOTS: LunchSpot[] = [
     name: "Unremarkable Korean Place (Jeonpo Meat Shop)",
     url: mapsUrl("Jeonpo Meat Shop"),
   },
+  { name: "Servo", url: mapsUrl("Servo") },
   { name: "Samsic", url: mapsUrl("Samsic") },
   { name: "Blue Supreme", url: mapsUrl("Blue Supreme") },
   { name: "La Parrilla", url: mapsUrl("La Parrilla") },

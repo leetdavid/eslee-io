@@ -180,7 +180,7 @@ export function SlotMachine() {
                 jackpot
               </p>
               <p className="mt-1.5 font-display text-cream text-lg md:text-xl">
-                go eat {winner.name}
+                go eat at (a) {winner.name}
               </p>
               <a
                 href={winner.url ?? mapsUrl(winner.name)}
