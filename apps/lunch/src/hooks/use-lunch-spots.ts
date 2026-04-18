@@ -9,10 +9,15 @@ export type LunchSpot = {
   url?: string;
 };
 
-const mapsUrl = (query: string) =>
+export type LunchPreset = {
+  title: string;
+  spots: LunchSpot[];
+};
+
+export const mapsUrl = (query: string) =>
   `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
 
-const DEFAULT_SPOTS: LunchSpot[] = [
+export const DEFAULT_SPOTS: LunchSpot[] = [
   { name: "Maison Libanaise", url: mapsUrl("Maison Libanaise") },
   { name: "BaseHall", url: mapsUrl("BaseHall") },
   { name: "Kyung Yang Katsu", url: mapsUrl("Kyung Yang Katsu") },
@@ -39,7 +44,37 @@ const DEFAULT_SPOTS: LunchSpot[] = [
   { name: "Sandwich" },
 ];
 
-function normalize(raw: unknown): LunchSpot[] | null {
+export const RECOMMENDED_PRESETS: LunchPreset[] = [
+  { title: "Today's Lunch", spots: DEFAULT_SPOTS },
+  {
+    title: "Dessert",
+    spots: [
+      { name: "Ice Cream" },
+      { name: "Bakery" },
+      { name: "Café" },
+      { name: "Patisserie" },
+      { name: "Gelato" },
+      { name: "Bingsu" },
+    ],
+  },
+  {
+    title: "4:30pm Snack",
+    spots: [
+      { name: "Bakehouse", url: mapsUrl("Bakehouse Staunton") },
+      { name: "Amo·Ago", url: mapsUrl("Amo·Ago") },
+      { name: "Vission Bakery", url: mapsUrl("Vission Bakery") },
+      { name: "Frenchies", url: mapsUrl("Frenchies") },
+      { name: "Coffee Shop" },
+      { name:"Boba" },
+      { name: "Convenience Store" },
+      { name: "Snack Bar" },
+      { name: "Fruit Stand" },
+      { name: "Chips" },
+    ],
+  },
+];
+
+export function normalizeLunchSpots(raw: unknown): LunchSpot[] | null {
   if (!Array.isArray(raw)) return null;
   const out: LunchSpot[] = [];
   for (const entry of raw) {
@@ -69,7 +104,7 @@ export function useLunchSpots() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
-        const parsed = normalize(JSON.parse(raw));
+        const parsed = normalizeLunchSpots(JSON.parse(raw));
         if (parsed) setSpots(parsed);
       }
     } catch {
@@ -105,5 +140,10 @@ export function useLunchSpots() {
     setSpots(DEFAULT_SPOTS);
   }, []);
 
-  return { spots, addSpot, removeSpot, resetSpots, hydrated };
+  const loadSpots = useCallback((incoming: LunchSpot[]) => {
+    const normalized = normalizeLunchSpots(incoming);
+    if (normalized) setSpots(normalized);
+  }, []);
+
+  return { spots, addSpot, removeSpot, resetSpots, loadSpots, hydrated };
 }
