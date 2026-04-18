@@ -68,23 +68,23 @@ export function SlotMachine() {
 
   return (
     <div className="w-full">
-      <div className="cabinet relative overflow-hidden rounded-3xl border border-[var(--color-panel-edge)] p-5 md:p-8">
+      <div className="cabinet relative overflow-hidden rounded-3xl border border-panel-edge p-5 md:p-8">
         <div className="mb-6 flex items-center justify-center gap-3">
-          <Utensils className="h-3.5 w-3.5 text-[var(--color-gold)]" strokeWidth={2.4} />
-          <span className="font-mono text-[10px] text-[var(--color-gold)] uppercase tracking-[0.4em]">
+          <Utensils className="h-3.5 w-3.5 text-gold" strokeWidth={2.4} />
+          <span className="font-mono text-[10px] text-gold uppercase tracking-[0.4em]">
             today&rsquo;s lunch
           </span>
-          <Utensils className="h-3.5 w-3.5 text-[var(--color-gold)]" strokeWidth={2.4} />
+          <Utensils className="h-3.5 w-3.5 text-gold" strokeWidth={2.4} />
         </div>
 
         <div className="flex items-stretch gap-3 md:gap-5">
           <div
-            className="reel-glass reel-mask relative flex-1 overflow-hidden rounded-xl border-4 border-[var(--color-gold-deep)]"
+            className="reel-glass reel-mask relative flex-1 overflow-hidden rounded-xl border-4 border-gold-deep"
             style={{ height: `${VISIBLE_ROWS * ITEM_HEIGHT}px` }}
           >
             <div
               aria-hidden
-              className="pointer-events-none absolute inset-x-0 z-20 border-[var(--color-red)] border-y-2"
+              className="pointer-events-none absolute inset-x-0 z-20 border-red border-y-2"
               style={{
                 top: `${CENTER_ROW * ITEM_HEIGHT}px`,
                 height: `${ITEM_HEIGHT}px`,
@@ -94,7 +94,7 @@ export function SlotMachine() {
             />
 
             {spots.length === 0 ? (
-              <div className="flex h-full items-center justify-center px-4 text-center font-display text-[var(--color-bg)] text-lg">
+              <div className="flex h-full items-center justify-center px-4 text-center font-display text-bg text-lg">
                 add some spots to get started
               </div>
             ) : (
@@ -111,7 +111,7 @@ export function SlotMachine() {
                 {strip.map((spot, i) => (
                   <div
                     key={`${spot.name}-${i}`}
-                    className="flex items-center justify-center px-4 font-display text-2xl text-[var(--color-bg)] md:text-3xl"
+                    className="flex items-center justify-center px-4 font-display text-2xl text-bg md:text-3xl"
                     style={{ height: `${ITEM_HEIGHT}px` }}
                   >
                     <span className="line-clamp-1 text-center">{spot.name}</span>
@@ -127,18 +127,18 @@ export function SlotMachine() {
         <div className="mt-6 min-h-14 text-center">
           {winner ? (
             <>
-              <p className="font-mono text-[10px] text-[var(--color-gold)] uppercase tracking-[0.4em]">
+              <p className="font-mono text-[10px] text-gold uppercase tracking-[0.4em]">
                 jackpot
               </p>
-              <p className="mt-1.5 font-display text-[var(--color-cream)] text-lg md:text-xl">
-                go eat at {winner.name}
+              <p className="mt-1.5 font-display text-cream text-lg md:text-xl">
+                go eat {winner.name}
               </p>
               {winner.url && (
                 <a
                   href={winner.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-2 inline-flex items-center gap-1.5 font-mono text-[10px] text-[var(--color-gold)] uppercase tracking-[0.35em] transition-opacity hover:opacity-70"
+                  className="mt-2 inline-flex items-center gap-1.5 font-mono text-[10px] text-gold uppercase tracking-[0.35em] transition-opacity hover:opacity-70"
                 >
                   <ExternalLink className="h-3 w-3" />
                   open in maps
@@ -146,7 +146,7 @@ export function SlotMachine() {
               )}
             </>
           ) : (
-            <p className="font-mono text-[10px] text-[var(--color-muted)] uppercase tracking-[0.4em]">
+            <p className="font-mono text-[10px] text-muted uppercase tracking-[0.4em]">
               {spinning
                 ? "spinning…"
                 : spots.length < 2
@@ -276,7 +276,7 @@ function DraggableLever({
       <span
         className={cn(
           "mt-3 font-mono text-[9px] uppercase tracking-[0.3em] transition-colors",
-          primed ? "text-[var(--color-gold)]" : "text-[var(--color-muted)]",
+          primed ? "text-gold" : "text-muted",
         )}
       >
         {hint}
@@ -314,14 +314,14 @@ function SpotsManager({
   return (
     <section className="mt-10">
       <div className="mb-4 flex items-baseline justify-between">
-        <h2 className="font-mono text-[10px] text-[var(--color-muted)] uppercase tracking-[0.35em]">
+        <h2 className="font-mono text-[10px] text-muted uppercase tracking-[0.35em]">
           your spots ({spots.length})
         </h2>
         <button
           type="button"
           onClick={onReset}
           disabled={disabled}
-          className="flex items-center gap-1.5 font-mono text-[10px] text-[var(--color-muted)] uppercase tracking-[0.3em] transition-colors hover:text-[var(--color-gold)] disabled:opacity-50"
+          className="flex items-center gap-1.5 font-mono text-[10px] text-muted uppercase tracking-[0.3em] transition-colors hover:text-gold disabled:opacity-50"
         >
           <RotateCcw className="h-3 w-3" />
           reset
@@ -337,12 +337,12 @@ function SpotsManager({
             disabled={disabled}
             placeholder="add a spot…"
             maxLength={60}
-            className="flex-1 rounded-md border border-[var(--color-panel-edge)] bg-[var(--color-panel)] px-3 py-2 text-[var(--color-ink)] text-sm outline-none placeholder:text-[var(--color-muted)] focus:border-[var(--color-gold)] disabled:opacity-50"
+            className="flex-1 rounded-md border border-panel-edge bg-panel px-3 py-2 text-ink text-sm outline-none placeholder:text-muted focus:border-gold disabled:opacity-50"
           />
           <button
             type="submit"
             disabled={disabled || !input.trim()}
-            className="gold-plate flex items-center gap-1 rounded-md px-3 py-2 font-mono text-[10px] text-[var(--color-bg)] uppercase tracking-[0.3em] shadow-md transition-transform active:translate-y-px disabled:opacity-50"
+            className="gold-plate flex items-center gap-1 rounded-md px-3 py-2 font-mono text-[10px] text-bg uppercase tracking-[0.3em] shadow-md transition-transform active:translate-y-px disabled:opacity-50"
           >
             <Plus className="h-3.5 w-3.5" strokeWidth={3} />
             add
@@ -354,7 +354,7 @@ function SpotsManager({
           onChange={(e) => setUrlInput(e.target.value)}
           disabled={disabled}
           placeholder="google maps link (optional)"
-          className="rounded-md border border-[var(--color-panel-edge)] bg-[var(--color-panel)] px-3 py-2 text-[var(--color-ink)] text-sm outline-none placeholder:text-[var(--color-muted)] focus:border-[var(--color-gold)] disabled:opacity-50"
+          className="rounded-md border border-panel-edge bg-panel px-3 py-2 text-ink text-sm outline-none placeholder:text-muted focus:border-gold disabled:opacity-50"
         />
       </form>
 
@@ -367,22 +367,22 @@ function SpotsManager({
                 onClick={() => onRemove(spot.name)}
                 disabled={disabled}
                 className={cn(
-                  "group flex items-center gap-2 border border-[var(--color-panel-edge)] bg-[var(--color-panel)] py-1.5 pl-3 text-[var(--color-ink)] text-sm transition-colors hover:border-[var(--color-red)] hover:bg-[oklch(0.25_0.08_25)] disabled:opacity-50",
+                  "py-1 my-0 group flex items-center gap-2 border border-panel-edge bg-panel pl-3 text-ink text-sm transition-colors hover:border-red hover:bg-[oklch(0.25_0.08_25)] disabled:opacity-50",
                   spot.url ? "rounded-l-full pr-2" : "rounded-full pr-2",
                 )}
               >
                 <span>{spot.name}</span>
-                <X className="h-3.5 w-3.5 text-[var(--color-muted)] group-hover:text-[var(--color-red)]" />
+                <X className="size-3.5 text-muted group-hover:text-red" />
               </button>
               {spot.url && (
                 <a
                   href={spot.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center rounded-r-full border border-[var(--color-panel-edge)] border-l-0 bg-[var(--color-panel)] px-2 py-1.5 text-[var(--color-muted)] transition-colors hover:border-[var(--color-gold)] hover:text-[var(--color-gold)]"
+                  className="py-1 my-0 flex items-center rounded-r-full border border-panel-edge border-l-0 bg-panel px-2 text-sm  text-muted transition-colors hover:border-gold hover:text-gold"
                   title="Open in Google Maps"
                 >
-                  <ExternalLink className="h-3.5 w-3.5" />
+                  <ExternalLink className="size-3.5" />
                 </a>
               )}
             </li>
