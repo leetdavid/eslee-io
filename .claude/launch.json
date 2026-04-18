@@ -24,6 +24,13 @@
       "runtimeExecutable": "fnm",
       "runtimeArgs": ["exec", "--using", "20", "--", "pnpm", "--filter", "@eslee/yomi", "dev"],
       "port": 3003
+    },
+    {
+      "name": "lunch",
+      "runtimeExecutable": "fnm",
+      "runtimeArgs": ["exec", "--using", "20", "--", "pnpm", "--filter", "@eslee/lunch", "dev"],
+      "port": 3004,
+      "autoPort": false
     }
   ]
 }
