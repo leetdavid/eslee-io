@@ -3,9 +3,9 @@
 import confetti from "canvas-confetti";
 import { Download, ExternalLink, Github, Plus, RotateCcw, Upload, Utensils, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { RECOMMENDED_PRESETS, type LunchPreset, type LunchSpot, mapsUrl } from "@/data/presets";
-import { normalizeLunchSpots, useLunchSpots } from "@/hooks/use-lunch-spots";
+import { type LunchPreset, type LunchSpot, mapsUrl, RECOMMENDED_PRESETS } from "@/data/presets";
 import { useLunchPresets } from "@/hooks/use-lunch-presets";
+import { normalizeLunchSpots, useLunchSpots } from "@/hooks/use-lunch-spots";
 import { cn } from "@/lib/utils";
 
 const ITEM_HEIGHT = 88;
@@ -24,7 +24,15 @@ const PULL_THRESHOLD = Math.round(MAX_DRAG * 0.75);
 
 function fireConfetti() {
   const colors = ["#d4a843", "#f2e8d0", "#c97b5a", "#e8c97a"];
-  confetti({ particleCount: 120, spread: 70, origin: { y: 0.4 }, colors, startVelocity: 45, decay: 0.92, scalar: 0.9 });
+  confetti({
+    particleCount: 120,
+    spread: 70,
+    origin: { y: 0.4 },
+    colors,
+    startVelocity: 45,
+    decay: 0.92,
+    scalar: 0.9,
+  });
   window.setTimeout(() => {
     confetti({ particleCount: 40, angle: 60, spread: 55, origin: { x: 0, y: 0.5 }, colors });
     confetti({ particleCount: 40, angle: 120, spread: 55, origin: { x: 1, y: 0.5 }, colors });
@@ -141,7 +149,12 @@ export function SlotMachine() {
           suggest a preset
         </a>
       </div>
-      <div className={cn("cabinet relative overflow-hidden rounded-3xl border border-panel-edge p-5 md:p-8", winFlash && "cabinet-flash")}>
+      <div
+        className={cn(
+          "cabinet relative overflow-hidden rounded-3xl border border-panel-edge p-5 md:p-8",
+          winFlash && "cabinet-flash",
+        )}
+      >
         <div className="mb-6 flex items-center justify-center gap-3">
           <Utensils className="h-3.5 w-3.5 text-gold" strokeWidth={2.4} />
           <span className="font-mono text-[10px] text-gold uppercase tracking-[0.4em]">
@@ -210,7 +223,7 @@ export function SlotMachine() {
                 className="mt-1.5 font-display text-cream text-lg md:text-xl"
                 style={{ animation: "winner-slide-up 0.35s ease-out 0.05s both" }}
               >
-                go eat at (a) {winner.name}
+                go eat at {winner.name}
               </p>
               <a
                 href={winner.url ?? mapsUrl(winner.name)}
@@ -435,9 +448,7 @@ function SpotsManager({
           setImportError("missing title");
           return;
         }
-        const importedSpots = normalizeLunchSpots(
-          (parsed as Record<string, unknown>).spots,
-        );
+        const importedSpots = normalizeLunchSpots((parsed as Record<string, unknown>).spots);
         if (!importedSpots || importedSpots.length === 0) {
           setImportError("no spots found");
           return;
@@ -508,16 +519,14 @@ function SpotsManager({
       </div>
 
       {importError && (
-        <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.3em] text-[oklch(0.65_0.2_25)]">
+        <p className="mb-3 font-mono text-[10px] text-[oklch(0.65_0.2_25)] uppercase tracking-[0.3em]">
           {importError}
         </p>
       )}
 
       {/* Presets: recommended + saved */}
       <div className="mb-4">
-        <p className="mb-2 font-mono text-[10px] text-muted uppercase tracking-[0.35em]">
-          presets
-        </p>
+        <p className="mb-2 font-mono text-[10px] text-muted uppercase tracking-[0.35em]">presets</p>
         <div className="flex flex-wrap gap-2">
           {recommendedPresets.map((preset) => (
             <button
@@ -543,7 +552,7 @@ function SpotsManager({
                   onClick={() => onLoadSavedPreset(preset)}
                   disabled={disabled}
                   className={cn(
-                    "flex items-center rounded-l-full border py-1.5 pl-3 pr-2 font-mono text-[10px] uppercase tracking-[0.2em] transition-colors disabled:opacity-50",
+                    "flex items-center rounded-l-full border py-1.5 pr-2 pl-3 font-mono text-[10px] uppercase tracking-[0.2em] transition-colors disabled:opacity-50",
                     activePresetTitle === preset.title
                       ? "border-gold bg-[oklch(0.25_0.08_50)] text-gold"
                       : "border-panel-edge text-muted hover:border-gold hover:text-gold",
@@ -555,7 +564,7 @@ function SpotsManager({
                   type="button"
                   onClick={() => onDeletePreset(preset.title)}
                   disabled={disabled}
-                  className="flex items-center rounded-r-full border border-l-0 border-panel-edge px-2 py-1.5 text-muted transition-colors hover:border-red hover:text-red disabled:opacity-50"
+                  className="flex items-center rounded-r-full border border-panel-edge border-l-0 px-2 py-1.5 text-muted transition-colors hover:border-red hover:text-red disabled:opacity-50"
                 >
                   <X className="size-3" />
                 </button>
@@ -573,7 +582,7 @@ function SpotsManager({
           disabled={disabled}
           placeholder="save as…"
           maxLength={60}
-          className="flex-1 border-b border-panel-edge bg-transparent px-1 py-2 text-ink text-sm outline-none placeholder:text-muted focus:border-gold transition-colors disabled:opacity-50"
+          className="flex-1 border-panel-edge border-b bg-transparent px-1 py-2 text-ink text-sm outline-none transition-colors placeholder:text-muted focus:border-gold disabled:opacity-50"
         />
         <button
           type="submit"
@@ -622,34 +631,34 @@ function SpotsManager({
           </p>
           <ul className="flex flex-wrap gap-2">
             {spots.map((spot) => (
-            <li
-              key={spot.name}
-              className={cn(
-                "flex items-stretch overflow-hidden rounded-full border border-panel-edge bg-panel text-sm",
-                disabled && "opacity-50",
-              )}
-            >
-              <a
-                href={spot.url ?? mapsUrl(spot.name)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 py-1.5 pl-3 pr-3 text-ink transition-colors hover:text-gold"
+              <li
+                key={spot.name}
+                className={cn(
+                  "flex items-stretch overflow-hidden rounded-full border border-panel-edge bg-panel text-sm",
+                  disabled && "opacity-50",
+                )}
               >
-                {spot.name}
-                <ExternalLink className="size-3 shrink-0 text-muted" />
-              </a>
-              <span aria-hidden className="w-px self-stretch bg-panel-edge" />
-              <button
-                type="button"
-                onClick={() => onRemove(spot.name)}
-                disabled={disabled}
-                className="group flex items-center px-2.5 py-1.5 text-muted transition-colors hover:text-red"
-              >
-                <X className="size-3" />
-              </button>
-            </li>
-          ))}
-        </ul>
+                <a
+                  href={spot.url ?? mapsUrl(spot.name)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 py-1.5 pr-3 pl-3 text-ink transition-colors hover:text-gold"
+                >
+                  {spot.name}
+                  <ExternalLink className="size-3 shrink-0 text-muted" />
+                </a>
+                <span aria-hidden className="w-px self-stretch bg-panel-edge" />
+                <button
+                  type="button"
+                  onClick={() => onRemove(spot.name)}
+                  disabled={disabled}
+                  className="group flex items-center px-2.5 py-1.5 text-muted transition-colors hover:text-red"
+                >
+                  <X className="size-3" />
+                </button>
+              </li>
+            ))}
+          </ul>
         </>
       )}
     </section>
