@@ -1,15 +1,9 @@
 "use client";
 
-import { Download, ExternalLink, Plus, RotateCcw, Upload, Utensils, X } from "lucide-react";
+import { Download, ExternalLink, Github, Plus, RotateCcw, Upload, Utensils, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import {
-  RECOMMENDED_PRESETS,
-  type LunchPreset,
-  type LunchSpot,
-  mapsUrl,
-  normalizeLunchSpots,
-  useLunchSpots,
-} from "@/hooks/use-lunch-spots";
+import { RECOMMENDED_PRESETS, type LunchPreset, type LunchSpot, mapsUrl } from "@/data/presets";
+import { normalizeLunchSpots, useLunchSpots } from "@/hooks/use-lunch-spots";
 import { useLunchPresets } from "@/hooks/use-lunch-presets";
 import { cn } from "@/lib/utils";
 
@@ -117,6 +111,17 @@ export function SlotMachine() {
 
   return (
     <div className="w-full">
+      <div className="mb-3 flex justify-end">
+        <a
+          href="https://github.com/leetdavid/eslee-io/blob/main/apps/lunch/src/data/presets.ts"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-1.5 font-mono text-[9px] text-muted uppercase tracking-[0.3em] opacity-60 transition-all hover:text-gold hover:opacity-100"
+        >
+          <Github className="h-2.5 w-2.5" />
+          suggest a preset
+        </a>
+      </div>
       <div className="cabinet relative overflow-hidden rounded-3xl border border-panel-edge p-5 md:p-8">
         <div className="mb-6 flex items-center justify-center gap-3">
           <Utensils className="h-3.5 w-3.5 text-gold" strokeWidth={2.4} />
