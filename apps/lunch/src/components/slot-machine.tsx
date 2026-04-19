@@ -1,5 +1,6 @@
 "use client";
 
+import confetti from "canvas-confetti";
 import { Download, ExternalLink, Github, Plus, RotateCcw, Upload, Utensils, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { RECOMMENDED_PRESETS, type LunchPreset, type LunchSpot, mapsUrl } from "@/data/presets";
@@ -21,6 +22,15 @@ const BRACKET_HEIGHT = 12;
 const MAX_DRAG = Math.round(LEVER_HEIGHT * 0.5);
 const PULL_THRESHOLD = Math.round(MAX_DRAG * 0.75);
 
+function fireConfetti() {
+  const colors = ["#d4a843", "#f2e8d0", "#c97b5a", "#e8c97a"];
+  confetti({ particleCount: 120, spread: 70, origin: { y: 0.4 }, colors, startVelocity: 45, decay: 0.92, scalar: 0.9 });
+  window.setTimeout(() => {
+    confetti({ particleCount: 40, angle: 60, spread: 55, origin: { x: 0, y: 0.5 }, colors });
+    confetti({ particleCount: 40, angle: 120, spread: 55, origin: { x: 1, y: 0.5 }, colors });
+  }, 150);
+}
+
 function downloadPreset(preset: LunchPreset) {
   const blob = new Blob([JSON.stringify(preset, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
@@ -38,6 +48,8 @@ export function SlotMachine() {
   const [index, setIndex] = useState(0);
   const [spinning, setSpinning] = useState(false);
   const [winner, setWinner] = useState<LunchSpot | null>(null);
+  const [winFlash, setWinFlash] = useState(false);
+  const [animKey, setAnimKey] = useState(0);
   const timeoutRef = useRef<number | null>(null);
 
   const strip = useMemo(() => {
@@ -72,9 +84,16 @@ export function SlotMachine() {
     setIndex(target);
 
     timeoutRef.current = window.setTimeout(() => {
+      const won = spots[winnerIdx] ?? null;
       setSpinning(false);
       setIndex(winnerIdx);
-      setWinner(spots[winnerIdx] ?? null);
+      setWinner(won);
+      if (won) {
+        setAnimKey((k) => k + 1);
+        setWinFlash(true);
+        fireConfetti();
+        window.setTimeout(() => setWinFlash(false), 800);
+      }
     }, SPIN_DURATION_MS);
   }, [spinning, spots]);
 
@@ -122,7 +141,7 @@ export function SlotMachine() {
           suggest a preset
         </a>
       </div>
-      <div className="cabinet relative overflow-hidden rounded-3xl border border-panel-edge p-5 md:p-8">
+      <div className={cn("cabinet relative overflow-hidden rounded-3xl border border-panel-edge p-5 md:p-8", winFlash && "cabinet-flash")}>
         <div className="mb-6 flex items-center justify-center gap-3">
           <Utensils className="h-3.5 w-3.5 text-gold" strokeWidth={2.4} />
           <span className="font-mono text-[10px] text-gold uppercase tracking-[0.4em]">
@@ -180,11 +199,17 @@ export function SlotMachine() {
 
         <div className="mt-6 min-h-14 text-center">
           {winner ? (
-            <>
-              <p className="font-mono text-[10px] text-gold uppercase tracking-[0.4em]">
+            <div key={animKey}>
+              <p
+                className="font-mono text-[10px] text-gold uppercase tracking-[0.4em]"
+                style={{ animation: "jackpot-pop 0.4s cubic-bezier(0.34,1.56,0.64,1) both" }}
+              >
                 jackpot
               </p>
-              <p className="mt-1.5 font-display text-cream text-lg md:text-xl">
+              <p
+                className="mt-1.5 font-display text-cream text-lg md:text-xl"
+                style={{ animation: "winner-slide-up 0.35s ease-out 0.05s both" }}
+              >
                 go eat at (a) {winner.name}
               </p>
               <a
@@ -192,11 +217,12 @@ export function SlotMachine() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-2 inline-flex items-center gap-1.5 font-mono text-[10px] text-gold uppercase tracking-[0.35em] transition-opacity hover:opacity-70"
+                style={{ animation: "winner-slide-up 0.35s ease-out 0.15s both" }}
               >
                 <ExternalLink className="h-3 w-3" />
                 open in maps
               </a>
-            </>
+            </div>
           ) : (
             <p className="font-mono text-[10px] text-muted uppercase tracking-[0.4em]">
               {spinning

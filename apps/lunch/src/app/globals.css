@@ -48,7 +48,38 @@ body::before {
   z-index: 0;
 }
 
+@keyframes jackpot-pop {
+  0%   { opacity: 0; transform: scale(0.5); }
+  70%  { transform: scale(1.18); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes winner-slide-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cabinet-flash {
+  0%, 100% {
+    box-shadow:
+      inset 0 2px 0 oklch(1 0 0 / 0.06),
+      inset 0 -2px 0 oklch(0 0 0 / 0.5),
+      0 30px 60px -20px oklch(0 0 0 / 0.8);
+  }
+  35% {
+    box-shadow:
+      inset 0 2px 0 oklch(1 0 0 / 0.06),
+      inset 0 -2px 0 oklch(0 0 0 / 0.5),
+      0 30px 60px -20px oklch(0 0 0 / 0.8),
+      0 0 48px 8px oklch(0.83 0.17 86 / 0.55);
+  }
+}
+
 @layer utilities {
+  .cabinet-flash {
+    animation: cabinet-flash 0.8s ease-out forwards;
+  }
+
   .gold-plate {
     background: linear-gradient(
       180deg,
