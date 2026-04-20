@@ -59,6 +59,7 @@ export function SlotMachine() {
   const [winFlash, setWinFlash] = useState(false);
   const [animKey, setAnimKey] = useState(0);
   const timeoutRef = useRef<number | null>(null);
+  const didInitRef = useRef(false);
 
   const strip = useMemo(() => {
     if (spots.length === 0) return [] as LunchSpot[];
@@ -72,6 +73,12 @@ export function SlotMachine() {
       if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
     };
   }, []);
+
+  useEffect(() => {
+    if (!hydrated || didInitRef.current || spots.length === 0) return;
+    didInitRef.current = true;
+    setIndex(Math.floor(Math.random() * spots.length));
+  }, [hydrated, spots]);
 
   useEffect(() => {
     if (!spinning && spots.length > 0 && index >= spots.length) {
@@ -223,7 +230,7 @@ export function SlotMachine() {
                 className="mt-1.5 font-display text-cream text-lg md:text-xl"
                 style={{ animation: "winner-slide-up 0.35s ease-out 0.05s both" }}
               >
-                go eat at {winner.name}
+                go eat {winner.name}
               </p>
               <a
                 href={winner.url ?? mapsUrl(winner.name)}
