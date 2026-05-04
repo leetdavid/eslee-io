@@ -19,6 +19,8 @@ export const DEFAULT_SPOTS: LunchSpot[] = [
     name: "Unremarkable Korean Place (Jeonpo Meat Shop)",
     url: mapsUrl("Jeonpo Meat Shop"),
   },
+  { name: "Pecorino" },
+  { name: "Dim Sum Square" },
   { name: "Zagin Soba" },
   { name: "Art & Taste", url: mapsUrl("Art & Taste (美食台灣餐廳)") },
   { name: "Servo", url: mapsUrl("Servo") },
