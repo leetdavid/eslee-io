@@ -20,10 +20,9 @@ resource "cloudflare_r2_bucket_cors" "media" {
   ]
 }
 
-data "cloudflare_account_api_token_permission_groups_list" "r2" {
-  provider   = cloudflare.token_creator
-  account_id = var.cloudflare_account_id
-  name       = "Workers R2 Storage Bucket Item Write"
+data "cloudflare_api_token_permission_groups_list" "r2" {
+  provider = cloudflare.token_creator
+  name     = "Workers R2 Storage Bucket Item Write"
 }
 
 resource "cloudflare_api_token" "cms_r2" {
@@ -35,7 +34,7 @@ resource "cloudflare_api_token" "cms_r2" {
       effect = "allow"
       permission_groups = [
         {
-          id = one(data.cloudflare_account_api_token_permission_groups_list.r2.result).id
+          id = one(data.cloudflare_api_token_permission_groups_list.r2.result).id
         },
       ]
       resources = jsonencode({
