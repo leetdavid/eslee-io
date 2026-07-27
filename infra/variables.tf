@@ -3,6 +3,11 @@ variable "cloudflare_api_token" {
   sensitive = true
 }
 
+variable "cloudflare_token_creator_api_token" {
+  type      = string
+  sensitive = true
+}
+
 variable "cloudflare_zone_id" {
   type = string
 }

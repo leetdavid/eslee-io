@@ -10,3 +10,8 @@ terraform {
 provider "cloudflare" {
   api_token = var.cloudflare_api_token
 }
+
+provider "cloudflare" {
+  alias     = "token_creator"
+  api_token = var.cloudflare_token_creator_api_token
+}

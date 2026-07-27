@@ -21,12 +21,14 @@ resource "cloudflare_r2_bucket_cors" "media" {
 }
 
 data "cloudflare_account_api_token_permission_groups_list" "r2" {
+  provider   = cloudflare.token_creator
   account_id = var.cloudflare_account_id
-  name       = "Workers%20R2%20Storage%20Bucket%20Item%20Write"
+  name       = "Workers R2 Storage Bucket Item Write"
 }
 
 resource "cloudflare_api_token" "cms_r2" {
-  name = "cms-r2-media"
+  provider = cloudflare.token_creator
+  name     = "cms-r2-media"
 
   policies = [
     {
