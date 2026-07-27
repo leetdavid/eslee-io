@@ -1,17 +1,31 @@
+import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { postgresAdapter } from "@payloadcms/db-postgres";
-import { lexicalEditor } from "@payloadcms/richtext-lexical";
+import {
+  BlocksFeature,
+  CodeBlock,
+  FixedToolbarFeature,
+  HeadingFeature,
+  InlineCodeFeature,
+  InlineToolbarFeature,
+  LinkFeature,
+  lexicalEditor,
+  UploadFeature,
+} from "@payloadcms/richtext-lexical";
 import { vercelBlobStorage } from "@payloadcms/storage-vercel-blob";
 import { buildConfig } from "payload";
-import sharp from "sharp";
 
 import { Media } from "./collections/Media";
 import { Photos } from "./collections/Photos";
+import { Posts } from "./collections/Posts";
+import { Tags } from "./collections/Tags";
 import { Users } from "./collections/Users";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
+const require = createRequire(import.meta.url);
+const sharp = process.env.PAYLOAD_DISABLE_SHARP === "true" ? undefined : require("sharp");
 
 export const config = buildConfig({
   admin: {
@@ -20,8 +34,19 @@ export const config = buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, Photos],
-  editor: lexicalEditor(),
+  collections: [Users, Media, Photos, Tags, Posts],
+  editor: lexicalEditor({
+    features: ({ defaultFeatures }) => [
+      ...defaultFeatures,
+      HeadingFeature({ enabledHeadingSizes: ["h2", "h3", "h4"] }),
+      InlineCodeFeature(),
+      LinkFeature(),
+      UploadFeature({ collections: { media: { fields: [] } } }),
+      BlocksFeature({ blocks: [CodeBlock()] }),
+      FixedToolbarFeature(),
+      InlineToolbarFeature(),
+    ],
+  }),
   secret: process.env.PAYLOAD_SECRET || "temporary-secret-for-build",
   typescript: {
     outputFile: path.resolve(dirname, "payload-types.ts"),
