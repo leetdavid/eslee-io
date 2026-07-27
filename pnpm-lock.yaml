@@ -788,6 +788,9 @@ importers:
       drizzle-kit:
         specifier: 'catalog:'
         version: 0.31.8
+      tsx:
+        specifier: ^4.20.6
+        version: 4.20.6
       typescript:
         specifier: 'catalog:'
         version: 5.9.3

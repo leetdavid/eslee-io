@@ -25,6 +25,7 @@
     "push": "pnpm with-env drizzle-kit push",
     "db:generate": "pnpm with-env drizzle-kit generate",
     "db:migrate": "pnpm with-env drizzle-kit migrate",
+    "db:migrate:status": "pnpm with-env tsx scripts/migration-status.ts",
     "db:studio": "pnpm with-env drizzle-kit studio",
     "studio": "pnpm with-env drizzle-kit studio",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false",
@@ -41,6 +42,7 @@
     "@types/node": "catalog:node",
     "dotenv-cli": "catalog:",
     "drizzle-kit": "catalog:",
+    "tsx": "^4.20.6",
     "typescript": "catalog:"
   }
 }

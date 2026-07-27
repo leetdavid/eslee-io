@@ -12,6 +12,7 @@
     "clean:workspaces": "turbo run clean",
     "db:generate": "turbo -F @eslee/db db:generate",
     "db:migrate": "turbo -F @eslee/db db:migrate",
+    "db:migrate:status": "pnpm --filter=@eslee/db db:migrate:status",
     "db:push": "turbo -F @eslee/db db:push",
     "db:studio": "turbo -F @eslee/db db:studio",
     "dev": "turbo watch dev --continue",
