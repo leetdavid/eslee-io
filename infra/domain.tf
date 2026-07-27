@@ -20,6 +20,10 @@ locals {
       name    = "lunch.eslee.io"
       content = "a78f02d64adb40fe.vercel-dns-017.com."
     }
+    blog = {
+      name    = "blog.eslee.io"
+      content = "869642ca4d27b8f0.vercel-dns-017.com."
+    }
   }
 }
 
