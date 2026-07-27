@@ -45,4 +45,7 @@ dist/
 # turbo
 .turbo
 
+# terraform
+infra/.terraform/
+
 testing/
