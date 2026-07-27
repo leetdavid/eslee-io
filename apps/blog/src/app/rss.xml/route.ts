@@ -29,7 +29,7 @@ export async function GET() {
           <guid>${url}</guid>
           <description>${escapeXml(post.excerpt)}</description>
           <pubDate>${new Date(post.publishedAt ?? post.createdAt).toUTCString()}</pubDate>
-          ${post.authors.map((author) => `<author>${escapeXml(author.name)}</author>`).join("")}
+          ${post.authors.map((author) => `<author>${escapeXml(author.name ?? "Anonymous")}</author>`).join("")}
         </item>`;
     })
     .join("");
