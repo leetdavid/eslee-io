@@ -52,6 +52,7 @@ export const config = buildConfig({
     outputFile: path.resolve(dirname, "payload-types.ts"),
   },
   db: postgresAdapter({
+    migrationDir: path.resolve(dirname, "migrations"),
     pool: {
       connectionString: process.env.DATABASE_URL || "",
     },
