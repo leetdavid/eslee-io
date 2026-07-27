@@ -6,3 +6,12 @@ variable "cloudflare_api_token" {
 variable "cloudflare_zone_id" {
   type = string
 }
+
+variable "cloudflare_account_id" {
+  type = string
+}
+
+variable "r2_bucket_name" {
+  type    = string
+  default = "eslee-io-media"
+}
