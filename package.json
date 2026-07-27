@@ -10,7 +10,7 @@
     "build": "turbo run build",
     "clean": "git clean -xdf node_modules",
     "clean:workspaces": "turbo run clean",
-    "db:generate": "turbo -F @eslee/db db:generate",
+    "db:generate": "turbo -F @eslee/db db:generate && pnpm -F @eslee/payload generate:types",
     "db:migrate": "turbo -F @eslee/db db:migrate",
     "db:migrate:status": "pnpm --filter=@eslee/db db:migrate:status",
     "db:push": "turbo -F @eslee/db db:push",

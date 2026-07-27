@@ -26,7 +26,6 @@ export const Users: CollectionConfig = {
     {
       name: "name",
       type: "text",
-      required: true,
     },
     {
       name: "avatar",

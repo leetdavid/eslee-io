@@ -23,7 +23,7 @@ function toBlogPost(post: Post): BlogPost {
     ...post,
     authors: post.authors.filter(isAuthor).map(({ id, name, bio, website }) => ({
       id,
-      name,
+      name: name || "Anonymous",
       bio,
       website,
     })),
