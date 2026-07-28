@@ -1,5 +1,5 @@
-export function slugify(value: string) {
-  return value
+export function slugify(value: string | null | undefined) {
+  return (value ?? "")
     .normalize("NFKD")
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
