@@ -13,7 +13,7 @@ import {
   lexicalEditor,
   UploadFeature,
 } from "@payloadcms/richtext-lexical";
-import { vercelBlobStorage } from "@payloadcms/storage-vercel-blob";
+import { s3Storage } from "@payloadcms/storage-s3";
 import { buildConfig } from "payload";
 
 import { Media } from "./collections/Media";
@@ -26,6 +26,12 @@ const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 const require = createRequire(import.meta.url);
 const sharp = process.env.PAYLOAD_DISABLE_SHARP === "true" ? undefined : require("sharp");
+const r2Enabled = Boolean(
+  process.env.R2_ACCOUNT_ID &&
+    process.env.R2_BUCKET_NAME &&
+    process.env.R2_ACCESS_KEY_ID &&
+    process.env.R2_SECRET_ACCESS_KEY,
+);
 
 export const config = buildConfig({
   admin: {
@@ -60,8 +66,9 @@ export const config = buildConfig({
   // biome-ignore lint/suspicious/noExplicitAny: I know it works, the types are getting in the way here
   sharp: sharp as any,
   plugins: [
-    vercelBlobStorage({
-      enabled: !!process.env.BLOB_READ_WRITE_TOKEN,
+    s3Storage({
+      alwaysInsertFields: true,
+      bucket: process.env.R2_BUCKET_NAME ?? "",
       clientUploads: true,
       collections: {
         media: {
@@ -71,7 +78,17 @@ export const config = buildConfig({
           prefix: "photos",
         },
       },
-      token: process.env.BLOB_READ_WRITE_TOKEN,
+      config: {
+        credentials: {
+          accessKeyId: process.env.R2_ACCESS_KEY_ID ?? "",
+          secretAccessKey: process.env.R2_SECRET_ACCESS_KEY ?? "",
+        },
+        endpoint: process.env.R2_ACCOUNT_ID
+          ? `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`
+          : undefined,
+        region: "auto",
+      },
+      enabled: r2Enabled,
     }),
   ],
 });

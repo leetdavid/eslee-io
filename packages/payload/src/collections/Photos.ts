@@ -8,6 +8,10 @@ export const Photos: CollectionConfig = {
     read: () => true,
   },
   upload: {
+    modifyResponseHeaders: ({ headers }) => {
+      headers.set("Cache-Control", "public, max-age=60");
+      return headers;
+    },
     staticDir: path.resolve(process.cwd(), "public/media/photos"),
     imageSizes: [
       {

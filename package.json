@@ -40,6 +40,9 @@
     "typescript": "catalog:"
   },
   "pnpm": {
+    "overrides": {
+      "@vercel/blob": "2.6.1"
+    },
     "peerDependencyRules": {
       "allowedVersions": {
         "react": "*",
