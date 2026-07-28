@@ -1,1 +1,32 @@
 @import "tailwindcss";
+
+.excerpt-field__action {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: calc(var(--base) * 0.5);
+}
+
+.excerpt-field__button {
+  background: var(--theme-elevation-100);
+  border: 1px solid var(--theme-elevation-250);
+  border-radius: var(--style-radius-s);
+  color: var(--theme-text);
+  cursor: pointer;
+  font: inherit;
+  padding: calc(var(--base) * 0.35) calc(var(--base) * 0.6);
+}
+
+.excerpt-field__button:hover:not(:disabled) {
+  background: var(--theme-elevation-150);
+}
+
+.excerpt-field__button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.excerpt-field__error {
+  color: var(--theme-error-500);
+  font-size: 0.875rem;
+  margin: calc(var(--base) * 0.35) 0 0;
+}
