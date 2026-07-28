@@ -1,8 +1,8 @@
 import { google } from "@ai-sdk/google";
-import { streamText, tool } from "ai";
-import { type NextRequest } from "next/server";
-import { z } from "zod";
 import { auth } from "@eslee/auth";
+import { stepCountIs, streamText, tool } from "ai";
+import type { NextRequest } from "next/server";
+import { z } from "zod";
 import { db } from "@/server/db";
 import { clips } from "@/server/db/schema";
 
@@ -19,12 +19,12 @@ export async function POST(req: NextRequest) {
     model: google("gemini-3-flash-preview"),
     system: systemPrompt,
     messages,
-    maxSteps: 3,
+    stopWhen: stepCountIs(3),
     tools: {
       add_clip: tool({
         description:
           "Save a Japanese word, phrase, or sentence as a study clip for the user to review later in Yomi.",
-        parameters: z.object({
+        inputSchema: z.object({
           text: z.string().describe("The Japanese text to save (word, phrase, or sentence)"),
           title: z.string().optional().describe("Brief descriptive title for the clip"),
           jlpt_level: z

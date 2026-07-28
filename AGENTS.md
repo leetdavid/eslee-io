@@ -63,7 +63,7 @@ This repository uses **Vitest** for testing. All test files should be placed alo
 
 ### Database (Drizzle ORM)
 - Located in `packages/db`. Define tables in `packages/db/src/schema.ts` using `pgTable`.
-- Always run `pnpm db:push` to sync schema to the local DB during development after making schema changes.
+- Never run `drizzle-kit push` against the shared database. Generate and commit a Drizzle migration, then run the owning package's `db:migrate` command. Run `pnpm payload:migrate` for Payload collection changes.
 
 ### API (tRPC)
 - Located in `packages/api`.
@@ -118,7 +118,7 @@ If working on Payload CMS functionality, you must follow these rules defined in 
    - Cache expensive lookups in `req.context` to avoid redundant database calls.
 
 ## 5. Standard Workflow for New Features
-1. **Database:** Add/modify Drizzle schema in `@eslee/db` or Payload Collections. Run migrations (`pnpm db:push` / `pnpm generate:types`).
+1. **Database:** Add/modify Drizzle schema in `@eslee/db` or Payload Collections. Generate and commit a Drizzle migration, then run the owning package's `db:migrate`; run `pnpm payload:migrate` and `pnpm generate:types` for Payload collection changes.
 2. **API:** Expose data via tRPC routers in `@eslee/api` or Payload custom endpoints.
 3. **UI:** Consume the API in Next.js apps using tRPC hooks or Server Components.
 4. **Safety Verification:** Before finalizing, ensure `pnpm typecheck` passes and write/run a targeted Vitest test for the new logic.

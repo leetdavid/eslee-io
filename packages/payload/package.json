@@ -20,10 +20,15 @@
   },
   "dependencies": {
     "@payloadcms/db-postgres": "catalog:payload",
+    "@payloadcms/next": "catalog:payload",
     "@payloadcms/richtext-lexical": "catalog:payload",
     "@payloadcms/storage-s3": "catalog:payload",
+    "@payloadcms/ui": "catalog:payload",
     "exifr": "^7.1.3",
+    "next": "catalog:",
     "payload": "catalog:payload",
+    "react": "catalog:react19",
+    "react-dom": "catalog:react19",
     "sharp": "catalog:"
   },
   "devDependencies": {

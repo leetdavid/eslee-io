@@ -13,8 +13,11 @@ pnpm install
 # Copy environment variables
 cp .env.example .env
 
-# Push database schema
-pnpm db:push
+# Apply committed auth migrations
+pnpm db:migrate
+
+# Apply committed CMS/Payload migrations
+pnpm payload:migrate
 
 # Start development server
 pnpm dev
@@ -30,7 +33,9 @@ pnpm dev
 | `pnpm typecheck` | Run TypeScript checks across the monorepo |
 | `pnpm check` | Run Biome linter/formatter checks |
 | `pnpm check:fix` | Auto-fix linting and formatting issues |
-| `pnpm db:push` | Push database schema changes |
+| `pnpm db:migrate` | Apply committed auth migrations |
+| `pnpm payload:migrate` | Apply committed Payload CMS migrations |
+| `pnpm --filter @eslee/yomi db:migrate` | Apply committed Yomi migrations |
 | `pnpm db:studio` | Open Drizzle Studio |
 
 ## Apps

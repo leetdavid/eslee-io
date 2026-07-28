@@ -22,7 +22,6 @@
     "build": "tsc",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
     "dev": "tsc",
-    "push": "pnpm with-env drizzle-kit push",
     "db:generate": "pnpm with-env drizzle-kit generate",
     "db:migrate": "pnpm with-env drizzle-kit migrate",
     "db:migrate:status": "pnpm with-env tsx scripts/migration-status.ts",
