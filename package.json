@@ -15,6 +15,8 @@
     "db:migrate:status": "pnpm --filter=@eslee/db db:migrate:status",
     "db:push": "turbo -F @eslee/db db:push",
     "db:studio": "turbo -F @eslee/db db:studio",
+    "payload:migrate": "pnpm -F @eslee/cms payload migrate",
+    "payload:migrate:status": "pnpm -F @eslee/cms payload migrate:status",
     "dev": "turbo watch dev --continue",
     "dev:next": "turbo watch dev -F @eslee/www...",
     "check": "biome check .",

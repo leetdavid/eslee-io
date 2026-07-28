@@ -3,8 +3,6 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { postgresAdapter } from "@payloadcms/db-postgres";
 import {
-  BlocksFeature,
-  CodeBlock,
   FixedToolbarFeature,
   HeadingFeature,
   InlineCodeFeature,
@@ -48,7 +46,6 @@ export const config = buildConfig({
       InlineCodeFeature(),
       LinkFeature(),
       UploadFeature({ collections: { media: { fields: [] } } }),
-      BlocksFeature({ blocks: [CodeBlock()] }),
       FixedToolbarFeature(),
       InlineToolbarFeature(),
     ],
