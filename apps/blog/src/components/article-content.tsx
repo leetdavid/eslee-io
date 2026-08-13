@@ -27,5 +27,7 @@ export function ArticleContent({ content }: Pick<BlogPost, "content">) {
   const headings = getTableOfContents(content);
   const data = addHeadingIds(content, headings);
 
-  return <RichText className="article-content" converters={converters} data={data as never} />;
+  return (
+    <RichText className="article-content mt-10" converters={converters} data={data as never} />
+  );
 }

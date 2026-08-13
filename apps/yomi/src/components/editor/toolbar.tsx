@@ -362,35 +362,23 @@ export function EditorToolbar({ editor, textScale, onTextScaleChange }: ToolbarP
             {editor.isActive("table") && (
               <>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => editor.chain().focus().addRowBefore().run()}
-                >
+                <DropdownMenuItem onClick={() => editor.chain().focus().addRowBefore().run()}>
                   Add Row Above
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => editor.chain().focus().addRowAfter().run()}
-                >
+                <DropdownMenuItem onClick={() => editor.chain().focus().addRowAfter().run()}>
                   Add Row Below
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => editor.chain().focus().deleteRow().run()}
-                >
+                <DropdownMenuItem onClick={() => editor.chain().focus().deleteRow().run()}>
                   Delete Row
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => editor.chain().focus().addColumnBefore().run()}
-                >
+                <DropdownMenuItem onClick={() => editor.chain().focus().addColumnBefore().run()}>
                   Add Column Before
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => editor.chain().focus().addColumnAfter().run()}
-                >
+                <DropdownMenuItem onClick={() => editor.chain().focus().addColumnAfter().run()}>
                   Add Column After
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => editor.chain().focus().deleteColumn().run()}
-                >
+                <DropdownMenuItem onClick={() => editor.chain().focus().deleteColumn().run()}>
                   Delete Column
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -713,7 +701,10 @@ export function EditorToolbar({ editor, textScale, onTextScaleChange }: ToolbarP
                   autoFocus
                   value={tableSize.rows}
                   onChange={(e) =>
-                    setTableSize({ ...tableSize, rows: Math.max(1, parseInt(e.target.value) || 1) })
+                    setTableSize({
+                      ...tableSize,
+                      rows: Math.max(1, parseInt(e.target.value, 10) || 1),
+                    })
                   }
                   className="mt-1.5"
                 />
@@ -729,7 +720,10 @@ export function EditorToolbar({ editor, textScale, onTextScaleChange }: ToolbarP
                   max={20}
                   value={tableSize.cols}
                   onChange={(e) =>
-                    setTableSize({ ...tableSize, cols: Math.max(1, parseInt(e.target.value) || 1) })
+                    setTableSize({
+                      ...tableSize,
+                      cols: Math.max(1, parseInt(e.target.value, 10) || 1),
+                    })
                   }
                   className="mt-1.5"
                 />

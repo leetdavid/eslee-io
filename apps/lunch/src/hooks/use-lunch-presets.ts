@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { type LunchPreset } from "@/data/presets";
+import type { LunchPreset } from "@/data/presets";
 import { normalizeLunchSpots } from "@/hooks/use-lunch-spots";
 
 const PRESETS_KEY = "eslee.lunch.presets.v1";

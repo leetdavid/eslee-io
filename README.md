@@ -52,6 +52,10 @@ Photography portfolio showcasing work. Separate subdomain for clean separation.
 
 Payload CMS for content management.
 
+### sushiro - sushiro.eslee.io
+
+Minimal bilingual map of Sushiro Hong Kong queue status. It uses a Next.js-cached server route to retrieve Sushiro's store and queue data without exposing a browser-side CORS dependency.
+
 ### auth-proxy (unused)
 Nitro server that proxies OAuth requests in preview deployments.
 

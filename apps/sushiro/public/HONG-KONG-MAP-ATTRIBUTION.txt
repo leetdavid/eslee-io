@@ -1,0 +1,7 @@
+Hong Kong land silhouette
+
+Derived from the Hong Kong SVG map by MapSVG, via VictorCazanave/svg-maps:
+https://github.com/VictorCazanave/svg-maps/tree/master/packages/hong-kong
+
+Licensed under CC BY 4.0: https://creativecommons.org/licenses/by/4.0/
+Modified to remove district metadata and render uniform white land on a transparent background.

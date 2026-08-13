@@ -1,0 +1,1 @@
+hong-kong.png was rasterized from hong-kong.svg at high resolution and composited into a single white land mask. District seams were closed; sea remains transparent.

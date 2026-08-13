@@ -1,7 +1,8 @@
 "use client";
 
 import { Mic, MicOff, SendHorizontal, Settings, X } from "lucide-react";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import type React from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
@@ -101,9 +102,13 @@ function useRealtimeSession(
   const pendingToolArgsRef = useRef<Record<string, string>>({});
   // Keep settings and callbacks accessible without triggering re-creation
   const settingsRef = useRef(settings);
-  useEffect(() => { settingsRef.current = settings; }, [settings]);
+  useEffect(() => {
+    settingsRef.current = settings;
+  }, [settings]);
   const onToolCallRef = useRef<ToolCallHandler>(onToolCall);
-  useEffect(() => { onToolCallRef.current = onToolCall; }, [onToolCall]);
+  useEffect(() => {
+    onToolCallRef.current = onToolCall;
+  }, [onToolCall]);
 
   const sendEvent = useCallback((event: object) => {
     if (dcRef.current?.readyState === "open") {
@@ -112,7 +117,9 @@ function useRealtimeSession(
   }, []);
 
   const cleanup = useCallback(() => {
-    micStreamRef.current?.getTracks().forEach((t) => t.stop());
+    micStreamRef.current?.getTracks().forEach((track) => {
+      track.stop();
+    });
     micStreamRef.current = null;
     dcRef.current?.close();
     dcRef.current = null;
@@ -250,7 +257,11 @@ function useRealtimeSession(
         }
 
         case "response.function_call_arguments.done": {
-          const { call_id, name, arguments: argsStr } = msg as {
+          const {
+            call_id,
+            name,
+            arguments: argsStr,
+          } = msg as {
             call_id: string;
             name: string;
             arguments: string;
@@ -294,7 +305,7 @@ function useRealtimeSession(
         }
       }
     },
-    [sendEvent],
+    [sendEvent, setMessages],
   );
 
   const connect = useCallback(async () => {
@@ -775,19 +786,15 @@ export function VoiceChatButton() {
 
   const [messages, setMessages] = useState<Message[]>([]);
   const messagesRef = useRef<Message[]>([]);
-  useEffect(() => { messagesRef.current = messages; }, [messages]);
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
 
-  const {
-    status,
-    isSpeaking,
-    isAiSpeaking,
-    audioElRef,
-    connect,
-    disconnect,
-    sendVoiceText,
-  } = useRealtimeSession(settings, handleToolCall, setMessages);
+  const { status, isSpeaking, isAiSpeaking, audioElRef, connect, disconnect, sendVoiceText } =
+    useRealtimeSession(settings, handleToolCall, setMessages);
 
   useEffect(() => {
+    if (messages.length === 0) return;
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
@@ -877,7 +884,7 @@ export function VoiceChatButton() {
   return (
     <>
       {/* biome-ignore lint/a11y/useMediaCaption: AI realtime speech — no captions available */}
-      <audio ref={audioElRef} autoPlay className="hidden" aria-hidden="true" />
+      <audio ref={audioElRef} autoPlay className="hidden" />
 
       {/* Floating trigger button — hidden when panel is open */}
       <button

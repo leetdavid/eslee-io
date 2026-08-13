@@ -15,6 +15,8 @@ const SPIN_DURATION_MS = 4200;
 const MAX_LOOPS = 9;
 const STRIP_MULTIPLIER = MAX_LOOPS + 3;
 
+type StripSlot = LunchSpot & { slotKey: string };
+
 const LEVER_HEIGHT = VISIBLE_ROWS * ITEM_HEIGHT;
 const BALL_SIZE = 42;
 const ROD_HEIGHT = LEVER_HEIGHT - 16;
@@ -44,7 +46,7 @@ function downloadPreset(preset: LunchPreset) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = preset.title.toLowerCase().replace(/[^a-z0-9]+/g, "-") + ".json";
+  a.download = `${preset.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.json`;
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -62,9 +64,13 @@ export function SlotMachine() {
   const didInitRef = useRef(false);
 
   const strip = useMemo(() => {
-    if (spots.length === 0) return [] as LunchSpot[];
-    const arr: LunchSpot[] = [];
-    for (let i = 0; i < STRIP_MULTIPLIER; i++) arr.push(...spots);
+    if (spots.length === 0) return [] as StripSlot[];
+    const arr: StripSlot[] = [];
+    for (let repeat = 0; repeat < STRIP_MULTIPLIER; repeat++) {
+      spots.forEach((spot, spotIndex) => {
+        arr.push({ ...spot, slotKey: `${repeat}-${spotIndex}` });
+      });
+    }
     return arr;
   }, [spots]);
 
@@ -201,9 +207,9 @@ export function SlotMachine() {
                   willChange: "transform",
                 }}
               >
-                {strip.map((spot, i) => (
+                {strip.map((spot) => (
                   <div
-                    key={`${spot.name}-${i}`}
+                    key={spot.slotKey}
                     className="flex items-center justify-center px-4 font-display text-2xl text-bg md:text-3xl"
                     style={{ height: `${ITEM_HEIGHT}px` }}
                   >

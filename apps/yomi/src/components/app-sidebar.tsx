@@ -5,7 +5,6 @@ import Link from "next/link";
 import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
 import { NavUser } from "@/components/nav-user";
-import { YomiLogo } from "@/components/yomi-logo";
 import {
   Sidebar,
   SidebarContent,
@@ -16,6 +15,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { YomiLogo } from "@/components/yomi-logo";
 import { useSession } from "@/lib/auth-client";
 
 const data = {

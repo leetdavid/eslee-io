@@ -1,0 +1,10 @@
+# Keep Vercel uploads free of local dependencies and generated output.
+**/.cache/
+**/.next/
+**/.turbo/
+**/dist/
+**/node_modules/
+**/tsconfig.tsbuildinfo
+infra/.terraform/
+.env
+.env.*

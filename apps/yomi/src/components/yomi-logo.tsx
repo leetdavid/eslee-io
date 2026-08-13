@@ -19,7 +19,7 @@ export function YomiLogo({ size = "md", showWordmark = false, className }: YomiL
     <div className={cn("flex items-center gap-2", className)}>
       <div
         className={cn(
-          "flex items-center justify-center bg-primary text-primary-foreground font-bold shrink-0",
+          "flex shrink-0 items-center justify-center bg-primary font-bold text-primary-foreground",
           s.icon,
         )}
         style={{ fontFamily: "'Noto Sans JP', 'Hiragino Sans', serif" }}

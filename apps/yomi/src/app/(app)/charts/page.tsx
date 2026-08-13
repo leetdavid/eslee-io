@@ -78,13 +78,7 @@ const GOJUUON: { row: string; chars: KanaCell[] }[] = [
   },
   {
     row: "y",
-    chars: [
-      ["ya", "や", "ヤ"],
-      null,
-      ["yu", "ゆ", "ユ"],
-      null,
-      ["yo", "よ", "ヨ"],
-    ],
+    chars: [["ya", "や", "ヤ"], null, ["yu", "ゆ", "ユ"], null, ["yo", "よ", "ヨ"]],
   },
   {
     row: "r",
@@ -98,23 +92,11 @@ const GOJUUON: { row: string; chars: KanaCell[] }[] = [
   },
   {
     row: "w",
-    chars: [
-      ["wa", "わ", "ワ"],
-      null,
-      null,
-      null,
-      ["wo", "を", "ヲ"],
-    ],
+    chars: [["wa", "わ", "ワ"], null, null, null, ["wo", "を", "ヲ"]],
   },
   {
     row: "n",
-    chars: [
-      ["n", "ん", "ン"],
-      null,
-      null,
-      null,
-      null,
-    ],
+    chars: [["n", "ん", "ン"], null, null, null, null],
   },
 ];
 

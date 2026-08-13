@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { DEFAULT_SPOTS, type LunchPreset, type LunchSpot, mapsUrl } from "@/data/presets";
 
-export type { LunchSpot, LunchPreset };
-export { mapsUrl, DEFAULT_SPOTS };
+export type { LunchPreset, LunchSpot };
+export { DEFAULT_SPOTS, mapsUrl };
 
 const STORAGE_KEY = "eslee.lunch.spots.v1";
 

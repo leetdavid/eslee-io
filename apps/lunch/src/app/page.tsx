@@ -10,9 +10,7 @@ export default function Home() {
         <h1 className="mt-2 font-display text-5xl text-cream tracking-tight md:text-6xl">
           where do we eat
         </h1>
-        <p className="mt-3 max-w-sm text-muted text-sm">
-          Can&rsquo;t decide? Pull the lever.
-        </p>
+        <p className="mt-3 max-w-sm text-muted text-sm">Can&rsquo;t decide? Pull the lever.</p>
       </header>
       <SlotMachine />
     </main>

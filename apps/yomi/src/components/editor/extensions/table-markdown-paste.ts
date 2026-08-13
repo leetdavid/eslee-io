@@ -2,7 +2,10 @@ import { Extension } from "@tiptap/core";
 import { Plugin, PluginKey } from "@tiptap/pm/state";
 
 function isMarkdownTable(text: string): boolean {
-  const lines = text.trim().split("\n").filter((l) => l.trim());
+  const lines = text
+    .trim()
+    .split("\n")
+    .filter((l) => l.trim());
   if (lines.length < 2) return false;
   const hasTableLines = lines.every((l) => l.trim().startsWith("|"));
   const hasSeparator = lines.some((l) => /^\|[\s\-:|]+\|/.test(l.trim()));
@@ -28,7 +31,8 @@ function buildTableNode(lines: string[]) {
   if (dataLines.length === 0) return null;
 
   const [headerLine, ...bodyLines] = dataLines;
-  const headerCells = parseCells(headerLine!);
+  if (!headerLine) return null;
+  const headerCells = parseCells(headerLine);
 
   const makeCell = (text: string, cellType: "tableHeader" | "tableCell") => ({
     type: cellType,
@@ -78,7 +82,6 @@ export const TableMarkdownPaste = Extension.create({
 
             try {
               const node = schema.nodeFromJSON(tableNode);
-              const pos = state.selection.from;
               dispatch(tr.replaceSelectionWith(node));
               view.focus();
               return true;

@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Voice chat is not configured" }, { status: 503 });
   }
 
-  const body = await req.json().catch(() => ({})) as { voice?: string };
+  const body = (await req.json().catch(() => ({}))) as { voice?: string };
   const voice = body.voice ?? "shimmer";
 
   const response = await fetch("https://api.openai.com/v1/realtime/sessions", {
