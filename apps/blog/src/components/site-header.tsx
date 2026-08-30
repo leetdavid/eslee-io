@@ -8,7 +8,12 @@ export function SiteHeader() {
         <Link className="font-medium text-sm tracking-tight" href="https://eslee.io">
           David E. S. Lee
         </Link>
-        <span className="text-muted-foreground text-sm">/ blog</span>
+        <Link
+          className="text-muted-foreground text-sm transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          href="/"
+        >
+          / Blog
+        </Link>
       </div>
       <ThemeToggle />
     </header>
