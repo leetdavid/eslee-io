@@ -19,7 +19,10 @@
       "!**/public",
       "!**/*-types.ts",
       "!**/src/components/ui",
-      "!**/drizzle/meta"
+      "!**/drizzle/meta",
+      "!.agents/",
+      "!.cursor/",
+      "!.claude"
     ]
   },
   "linter": {
