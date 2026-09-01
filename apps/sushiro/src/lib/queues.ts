@@ -19,6 +19,10 @@ export type QueueSnapshot = {
   stores: QueueStore[];
 };
 
+export const historyRanges = [24, 168, 720] as const;
+
+export type HistoryRange = (typeof historyRanges)[number];
+
 export type QueueHistoryPoint = {
   collectedAt: string;
   wait: number;

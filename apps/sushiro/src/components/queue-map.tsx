@@ -4,6 +4,8 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { QueueChart } from "@/components/queue-chart";
 import {
+  type HistoryRange,
+  historyRanges,
   isActiveStore,
   isTicketing,
   type QueueHistory,
@@ -41,7 +43,16 @@ const copy = {
     closed: "閉店中",
     history: "輪候趨勢",
     historyEmpty: "首次收集後將顯示趨勢。",
-    historyPeriod: "過去 24 小時",
+    historyPeriod: {
+      24: "過去 24 小時",
+      168: "過去 7 日",
+      720: "過去 30 日",
+    },
+    historyRange: {
+      24: "24 小時",
+      168: "7 日",
+      720: "30 日",
+    },
     globalQueues: "全港輪候組數",
     open: "營業中",
   },
@@ -72,7 +83,16 @@ const copy = {
     closed: "Closed",
     history: "Queue trends",
     historyEmpty: "Trends will appear after the first collection.",
-    historyPeriod: "Last 24 hours",
+    historyPeriod: {
+      24: "Last 24 hours",
+      168: "Last 7 days",
+      720: "Last 30 days",
+    },
+    historyRange: {
+      24: "24h",
+      168: "7d",
+      720: "30d",
+    },
     globalQueues: "All-store queue",
     open: "Open",
   },
@@ -158,6 +178,7 @@ export function QueueMap() {
   const [selectedStore, setSelectedStore] = useState<QueueStore | null>(null);
   const [refreshVersion, setRefreshVersion] = useState(0);
   const [history, setHistory] = useState<QueueHistory | null>(null);
+  const [historyRange, setHistoryRange] = useState<HistoryRange>(24);
 
   useEffect(() => {
     const storedLanguage = window.localStorage.getItem("sushiro-language");
@@ -172,7 +193,9 @@ export function QueueMap() {
 
     async function loadHistory() {
       try {
-        const response = await fetch("/api/queues/charts?hours=24", { cache: "no-store" });
+        const response = await fetch(`/api/queues/charts?hours=${historyRange}`, {
+          cache: "no-store",
+        });
 
         if (!response.ok) {
           throw new Error("Unable to load queue history");
@@ -197,7 +220,7 @@ export function QueueMap() {
       cancelled = true;
       window.clearInterval(interval);
     };
-  }, []);
+  }, [historyRange]);
 
   useEffect(() => {
     document.documentElement.lang = language;
@@ -289,6 +312,11 @@ export function QueueMap() {
     setRefreshVersion((version) => version + 1);
   }
 
+  function changeHistoryRange(range: HistoryRange) {
+    setHistory(null);
+    setHistoryRange(range);
+  }
+
   return (
     <main className="queue-app">
       {status === "ready" && snapshot ? (
@@ -371,8 +399,20 @@ export function QueueMap() {
         <header>
           <div>
             <h2 id="history-heading">{text.history}</h2>
-            <p>{text.historyPeriod}</p>
+            <p>{text.historyPeriod[historyRange]}</p>
           </div>
+          <fieldset aria-label={text.history} className="history-range">
+            {historyRanges.map((range) => (
+              <button
+                aria-pressed={historyRange === range}
+                key={range}
+                onClick={() => changeHistoryRange(range)}
+                type="button"
+              >
+                {text.historyRange[range]}
+              </button>
+            ))}
+          </fieldset>
         </header>
         {history === null ? <p className="history-loading">{text.loading}</p> : null}
         {history && history.global.length === 0 ? (

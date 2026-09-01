@@ -153,11 +153,6 @@ button {
   letter-spacing: -0.1em;
 }
 
-.telemetry div span {
-  font-size: 15px;
-  font-weight: 600;
-}
-
 .telemetry small {
   color: #525252;
 }
@@ -238,7 +233,7 @@ button {
 }
 
 .history-sidebar header {
-  align-items: baseline;
+  align-items: flex-end;
   border-bottom: 1px solid var(--black);
   display: flex;
   justify-content: space-between;
@@ -264,6 +259,33 @@ button {
 
 .history-sidebar header p {
   margin-top: 3px;
+}
+
+.history-range {
+  border: 0;
+  display: flex;
+  margin: 0;
+  padding: 0;
+}
+
+.history-range button {
+  background: var(--land);
+  border: 1px solid var(--black);
+  border-right: 0;
+  cursor: pointer;
+  font-size: 11px;
+  height: 28px;
+  min-width: 34px;
+  padding: 0 6px;
+}
+
+.history-range button:last-child {
+  border-right: 1px solid var(--black);
+}
+
+.history-range button[aria-pressed="true"] {
+  background: var(--black);
+  color: var(--land);
 }
 
 .history-sidebar .history-loading,
@@ -590,6 +612,11 @@ button {
   border-top: 1px solid var(--line);
   margin-top: 14px;
   padding-top: 10px;
+}
+
+.telemetry div span {
+  font-size: 15px;
+  font-weight: 600;
 }
 
 button:focus-visible {

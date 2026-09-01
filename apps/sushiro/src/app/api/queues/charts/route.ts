@@ -1,11 +1,21 @@
 import { sushiroQueueSnapshot } from "@eslee/db/schema";
-import { asc, gte } from "drizzle-orm";
-import type { QueueHistory, QueueHistoryPoint, QueueStoreHistory } from "@/lib/queues";
+import { asc, gte, sql } from "drizzle-orm";
+import {
+  type HistoryRange,
+  historyRanges,
+  type QueueHistory,
+  type QueueHistoryPoint,
+  type QueueStoreHistory,
+} from "@/lib/queues";
 
 export const dynamic = "force-dynamic";
 
 const defaultHours = 24;
-const maximumHours = 24;
+const bucketMinutes: Record<HistoryRange, number> = {
+  24: 5,
+  168: 30,
+  720: 120,
+};
 
 function parseHours(value: string | null) {
   if (value === null) {
@@ -13,31 +23,32 @@ function parseHours(value: string | null) {
   }
 
   const hours = Number(value);
-  return Number.isSafeInteger(hours) && hours > 0 && hours <= maximumHours ? hours : undefined;
+  return historyRanges.find((range) => range === hours);
 }
 
 export async function GET(request: Request) {
   const hours = parseHours(new URL(request.url).searchParams.get("hours"));
 
   if (hours === undefined) {
-    return Response.json({ error: "Hours must be between 1 and 24" }, { status: 400 });
+    return Response.json({ error: "Hours must be 24, 168, or 720" }, { status: 400 });
   }
 
   const from = new Date(Date.now() - hours * 60 * 60 * 1_000);
+  const bucketedAt = sql<Date>`date_bin(${bucketMinutes[hours]} * interval '1 minute', ${sushiroQueueSnapshot.collectedAt}, timestamptz '2000-01-01')`;
+  const activeWait = sql<number>`round(avg(case when ${sushiroQueueSnapshot.storeStatus} = 'OPEN' and (${sushiroQueueSnapshot.netTicketStatus} like '%MANUAL%' or ${sushiroQueueSnapshot.netTicketStatus} like '%ONLINE%') then ${sushiroQueueSnapshot.wait} else 0 end))::integer`;
   const { db } = await import("@eslee/db/client");
   const snapshots = await db
     .select({
-      collectedAt: sushiroQueueSnapshot.collectedAt,
-      name: sushiroQueueSnapshot.name,
-      nameEn: sushiroQueueSnapshot.nameEn,
-      netTicketStatus: sushiroQueueSnapshot.netTicketStatus,
+      collectedAt: bucketedAt,
+      name: sql<string>`max(${sushiroQueueSnapshot.name})`,
+      nameEn: sql<string>`max(${sushiroQueueSnapshot.nameEn})`,
       storeId: sushiroQueueSnapshot.storeId,
-      storeStatus: sushiroQueueSnapshot.storeStatus,
-      wait: sushiroQueueSnapshot.wait,
+      wait: activeWait,
     })
     .from(sushiroQueueSnapshot)
     .where(gte(sushiroQueueSnapshot.collectedAt, from))
-    .orderBy(asc(sushiroQueueSnapshot.collectedAt), asc(sushiroQueueSnapshot.storeId));
+    .groupBy(sushiroQueueSnapshot.storeId, bucketedAt)
+    .orderBy(asc(bucketedAt), asc(sushiroQueueSnapshot.storeId));
 
   const global = new Map<string, QueueHistoryPoint>();
   const stores = new Map<number, QueueStoreHistory>();
@@ -62,13 +73,7 @@ export async function GET(request: Request) {
 
     const total = global.get(collectedAt) ?? { collectedAt, wait: 0 };
 
-    if (
-      snapshot.storeStatus === "OPEN" &&
-      (snapshot.netTicketStatus.includes("MANUAL") || snapshot.netTicketStatus.includes("ONLINE"))
-    ) {
-      total.wait += snapshot.wait;
-    }
-
+    total.wait += snapshot.wait;
     global.set(collectedAt, total);
   }
 
