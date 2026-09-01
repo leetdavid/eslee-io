@@ -35,7 +35,7 @@ export async function GET(request: Request) {
 
   const from = new Date(Date.now() - hours * 60 * 60 * 1_000);
   const bucketInterval = sql.raw(`${bucketMinutes[hours]} * interval '1 minute'`);
-  const bucketedAt = sql<Date>`date_bin(${bucketInterval}, ${sushiroQueueSnapshot.collectedAt}, timestamptz '2000-01-01')`;
+  const bucketedAt = sql<string>`date_bin(${bucketInterval}, ${sushiroQueueSnapshot.collectedAt}, timestamptz '2000-01-01')`;
   const activeWait = sql<number>`round(avg(case when ${sushiroQueueSnapshot.storeStatus} = 'OPEN' and (${sushiroQueueSnapshot.netTicketStatus} like '%MANUAL%' or ${sushiroQueueSnapshot.netTicketStatus} like '%ONLINE%') then ${sushiroQueueSnapshot.wait} else 0 end))::integer`;
   const { db } = await import("@eslee/db/client");
   const snapshots = await db
@@ -55,7 +55,7 @@ export async function GET(request: Request) {
   const stores = new Map<number, QueueStoreHistory>();
 
   for (const snapshot of snapshots) {
-    const collectedAt = snapshot.collectedAt.toISOString();
+    const collectedAt = new Date(snapshot.collectedAt).toISOString();
     const point = { collectedAt, wait: snapshot.wait };
     const store = stores.get(snapshot.storeId) ?? {
       latestWait: 0,
