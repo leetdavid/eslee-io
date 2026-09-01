@@ -19,6 +19,24 @@ export type QueueSnapshot = {
   stores: QueueStore[];
 };
 
+export type QueueHistoryPoint = {
+  collectedAt: string;
+  wait: number;
+};
+
+export type QueueStoreHistory = {
+  latestWait: number;
+  name: string;
+  nameEn: string;
+  points: QueueHistoryPoint[];
+  storeId: number;
+};
+
+export type QueueHistory = {
+  global: QueueHistoryPoint[];
+  stores: QueueStoreHistory[];
+};
+
 export function isTicketing(store: QueueStore) {
   return store.netTicketStatus.includes("MANUAL") || store.netTicketStatus.includes("ONLINE");
 }

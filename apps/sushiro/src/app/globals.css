@@ -6,6 +6,7 @@
   --green: #166534;
   --lime: #4d7c0f;
   --yellow: #a16207;
+  --history-sidebar-width: clamp(280px, 28vw, 360px);
   --red: #b91c1c;
 }
 
@@ -38,8 +39,11 @@ button {
 }
 
 .map-stage {
-  inset: 0;
+  bottom: 0;
+  left: 0;
   position: absolute;
+  right: var(--history-sidebar-width);
+  top: 0;
 }
 
 .map-canvas {
@@ -50,7 +54,7 @@ button {
   position: absolute;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: min(calc(100vw - 64px), calc(100dvh * 1.378));
+  width: min(calc(100% - 64px), calc(100dvh * 1.378));
 }
 
 .basemap {
@@ -182,7 +186,7 @@ button {
   display: flex;
   gap: 8px;
   position: absolute;
-  right: clamp(18px, 3vw, 48px);
+  right: calc(var(--history-sidebar-width) + clamp(18px, 3vw, 48px));
   top: clamp(18px, 3vw, 48px);
   z-index: 1;
 }
@@ -239,6 +243,154 @@ button {
   transform: translateX(-50%);
 }
 
+.history-sidebar {
+  background: var(--land);
+  border-left: 1px solid var(--black);
+  bottom: 0;
+  overflow-y: auto;
+  padding: 20px;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: var(--history-sidebar-width);
+  z-index: 2;
+}
+
+.history-sidebar header {
+  align-items: baseline;
+  border-bottom: 1px solid var(--black);
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 12px;
+}
+
+.history-sidebar h2,
+.history-sidebar p {
+  margin: 0;
+}
+
+.history-sidebar h2 {
+  font-size: 17px;
+  letter-spacing: -0.03em;
+}
+
+.history-sidebar header p,
+.history-loading,
+.history-empty {
+  color: #525252;
+  font-size: 12px;
+}
+
+.history-sidebar header p {
+  margin-top: 3px;
+}
+
+.history-sidebar .history-loading,
+.history-sidebar .history-empty {
+  line-height: 1.5;
+  margin-top: 16px;
+}
+
+.history-charts {
+  display: grid;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.queue-chart {
+  margin: 0;
+}
+
+.queue-chart-caption {
+  align-items: baseline;
+  display: flex;
+  font-size: 12px;
+  justify-content: space-between;
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+
+.queue-chart-caption span {
+  font-weight: 600;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.queue-chart-caption strong {
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  margin-left: 12px;
+  white-space: nowrap;
+}
+
+.queue-chart-caption small {
+  color: #525252;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.queue-chart svg {
+  display: block;
+  height: 52px;
+  overflow: visible;
+  width: 100%;
+}
+
+.queue-chart-baseline {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.queue-chart-line {
+  fill: none;
+  stroke: var(--black);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.queue-chart circle.queue-chart-line {
+  fill: var(--black);
+}
+
+.queue-chart-empty {
+  border-bottom: 1px solid var(--line);
+  color: #737373;
+  font-size: 12px;
+  margin: 0;
+  padding: 18px 0;
+}
+
+.history-store-list {
+  border-top: 1px solid var(--black);
+}
+
+.history-store {
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+  display: block;
+  padding: 12px 0;
+  text-align: left;
+  width: 100%;
+}
+
+.history-store:disabled {
+  color: #737373;
+  cursor: default;
+}
+
+.history-store:not(:disabled):is(:hover, :focus-visible) .queue-chart-line {
+  stroke: var(--red);
+}
+
+.history-store:active:not(:disabled) {
+  scale: 0.96;
+}
+
 .error-state {
   align-items: center;
   background: var(--land);
@@ -262,8 +414,8 @@ button {
   background: var(--land);
   border: 1px solid var(--black);
   bottom: 20px;
-  left: 50%;
-  max-width: 640px;
+  left: calc((100% - var(--history-sidebar-width)) / 2);
+  max-width: min(640px, calc(100% - var(--history-sidebar-width) - 40px));
   max-height: calc(100dvh - 40px);
   overflow-y: auto;
   padding: 20px;
@@ -455,12 +607,36 @@ button:focus-visible {
 }
 
 @media (max-width: 600px) {
+  :root {
+    --history-sidebar-width: 100%;
+  }
+
   .map-canvas {
-    width: min(calc(100vw - 32px), calc((100dvh - 96px) * 1.378));
+    width: min(calc(100vw - 32px), calc((100dvh - 320px) * 1.378));
+  }
+
+  .map-stage {
+    bottom: 288px;
+    right: 0;
+  }
+
+  .controls {
+    right: 18px;
+  }
+
+  .history-sidebar {
+    border-left: 0;
+    border-top: 1px solid var(--black);
+    height: 288px;
+    padding: 16px;
+    top: auto;
+    width: 100%;
   }
 
   .store-sheet {
-    bottom: 0;
+    bottom: 288px;
+    left: 50%;
+    max-width: none;
     padding: 20px 16px 16px;
     width: 100%;
   }
