@@ -1,0 +1,1 @@
+DROP INDEX "sushiro_queue_snapshot_store_collected_at_idx";

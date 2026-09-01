@@ -478,6 +478,12 @@ importers:
 
   apps/sushiro:
     dependencies:
+      '@eslee/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      drizzle-orm:
+        specifier: 'catalog:'
+        version: 0.45.1(@neondatabase/serverless@0.10.0)(@opentelemetry/api@1.9.0)(@planetscale/database@1.19.0)(@prisma/client@5.22.0)(@types/pg@8.16.0)(@vercel/postgres@0.10.0(utf-8-validate@6.0.4))(better-sqlite3@12.6.2)(kysely@0.28.11)(mysql2@3.11.3)(pg@8.16.3)(postgres@3.4.5)
       next:
         specifier: 'catalog:'
         version: 15.5.9(@babel/core@7.29.7)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.1.4(react@19.1.4))(react@19.1.4)(sass@1.77.4)
@@ -500,6 +506,9 @@ importers:
       '@types/react-dom':
         specifier: catalog:react19
         version: 19.1.4(@types/react@19.1.4)
+      dotenv-cli:
+        specifier: 'catalog:'
+        version: 7.4.2
       typescript:
         specifier: 'catalog:'
         version: 5.9.3

@@ -11,5 +11,5 @@ export default {
   dialect: "postgresql",
   dbCredentials: { url: databaseUrl },
   casing: "snake_case",
-  tablesFilter: ["user", "session", "account", "verification"],
+  tablesFilter: ["user", "session", "account", "verification", "sushiro_queue_snapshot"],
 } satisfies Config;

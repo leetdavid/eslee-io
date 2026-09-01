@@ -5,14 +5,17 @@
   "type": "module",
   "scripts": {
     "build": "next build",
-    "dev": "next dev -p 3005 --turbopack",
-    "start": "next start -p 3005",
+    "dev": "pnpm with-env next dev -p 3005 --turbopack",
+    "start": "pnpm with-env next start -p 3005",
     "lint": "biome lint .",
     "check": "biome check .",
     "check:fix": "biome check --write .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
+    "@eslee/db": "workspace:*",
+    "drizzle-orm": "catalog:",
     "next": "catalog:",
     "react": "catalog:react19",
     "react-dom": "catalog:react19"
@@ -22,6 +25,7 @@
     "@types/node": "catalog:node",
     "@types/react": "catalog:react19",
     "@types/react-dom": "catalog:react19",
+    "dotenv-cli": "catalog:",
     "typescript": "catalog:"
   }
 }
