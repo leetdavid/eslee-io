@@ -250,6 +250,21 @@ export function QueueMap() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!selectedStore) {
+      return;
+    }
+
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setSelectedStore(null);
+      }
+    }
+
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [selectedStore]);
+
   const text = copy[language];
   const activeStores = snapshot?.stores.filter(isActiveStore) ?? [];
   const positionedStores = snapshot ? layoutStores(snapshot.stores) : [];
@@ -305,7 +320,6 @@ export function QueueMap() {
                   type="button"
                 >
                   <strong>{store.wait}</strong>
-                  <span>{storeName}</span>
                 </button>
               );
             })}
@@ -416,79 +430,88 @@ export function QueueMap() {
       ) : null}
 
       {selectedStore ? (
-        <aside
-          aria-label={language === "en" ? selectedStore.nameEn : selectedStore.name}
-          className="store-sheet"
-        >
-          <div className="sheet-handle" />
-          <div className="sheet-heading">
-            <div>
-              <p>{selectedStore.area}</p>
-              <h1>
-                {language === "en"
-                  ? selectedStore.nameEn || selectedStore.name
-                  : selectedStore.name}
-              </h1>
+        <>
+          <button
+            aria-label={text.close}
+            className="sheet-backdrop"
+            onClick={() => setSelectedStore(null)}
+            tabIndex={-1}
+            type="button"
+          />
+          <aside
+            aria-label={language === "en" ? selectedStore.nameEn : selectedStore.name}
+            className="store-sheet"
+          >
+            <div className="sheet-handle" />
+            <div className="sheet-heading">
+              <div>
+                <p>{selectedStore.area}</p>
+                <h1>
+                  {language === "en"
+                    ? selectedStore.nameEn || selectedStore.name
+                    : selectedStore.name}
+                </h1>
+              </div>
+              <button
+                aria-label={text.close}
+                className="close-sheet"
+                onClick={() => setSelectedStore(null)}
+                type="button"
+              >
+                {text.close}
+              </button>
             </div>
-            <button
-              aria-label={text.close}
-              className="close-sheet"
-              onClick={() => setSelectedStore(null)}
-              type="button"
-            >
-              {text.close}
-            </button>
-          </div>
 
-          <div className="store-status">
-            <span>{selectedStore.storeStatus === "OPEN" ? text.open : text.closed}</span>
-            <span>{isTicketing(selectedStore) ? text.ticketing : text.ticketingPaused}</span>
-            {queueBandLabel(selectedStore, language) ? (
-              <span className={`status-dot status-dot-${queueBand(selectedStore)}`}>
-                {queueBandLabel(selectedStore, language)}
-              </span>
-            ) : null}
-          </div>
-
-          <div className="wait-stat">
-            <span>{text.waitingGroups}</span>
-            <strong className={`count-${queueBand(selectedStore)}`}>{selectedStore.wait}</strong>
-            <small>{text.groups}</small>
-          </div>
-
-          <div className="sheet-grid">
-            <div>
-              <p>{text.address}</p>
-              <span>{selectedStore.address}</span>
+            <div className="store-status">
+              <span>{selectedStore.storeStatus === "OPEN" ? text.open : text.closed}</span>
+              <span>{isTicketing(selectedStore) ? text.ticketing : text.ticketingPaused}</span>
+              {queueBandLabel(selectedStore, language) ? (
+                <span className={`status-dot status-dot-${queueBand(selectedStore)}`}>
+                  {queueBandLabel(selectedStore, language)}
+                </span>
+              ) : null}
             </div>
-            <div>
-              <p>{text.calledTickets}</p>
-              <span>{selectedStore.storeQueue.join(", ") || "—"}</span>
+
+            <div className="wait-stat">
+              <span>{text.waitingGroups}</span>
+              <strong className={`count-${queueBand(selectedStore)}`}>{selectedStore.wait}</strong>
+              <small>{text.groups}</small>
             </div>
-          </div>
 
-          <section className="breakdown">
-            <p>{text.queueBreakdown}</p>
-            <table>
-              <thead>
-                <tr>
-                  <th>{text.table}</th>
-                  <th>{text.counter}</th>
-                  <th>{text.pair}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>{selectedStore.waitingGroupTable}</td>
-                  <td>{selectedStore.waitingGroupCounter}</td>
-                  <td>{selectedStore.waitingGroupPair}</td>
-                </tr>
-              </tbody>
-            </table>
-          </section>
+            <div className="sheet-grid">
+              <div>
+                <p>{text.address}</p>
+                <span>{selectedStore.address}</span>
+              </div>
+              <div>
+                <p>{text.calledTickets}</p>
+                <span>{selectedStore.storeQueue.join(", ") || "—"}</span>
+              </div>
+            </div>
 
-          <footer>{text.dataSource}</footer>
-        </aside>
+            <section className="breakdown">
+              <p>{text.queueBreakdown}</p>
+              <table>
+                <thead>
+                  <tr>
+                    <th>{text.table}</th>
+                    <th>{text.counter}</th>
+                    <th>{text.pair}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{selectedStore.waitingGroupTable}</td>
+                    <td>{selectedStore.waitingGroupCounter}</td>
+                    <td>{selectedStore.waitingGroupPair}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </section>
+
+            <footer>{text.dataSource}</footer>
+          </aside>
+        </>
       ) : null}
     </main>
   );

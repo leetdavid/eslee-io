@@ -121,25 +121,6 @@ button {
   outline-offset: 3px;
 }
 
-.store-marker span {
-  background: var(--land);
-  border: 1px solid var(--black);
-  bottom: calc(100% + 8px);
-  font-size: clamp(10px, 1.25cqw, 14px);
-  font-weight: 600;
-  left: 50%;
-  opacity: 0;
-  padding: 4px 6px;
-  pointer-events: none;
-  position: absolute;
-  transform: translateX(-50%);
-  white-space: nowrap;
-}
-
-.store-marker:is(:hover, :focus-visible, [data-selected="true"]) span {
-  opacity: 1;
-}
-
 .telemetry {
   left: clamp(18px, 3vw, 48px);
   position: absolute;
@@ -422,7 +403,17 @@ button {
   position: absolute;
   transform: translateX(-50%);
   width: calc(100% - 40px);
-  z-index: 2;
+  z-index: 4;
+}
+
+.sheet-backdrop {
+  background: transparent;
+  border: 0;
+  cursor: default;
+  inset: 0;
+  padding: 0;
+  position: absolute;
+  z-index: 3;
 }
 
 .sheet-handle {
