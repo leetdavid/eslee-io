@@ -74,10 +74,15 @@ export function useLunchSpots() {
     setSpots(DEFAULT_SPOTS);
   }, []);
 
+  const replaceSpots = useCallback((incoming: LunchSpot[]) => {
+    const normalized = normalizeLunchSpots(incoming);
+    if (normalized) setSpots(normalized);
+  }, []);
+
   const loadSpots = useCallback((incoming: LunchSpot[]) => {
     const normalized = normalizeLunchSpots(incoming);
     if (normalized) setSpots(normalized);
   }, []);
 
-  return { spots, addSpot, removeSpot, resetSpots, loadSpots, hydrated };
+  return { spots, addSpot, removeSpot, resetSpots, replaceSpots, loadSpots, hydrated };
 }

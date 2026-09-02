@@ -52,7 +52,8 @@ function downloadPreset(preset: LunchPreset) {
 }
 
 export function SlotMachine() {
-  const { spots, addSpot, removeSpot, resetSpots, loadSpots, hydrated } = useLunchSpots();
+  const { spots, addSpot, removeSpot, resetSpots, replaceSpots, loadSpots, hydrated } =
+    useLunchSpots();
   const { presets, savePreset, deletePreset, hydrated: presetsHydrated } = useLunchPresets();
   const [activePresetTitle, setActivePresetTitle] = useState<string | null>(null);
   const [index, setIndex] = useState(0);
@@ -125,6 +126,41 @@ export function SlotMachine() {
     },
     [loadSpots],
   );
+
+  const handleAddSpot = useCallback(
+    (name: string, url?: string) => {
+      addSpot(name, url);
+      setActivePresetTitle(null);
+      setWinner(null);
+    },
+    [addSpot],
+  );
+
+  const handleRemoveSpot = useCallback(
+    (name: string) => {
+      removeSpot(name);
+      setActivePresetTitle(null);
+      setWinner(null);
+    },
+    [removeSpot],
+  );
+
+  const handleReplaceSpots = useCallback(
+    (nextSpots: LunchSpot[]) => {
+      replaceSpots(nextSpots);
+      setActivePresetTitle(null);
+      setWinner(null);
+      setIndex(0);
+    },
+    [replaceSpots],
+  );
+
+  const handleResetSpots = useCallback(() => {
+    resetSpots();
+    setActivePresetTitle(null);
+    setWinner(null);
+    setIndex(0);
+  }, [resetSpots]);
 
   const handleSavePreset = useCallback(
     (title: string) => {
@@ -263,9 +299,10 @@ export function SlotMachine() {
 
       <SpotsManager
         spots={spots}
-        onAdd={addSpot}
-        onRemove={removeSpot}
-        onReset={resetSpots}
+        onAdd={handleAddSpot}
+        onRemove={handleRemoveSpot}
+        onReplace={handleReplaceSpots}
+        onReset={handleResetSpots}
         disabled={spinning}
         recommendedPresets={RECOMMENDED_PRESETS}
         presets={presets}
@@ -402,6 +439,7 @@ function SpotsManager({
   spots,
   onAdd,
   onRemove,
+  onReplace,
   onReset,
   disabled,
   recommendedPresets,
@@ -417,6 +455,7 @@ function SpotsManager({
   spots: LunchSpot[];
   onAdd: (name: string, url?: string) => void;
   onRemove: (name: string) => void;
+  onReplace: (spots: LunchSpot[]) => void;
   onReset: () => void;
   disabled: boolean;
   recommendedPresets: LunchPreset[];
@@ -431,6 +470,7 @@ function SpotsManager({
 }) {
   const [input, setInput] = useState("");
   const [urlInput, setUrlInput] = useState("");
+  const [optionsInput, setOptionsInput] = useState(() => spots.map((spot) => spot.name).join(", "));
   const [saveInput, setSaveInput] = useState(activePresetTitle ?? "");
   const [importError, setImportError] = useState<string | null>(null);
   const importRef = useRef<HTMLInputElement>(null);
@@ -438,6 +478,10 @@ function SpotsManager({
   useEffect(() => {
     setSaveInput(activePresetTitle ?? "");
   }, [activePresetTitle]);
+
+  useEffect(() => {
+    setOptionsInput(spots.map((spot) => spot.name).join(", "));
+  }, [spots]);
 
   useEffect(() => {
     if (!importError) return;
@@ -484,6 +528,27 @@ function SpotsManager({
     setUrlInput("");
   };
 
+  const submitOptions = (e: React.FormEvent) => {
+    e.preventDefault();
+    const urlsByName = new Map(spots.map((spot) => [spot.name.toLocaleLowerCase(), spot.url]));
+    const seen = new Set<string>();
+    const nextSpots = optionsInput
+      .split(/[,;\n]+/)
+      .map((name) => name.trim())
+      .filter((name) => {
+        const key = name.toLocaleLowerCase();
+        if (!key || seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      })
+      .map((name) => {
+        const url = urlsByName.get(name.toLocaleLowerCase());
+        return { name, ...(url ? { url } : {}) };
+      });
+
+    onReplace(nextSpots);
+  };
+
   const submitSave = (e: React.FormEvent) => {
     e.preventDefault();
     const v = saveInput.trim();
@@ -493,6 +558,41 @@ function SpotsManager({
 
   return (
     <section className="mt-8">
+      <details className="mb-5 rounded-xl border border-panel-edge bg-panel/50 px-4 py-3">
+        <summary className="cursor-pointer font-mono text-[10px] text-gold uppercase tracking-[0.3em] focus-visible:outline-2 focus-visible:outline-gold focus-visible:outline-offset-4">
+          edit options
+        </summary>
+        <form onSubmit={submitOptions} className="mt-4">
+          <label
+            htmlFor="lunch-options"
+            className="font-mono text-[10px] text-muted uppercase tracking-[0.25em]"
+          >
+            Lunch options
+          </label>
+          <textarea
+            id="lunch-options"
+            value={optionsInput}
+            onChange={(e) => setOptionsInput(e.target.value)}
+            disabled={disabled}
+            placeholder="Pizza, Ramen, Sushi"
+            rows={4}
+            className="mt-2 w-full rounded-md border border-panel-edge bg-bg px-3 py-2 text-ink text-sm outline-none transition-colors placeholder:text-muted focus:border-gold focus-visible:outline-2 focus-visible:outline-gold focus-visible:outline-offset-2 disabled:opacity-50"
+          />
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+            <p className="font-mono text-[9px] text-muted uppercase tracking-[0.2em]">
+              Separate with commas, semicolons, or new lines
+            </p>
+            <button
+              type="submit"
+              disabled={disabled}
+              className="gold-plate rounded-md px-3 py-2 font-mono text-[10px] text-bg uppercase tracking-[0.3em] shadow-md transition-transform focus-visible:outline-2 focus-visible:outline-gold focus-visible:outline-offset-2 active:translate-y-px disabled:opacity-50"
+            >
+              save options
+            </button>
+          </div>
+        </form>
+      </details>
+
       {/* Import / export / reset */}
       <div className="mb-4 flex items-center justify-end gap-3">
         <input
@@ -593,6 +693,7 @@ function SpotsManager({
           value={saveInput}
           onChange={(e) => setSaveInput(e.target.value)}
           disabled={disabled}
+          aria-label="Preset name"
           placeholder="save as…"
           maxLength={60}
           className="flex-1 border-panel-edge border-b bg-transparent px-1 py-2 text-ink text-sm outline-none transition-colors placeholder:text-muted focus:border-gold disabled:opacity-50"
@@ -614,6 +715,7 @@ function SpotsManager({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             disabled={disabled}
+            aria-label="Lunch option"
             placeholder="add a spot…"
             maxLength={60}
             className="flex-1 rounded-md border border-panel-edge bg-panel px-3 py-2 text-ink text-sm outline-none placeholder:text-muted focus:border-gold disabled:opacity-50"
@@ -632,6 +734,7 @@ function SpotsManager({
           value={urlInput}
           onChange={(e) => setUrlInput(e.target.value)}
           disabled={disabled}
+          aria-label="Google Maps link"
           placeholder="google maps link (optional)"
           className="rounded-md border border-panel-edge bg-panel px-3 py-2 text-ink text-sm outline-none placeholder:text-muted focus:border-gold disabled:opacity-50"
         />
@@ -665,9 +768,10 @@ function SpotsManager({
                   type="button"
                   onClick={() => onRemove(spot.name)}
                   disabled={disabled}
+                  aria-label={`Remove ${spot.name}`}
                   className="group flex items-center px-2.5 py-1.5 text-muted transition-colors hover:text-red"
                 >
-                  <X className="size-3" />
+                  <X aria-hidden="true" className="size-3" />
                 </button>
               </li>
             ))}
