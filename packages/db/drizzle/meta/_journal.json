@@ -36,6 +36,13 @@
       "when": 1788254779619,
       "tag": "0004_right_the_twelve",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1788318378843,
+      "tag": "0005_wooden_bedlam",
+      "breakpoints": true
     }
   ]
 }

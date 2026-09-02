@@ -1,0 +1,19 @@
+name: Database Migrations
+
+on:
+  push:
+    branches: [main]
+    paths: ["packages/db/drizzle/**"]
+
+permissions:
+  contents: read
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./tooling/github/setup
+      - run: pnpm --dir packages/db exec drizzle-kit migrate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
