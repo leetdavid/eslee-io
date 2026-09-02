@@ -1,11 +1,8 @@
-import { unstable_cache } from "next/cache";
-import { fetchQueues } from "@/lib/sushiro";
-
-const getQueues = unstable_cache(fetchQueues, ["sushiro-queues"], { revalidate: 60 });
+import { getQueues } from "@/lib/queue-cache";
 
 export async function GET() {
   try {
-    return Response.json(await getQueues());
+    return Response.json(await getQueues(), { headers: { "Cache-Control": "no-store" } });
   } catch {
     return Response.json({ error: "Unable to load Sushiro queue data" }, { status: 502 });
   }

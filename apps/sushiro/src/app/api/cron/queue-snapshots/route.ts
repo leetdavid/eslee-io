@@ -1,7 +1,7 @@
 import { sushiroQueueSnapshot, sushiroStoreHours } from "@eslee/db/schema";
 import { sql } from "drizzle-orm";
+import { getQueues } from "@/lib/queue-cache";
 import { fetchStoreHours } from "@/lib/store-hours";
-import { fetchQueues } from "@/lib/sushiro";
 
 export const maxDuration = 60;
 
@@ -16,7 +16,7 @@ export async function GET(request: Request) {
 
   try {
     const collectedAt = new Date();
-    const { stores } = await fetchQueues();
+    const { stores } = await getQueues();
     const { db } = await import("@eslee/db/client");
 
     await db.insert(sushiroQueueSnapshot).values(

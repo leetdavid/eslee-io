@@ -211,6 +211,30 @@ button {
   cursor: wait;
 }
 
+.refresh-control[aria-busy="true"]::after {
+  border: 1px solid currentColor;
+  border-left-color: transparent;
+  border-radius: 50%;
+  content: "";
+  display: inline-block;
+  height: 9px;
+  margin-left: 6px;
+  vertical-align: -1px;
+  width: 9px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .refresh-control[aria-busy="true"]::after {
+    animation: refresh-spin 0.7s linear infinite;
+  }
+}
+
+@keyframes refresh-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
 .loading {
   bottom: 24px;
   font-size: 12px;
@@ -334,7 +358,12 @@ button {
   font-weight: 500;
 }
 
+.queue-chart-plot {
+  position: relative;
+}
+
 .queue-chart svg {
+  cursor: crosshair;
   display: block;
   height: 52px;
   overflow: visible;
@@ -356,6 +385,61 @@ button {
 
 .queue-chart circle.queue-chart-line {
   fill: var(--black);
+}
+
+.queue-chart-hover-dot {
+  fill: var(--land);
+  stroke: var(--black);
+  stroke-width: 2;
+}
+
+.queue-chart-tooltip {
+  background: var(--black);
+  color: var(--land);
+  font-size: 10px;
+  line-height: 1.3;
+  padding: 4px 6px;
+  pointer-events: none;
+  position: absolute;
+  white-space: nowrap;
+  z-index: 1;
+}
+
+.queue-chart-tooltip strong,
+.queue-chart-tooltip time {
+  display: block;
+}
+
+.queue-chart-tooltip strong {
+  font-size: 11px;
+}
+
+.queue-chart-tooltip time {
+  color: #d4d4d4;
+}
+
+.queue-chart-tooltip[data-align="left"][data-position="above"] {
+  transform: translate(6px, calc(-100% - 6px));
+}
+
+.queue-chart-tooltip[data-align="left"][data-position="below"] {
+  transform: translate(6px, 6px);
+}
+
+.queue-chart-tooltip[data-align="center"][data-position="above"] {
+  transform: translate(-50%, calc(-100% - 6px));
+}
+
+.queue-chart-tooltip[data-align="center"][data-position="below"] {
+  transform: translate(-50%, 6px);
+}
+
+.queue-chart-tooltip[data-align="right"][data-position="above"] {
+  transform: translate(calc(-100% - 6px), calc(-100% - 6px));
+}
+
+.queue-chart-tooltip[data-align="right"][data-position="below"] {
+  transform: translate(calc(-100% - 6px), 6px);
 }
 
 .queue-chart-empty {

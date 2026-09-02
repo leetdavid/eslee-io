@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@eslee/db": "workspace:*",
+    "@upstash/redis": "^1.35.2",
     "drizzle-orm": "catalog:",
     "next": "catalog:",
     "react": "catalog:react19",

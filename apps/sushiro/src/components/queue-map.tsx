@@ -177,6 +177,7 @@ export function QueueMap() {
   const [status, setStatus] = useState<"error" | "loading" | "ready">("loading");
   const [selectedStore, setSelectedStore] = useState<QueueStore | null>(null);
   const [refreshVersion, setRefreshVersion] = useState(0);
+  const [isRefreshing, setIsRefreshing] = useState(true);
   const [history, setHistory] = useState<QueueHistory | null>(null);
   const [historyRange, setHistoryRange] = useState<HistoryRange>(24);
 
@@ -230,9 +231,8 @@ export function QueueMap() {
     let cancelled = false;
 
     async function loadQueues() {
-      setStatus("loading");
-      setSnapshot(null);
-      setSelectedStore(null);
+      setStatus((currentStatus) => (currentStatus === "ready" ? currentStatus : "loading"));
+      setIsRefreshing(true);
 
       try {
         const response = await fetch(`/api/queues?request=${refreshVersion}`, {
@@ -248,10 +248,17 @@ export function QueueMap() {
         if (!cancelled) {
           setSnapshot(nextSnapshot);
           setStatus("ready");
+          setSelectedStore((store) =>
+            store ? (nextSnapshot.stores.find(({ id }) => id === store.id) ?? null) : null,
+          );
         }
       } catch {
         if (!cancelled) {
-          setStatus("error");
+          setStatus((currentStatus) => (currentStatus === "ready" ? currentStatus : "error"));
+        }
+      } finally {
+        if (!cancelled) {
+          setIsRefreshing(false);
         }
       }
     }
@@ -387,7 +394,8 @@ export function QueueMap() {
         </fieldset>
         <button
           className="refresh-control"
-          disabled={status === "loading"}
+          aria-busy={isRefreshing}
+          disabled={isRefreshing}
           onClick={refreshQueues}
           type="button"
         >
@@ -423,6 +431,7 @@ export function QueueMap() {
             <QueueChart
               label={text.globalQueues}
               latestWait={snapshot ? total : undefined}
+              locale={language}
               points={history.global}
               valueLabel={text.groups}
             />
@@ -443,6 +452,7 @@ export function QueueMap() {
                     <QueueChart
                       label={storeName}
                       latestWait={matchingStore?.wait}
+                      locale={language}
                       points={store.points}
                       valueLabel={text.groups}
                     />
