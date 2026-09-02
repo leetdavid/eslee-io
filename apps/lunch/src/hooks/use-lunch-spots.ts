@@ -1,10 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { DEFAULT_SPOTS, type LunchPreset, type LunchSpot, mapsUrl } from "@/data/presets";
+import { DEFAULT_SPOTS, type LunchSpot } from "@/data/presets";
 
-export type { LunchPreset, LunchSpot };
-export { DEFAULT_SPOTS, mapsUrl };
+export type { LunchSpot };
+export { DEFAULT_SPOTS };
 
 const STORAGE_KEY = "eslee.lunch.spots.v1";
 
@@ -56,20 +56,6 @@ export function useLunchSpots() {
     }
   }, [spots, hydrated]);
 
-  const addSpot = useCallback((name: string, url?: string) => {
-    const cleanName = name.trim();
-    if (!cleanName) return;
-    const cleanUrl = url?.trim();
-    setSpots((prev) => {
-      if (prev.some((s) => s.name === cleanName)) return prev;
-      return [...prev, { name: cleanName, ...(cleanUrl ? { url: cleanUrl } : {}) }];
-    });
-  }, []);
-
-  const removeSpot = useCallback((name: string) => {
-    setSpots((prev) => prev.filter((s) => s.name !== name));
-  }, []);
-
   const resetSpots = useCallback(() => {
     setSpots(DEFAULT_SPOTS);
   }, []);
@@ -79,10 +65,5 @@ export function useLunchSpots() {
     if (normalized) setSpots(normalized);
   }, []);
 
-  const loadSpots = useCallback((incoming: LunchSpot[]) => {
-    const normalized = normalizeLunchSpots(incoming);
-    if (normalized) setSpots(normalized);
-  }, []);
-
-  return { spots, addSpot, removeSpot, resetSpots, replaceSpots, loadSpots, hydrated };
+  return { spots, resetSpots, replaceSpots, hydrated };
 }

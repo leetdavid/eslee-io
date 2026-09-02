@@ -1,10 +1,9 @@
 "use client";
 
 import confetti from "canvas-confetti";
-import { Download, ExternalLink, Github, Plus, RotateCcw, Upload, Utensils, X } from "lucide-react";
+import { Download, ExternalLink, Github, RotateCcw, Upload, Utensils } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { type LunchPreset, type LunchSpot, mapsUrl, RECOMMENDED_PRESETS } from "@/data/presets";
-import { useLunchPresets } from "@/hooks/use-lunch-presets";
 import { normalizeLunchSpots, useLunchSpots } from "@/hooks/use-lunch-spots";
 import { cn } from "@/lib/utils";
 
@@ -52,9 +51,7 @@ function downloadPreset(preset: LunchPreset) {
 }
 
 export function SlotMachine() {
-  const { spots, addSpot, removeSpot, resetSpots, replaceSpots, loadSpots, hydrated } =
-    useLunchSpots();
-  const { presets, savePreset, deletePreset, hydrated: presetsHydrated } = useLunchPresets();
+  const { spots, resetSpots, replaceSpots, hydrated } = useLunchSpots();
   const [activePresetTitle, setActivePresetTitle] = useState<string | null>(null);
   const [index, setIndex] = useState(0);
   const [spinning, setSpinning] = useState(false);
@@ -121,28 +118,12 @@ export function SlotMachine() {
 
   const handleLoadPreset = useCallback(
     (preset: LunchPreset) => {
-      loadSpots(preset.spots);
+      replaceSpots(preset.spots);
       setActivePresetTitle(preset.title);
-    },
-    [loadSpots],
-  );
-
-  const handleAddSpot = useCallback(
-    (name: string, url?: string) => {
-      addSpot(name, url);
-      setActivePresetTitle(null);
       setWinner(null);
+      setIndex(0);
     },
-    [addSpot],
-  );
-
-  const handleRemoveSpot = useCallback(
-    (name: string) => {
-      removeSpot(name);
-      setActivePresetTitle(null);
-      setWinner(null);
-    },
-    [removeSpot],
+    [replaceSpots],
   );
 
   const handleReplaceSpots = useCallback(
@@ -162,25 +143,18 @@ export function SlotMachine() {
     setIndex(0);
   }, [resetSpots]);
 
-  const handleSavePreset = useCallback(
-    (title: string) => {
-      savePreset(title, spots);
-      setActivePresetTitle(title);
-    },
-    [savePreset, spots],
-  );
-
   const handleImportFile = useCallback(
     (preset: LunchPreset) => {
-      savePreset(preset.title, preset.spots);
-      loadSpots(preset.spots);
+      replaceSpots(preset.spots);
       setActivePresetTitle(preset.title);
+      setWinner(null);
+      setIndex(0);
     },
-    [savePreset, loadSpots],
+    [replaceSpots],
   );
 
   const handleExportPreset = useCallback(() => {
-    downloadPreset({ title: activePresetTitle ?? "my-spots", spots });
+    downloadPreset({ title: activePresetTitle ?? "my-options", spots });
   }, [activePresetTitle, spots]);
 
   const leverActive = !spinning && spots.length >= 2 && hydrated;
@@ -198,6 +172,12 @@ export function SlotMachine() {
           suggest a preset
         </a>
       </div>
+      <PresetPicker
+        presets={RECOMMENDED_PRESETS}
+        activePresetTitle={activePresetTitle}
+        disabled={spinning}
+        onLoadPreset={handleLoadPreset}
+      />
       <div
         className={cn(
           "cabinet relative overflow-hidden rounded-3xl border border-panel-edge p-5 md:p-8",
@@ -299,18 +279,9 @@ export function SlotMachine() {
 
       <SpotsManager
         spots={spots}
-        onAdd={handleAddSpot}
-        onRemove={handleRemoveSpot}
         onReplace={handleReplaceSpots}
         onReset={handleResetSpots}
         disabled={spinning}
-        recommendedPresets={RECOMMENDED_PRESETS}
-        presets={presets}
-        presetsHydrated={presetsHydrated}
-        activePresetTitle={activePresetTitle}
-        onSavePreset={handleSavePreset}
-        onLoadSavedPreset={handleLoadPreset}
-        onDeletePreset={deletePreset}
         onExportPreset={handleExportPreset}
         onImportFile={handleImportFile}
       />
@@ -435,49 +406,60 @@ function DraggableLever({
   );
 }
 
+function PresetPicker({
+  presets,
+  activePresetTitle,
+  disabled,
+  onLoadPreset,
+}: {
+  presets: LunchPreset[];
+  activePresetTitle: string | null;
+  disabled: boolean;
+  onLoadPreset: (preset: LunchPreset) => void;
+}) {
+  return (
+    <section className="mb-4" aria-label="Presets">
+      <p className="mb-2 font-mono text-[10px] text-muted uppercase tracking-[0.35em]">presets</p>
+      <div className="flex flex-wrap gap-2">
+        {presets.map((preset) => (
+          <button
+            key={preset.title}
+            type="button"
+            onClick={() => onLoadPreset(preset)}
+            disabled={disabled}
+            className={cn(
+              "rounded-full border px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.3em] transition-colors disabled:opacity-50",
+              activePresetTitle === preset.title
+                ? "gold-plate border-transparent text-bg"
+                : "border-panel-edge text-muted hover:border-gold hover:text-gold",
+            )}
+          >
+            {preset.title}
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function SpotsManager({
   spots,
-  onAdd,
-  onRemove,
   onReplace,
   onReset,
   disabled,
-  recommendedPresets,
-  presets,
-  presetsHydrated,
-  activePresetTitle,
-  onSavePreset,
-  onLoadSavedPreset,
-  onDeletePreset,
   onExportPreset,
   onImportFile,
 }: {
   spots: LunchSpot[];
-  onAdd: (name: string, url?: string) => void;
-  onRemove: (name: string) => void;
   onReplace: (spots: LunchSpot[]) => void;
   onReset: () => void;
   disabled: boolean;
-  recommendedPresets: LunchPreset[];
-  presets: LunchPreset[];
-  presetsHydrated: boolean;
-  activePresetTitle: string | null;
-  onSavePreset: (title: string) => void;
-  onLoadSavedPreset: (preset: LunchPreset) => void;
-  onDeletePreset: (title: string) => void;
   onExportPreset: () => void;
   onImportFile: (preset: LunchPreset) => void;
 }) {
-  const [input, setInput] = useState("");
-  const [urlInput, setUrlInput] = useState("");
   const [optionsInput, setOptionsInput] = useState(() => spots.map((spot) => spot.name).join(", "));
-  const [saveInput, setSaveInput] = useState(activePresetTitle ?? "");
   const [importError, setImportError] = useState<string | null>(null);
   const importRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    setSaveInput(activePresetTitle ?? "");
-  }, [activePresetTitle]);
 
   useEffect(() => {
     setOptionsInput(spots.map((spot) => spot.name).join(", "));
@@ -519,15 +501,6 @@ function SpotsManager({
     e.target.value = "";
   };
 
-  const submitSpot = (e: React.FormEvent) => {
-    e.preventDefault();
-    const v = input.trim();
-    if (!v) return;
-    onAdd(v, urlInput.trim() || undefined);
-    setInput("");
-    setUrlInput("");
-  };
-
   const submitOptions = (e: React.FormEvent) => {
     e.preventDefault();
     const urlsByName = new Map(spots.map((spot) => [spot.name.toLocaleLowerCase(), spot.url]));
@@ -549,16 +522,9 @@ function SpotsManager({
     onReplace(nextSpots);
   };
 
-  const submitSave = (e: React.FormEvent) => {
-    e.preventDefault();
-    const v = saveInput.trim();
-    if (!v) return;
-    onSavePreset(v);
-  };
-
   return (
     <section className="mt-8">
-      <details className="mb-5 rounded-xl border border-panel-edge bg-panel/50 px-4 py-3">
+      <details open className="mb-5 rounded-xl border border-panel-edge bg-panel/50 px-4 py-3">
         <summary className="cursor-pointer font-mono text-[10px] text-gold uppercase tracking-[0.3em] focus-visible:outline-2 focus-visible:outline-gold focus-visible:outline-offset-4">
           edit options
         </summary>
@@ -635,148 +601,6 @@ function SpotsManager({
         <p className="mb-3 font-mono text-[10px] text-[oklch(0.65_0.2_25)] uppercase tracking-[0.3em]">
           {importError}
         </p>
-      )}
-
-      {/* Presets: recommended + saved */}
-      <div className="mb-4">
-        <p className="mb-2 font-mono text-[10px] text-muted uppercase tracking-[0.35em]">presets</p>
-        <div className="flex flex-wrap gap-2">
-          {recommendedPresets.map((preset) => (
-            <button
-              key={preset.title}
-              type="button"
-              onClick={() => onLoadSavedPreset(preset)}
-              disabled={disabled}
-              className={cn(
-                "rounded-full border px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.3em] transition-colors disabled:opacity-50",
-                activePresetTitle === preset.title
-                  ? "gold-plate border-transparent text-bg"
-                  : "border-panel-edge text-muted hover:border-gold hover:text-gold",
-              )}
-            >
-              {preset.title}
-            </button>
-          ))}
-          {presetsHydrated &&
-            presets.map((preset) => (
-              <div key={preset.title} className="flex items-center">
-                <button
-                  type="button"
-                  onClick={() => onLoadSavedPreset(preset)}
-                  disabled={disabled}
-                  className={cn(
-                    "flex items-center rounded-l-full border py-1.5 pr-2 pl-3 font-mono text-[10px] uppercase tracking-[0.2em] transition-colors disabled:opacity-50",
-                    activePresetTitle === preset.title
-                      ? "border-gold bg-[oklch(0.25_0.08_50)] text-gold"
-                      : "border-panel-edge text-muted hover:border-gold hover:text-gold",
-                  )}
-                >
-                  {preset.title}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onDeletePreset(preset.title)}
-                  disabled={disabled}
-                  className="flex items-center rounded-r-full border border-panel-edge border-l-0 px-2 py-1.5 text-muted transition-colors hover:border-red hover:text-red disabled:opacity-50"
-                >
-                  <X className="size-3" />
-                </button>
-              </div>
-            ))}
-        </div>
-      </div>
-
-      {/* Save as preset */}
-      <form onSubmit={submitSave} className="mb-4 flex gap-2">
-        <input
-          type="text"
-          value={saveInput}
-          onChange={(e) => setSaveInput(e.target.value)}
-          disabled={disabled}
-          aria-label="Preset name"
-          placeholder="save as…"
-          maxLength={60}
-          className="flex-1 border-panel-edge border-b bg-transparent px-1 py-2 text-ink text-sm outline-none transition-colors placeholder:text-muted focus:border-gold disabled:opacity-50"
-        />
-        <button
-          type="submit"
-          disabled={disabled || !saveInput.trim()}
-          className="gold-plate flex items-center rounded-md px-3 py-2 font-mono text-[10px] text-bg uppercase tracking-[0.3em] shadow-md transition-transform active:translate-y-px disabled:opacity-50"
-        >
-          save
-        </button>
-      </form>
-
-      {/* Add spot */}
-      <form onSubmit={submitSpot} className="flex flex-col gap-2">
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            disabled={disabled}
-            aria-label="Lunch option"
-            placeholder="add a spot…"
-            maxLength={60}
-            className="flex-1 rounded-md border border-panel-edge bg-panel px-3 py-2 text-ink text-sm outline-none placeholder:text-muted focus:border-gold disabled:opacity-50"
-          />
-          <button
-            type="submit"
-            disabled={disabled || !input.trim()}
-            className="gold-plate flex items-center gap-1 rounded-md px-3 py-2 font-mono text-[10px] text-bg uppercase tracking-[0.3em] shadow-md transition-transform active:translate-y-px disabled:opacity-50"
-          >
-            <Plus className="h-3.5 w-3.5" strokeWidth={3} />
-            add
-          </button>
-        </div>
-        <input
-          type="url"
-          value={urlInput}
-          onChange={(e) => setUrlInput(e.target.value)}
-          disabled={disabled}
-          aria-label="Google Maps link"
-          placeholder="google maps link (optional)"
-          className="rounded-md border border-panel-edge bg-panel px-3 py-2 text-ink text-sm outline-none placeholder:text-muted focus:border-gold disabled:opacity-50"
-        />
-      </form>
-
-      {spots.length > 0 && (
-        <>
-          <p className="mt-6 mb-2 font-mono text-[10px] text-muted uppercase tracking-[0.35em]">
-            your spots ({spots.length})
-          </p>
-          <ul className="flex flex-wrap gap-2">
-            {spots.map((spot) => (
-              <li
-                key={spot.name}
-                className={cn(
-                  "flex items-stretch overflow-hidden rounded-full border border-panel-edge bg-panel text-sm",
-                  disabled && "opacity-50",
-                )}
-              >
-                <a
-                  href={spot.url ?? mapsUrl(spot.name)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 py-1.5 pr-3 pl-3 text-ink transition-colors hover:text-gold"
-                >
-                  {spot.name}
-                  <ExternalLink className="size-3 shrink-0 text-muted" />
-                </a>
-                <span aria-hidden className="w-px self-stretch bg-panel-edge" />
-                <button
-                  type="button"
-                  onClick={() => onRemove(spot.name)}
-                  disabled={disabled}
-                  aria-label={`Remove ${spot.name}`}
-                  className="group flex items-center px-2.5 py-1.5 text-muted transition-colors hover:text-red"
-                >
-                  <X aria-hidden="true" className="size-3" />
-                </button>
-              </li>
-            ))}
-          </ul>
-        </>
       )}
     </section>
   );
