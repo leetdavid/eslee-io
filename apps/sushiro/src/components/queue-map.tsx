@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { type PointerEvent, useEffect, useRef, useState, type WheelEvent } from "react";
 import { QueueChart } from "@/components/queue-chart";
 import {
   type HistoryRange,
@@ -55,6 +55,8 @@ const copy = {
     },
     globalQueues: "全港輪候組數",
     open: "營業中",
+    zoomIn: "放大地圖",
+    zoomOut: "縮小地圖",
   },
   en: {
     activeStores: "issuing tickets",
@@ -95,8 +97,46 @@ const copy = {
     },
     globalQueues: "All-store queue",
     open: "Open",
+    zoomIn: "Zoom in",
+    zoomOut: "Zoom out",
   },
 } as const;
+
+const minMapZoom = 1;
+const maxMapZoom = 3;
+const mapZoomStep = 0.25;
+
+type MapPosition = {
+  x: number;
+  y: number;
+};
+
+type MapDrag = {
+  clientX: number;
+  clientY: number;
+  position: MapPosition;
+  pointerId: number;
+};
+
+function clampMapPosition(
+  mapCanvas: HTMLDivElement | null,
+  position: MapPosition,
+  zoom: number,
+): MapPosition {
+  const mapStage = mapCanvas?.parentElement;
+
+  if (!mapCanvas || !mapStage) {
+    return position;
+  }
+
+  const maxX = Math.max(0, (mapCanvas.offsetWidth * zoom - mapStage.clientWidth) / 2);
+  const maxY = Math.max(0, (mapCanvas.offsetHeight * zoom - mapStage.clientHeight) / 2);
+
+  return {
+    x: Math.max(-maxX, Math.min(maxX, position.x)),
+    y: Math.max(-maxY, Math.min(maxY, position.y)),
+  };
+}
 
 function queueBand(store: QueueStore) {
   if (!isActiveStore(store)) {
@@ -180,6 +220,11 @@ export function QueueMap() {
   const [isRefreshing, setIsRefreshing] = useState(true);
   const [history, setHistory] = useState<QueueHistory | null>(null);
   const [historyRange, setHistoryRange] = useState<HistoryRange>(24);
+  const [mapZoom, setMapZoom] = useState(minMapZoom);
+  const [mapPosition, setMapPosition] = useState<MapPosition>({ x: 0, y: 0 });
+  const [isDraggingMap, setIsDraggingMap] = useState(false);
+  const mapCanvasRef = useRef<HTMLDivElement>(null);
+  const mapDragRef = useRef<MapDrag | null>(null);
 
   useEffect(() => {
     const storedLanguage = window.localStorage.getItem("sushiro-language");
@@ -295,6 +340,17 @@ export function QueueMap() {
     return () => window.removeEventListener("keydown", closeOnEscape);
   }, [selectedStore]);
 
+  useEffect(() => {
+    function constrainMapPosition() {
+      setMapPosition((position) => clampMapPosition(mapCanvasRef.current, position, mapZoom));
+    }
+
+    constrainMapPosition();
+    window.addEventListener("resize", constrainMapPosition);
+
+    return () => window.removeEventListener("resize", constrainMapPosition);
+  }, [mapZoom]);
+
   const text = copy[language];
   const activeStores = snapshot?.stores.filter(isActiveStore) ?? [];
   const positionedStores = snapshot ? layoutStores(snapshot.stores) : [];
@@ -324,11 +380,80 @@ export function QueueMap() {
     setHistoryRange(range);
   }
 
+  function changeMapZoom(amount: number) {
+    setMapZoom((currentZoom) => Math.max(minMapZoom, Math.min(maxMapZoom, currentZoom + amount)));
+  }
+
+  function handleMapWheel(event: WheelEvent<HTMLDivElement>) {
+    if (event.deltaY === 0) {
+      return;
+    }
+
+    event.preventDefault();
+    changeMapZoom(event.deltaY < 0 ? mapZoomStep : -mapZoomStep);
+  }
+
+  function handleMapPointerDown(event: PointerEvent<HTMLDivElement>) {
+    if (mapZoom === minMapZoom || event.button !== 0 || event.target !== event.currentTarget) {
+      return;
+    }
+
+    event.currentTarget.setPointerCapture(event.pointerId);
+    mapDragRef.current = {
+      clientX: event.clientX,
+      clientY: event.clientY,
+      pointerId: event.pointerId,
+      position: mapPosition,
+    };
+    setIsDraggingMap(true);
+  }
+
+  function handleMapPointerMove(event: PointerEvent<HTMLDivElement>) {
+    const drag = mapDragRef.current;
+
+    if (!drag || drag.pointerId !== event.pointerId) {
+      return;
+    }
+
+    setMapPosition(
+      clampMapPosition(
+        mapCanvasRef.current,
+        {
+          x: drag.position.x + event.clientX - drag.clientX,
+          y: drag.position.y + event.clientY - drag.clientY,
+        },
+        mapZoom,
+      ),
+    );
+  }
+
+  function handleMapPointerEnd(event: PointerEvent<HTMLDivElement>) {
+    if (mapDragRef.current?.pointerId === event.pointerId) {
+      mapDragRef.current = null;
+      setIsDraggingMap(false);
+    }
+  }
+
   return (
     <main className="queue-app">
       {status === "ready" && snapshot ? (
-        <div className="map-stage">
-          <div className="map-canvas">
+        <div
+          className="map-stage"
+          data-dragging={isDraggingMap}
+          data-pannable={mapZoom > minMapZoom}
+        >
+          <div
+            className="map-canvas"
+            onPointerCancel={handleMapPointerEnd}
+            onPointerDown={handleMapPointerDown}
+            onPointerMove={handleMapPointerMove}
+            onPointerUp={handleMapPointerEnd}
+            onWheel={handleMapWheel}
+            ref={mapCanvasRef}
+            style={{
+              transform: `translate(calc(-50% + ${mapPosition.x}px), calc(-50% + ${mapPosition.y}px)) scale(${mapZoom})`,
+            }}
+          >
             <Image
               alt=""
               className="basemap"
@@ -359,6 +484,24 @@ export function QueueMap() {
               );
             })}
           </div>
+          <fieldset aria-label={text.mapLabel} className="map-zoom-controls">
+            <button
+              aria-label={text.zoomIn}
+              disabled={mapZoom === maxMapZoom}
+              onClick={() => changeMapZoom(mapZoomStep)}
+              type="button"
+            >
+              +
+            </button>
+            <button
+              aria-label={text.zoomOut}
+              disabled={mapZoom === minMapZoom}
+              onClick={() => changeMapZoom(-mapZoomStep)}
+              type="button"
+            >
+              -
+            </button>
+          </fieldset>
         </div>
       ) : null}
 

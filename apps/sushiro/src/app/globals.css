@@ -41,8 +41,10 @@ button {
 .map-stage {
   bottom: 0;
   left: 0;
+  overflow: hidden;
   position: absolute;
   right: var(--history-sidebar-width);
+  touch-action: none;
   top: 0;
 }
 
@@ -54,7 +56,16 @@ button {
   position: absolute;
   top: 50%;
   transform: translate(-50%, -50%);
+  transform-origin: center;
   width: min(calc(100% - 64px), calc(100dvh * 1.378));
+}
+
+.map-stage[data-pannable="true"] .map-canvas {
+  cursor: grab;
+}
+
+.map-stage[data-dragging="true"] .map-canvas {
+  cursor: grabbing;
 }
 
 .basemap {
@@ -119,6 +130,38 @@ button {
 .store-marker:focus-visible {
   outline: 1px solid var(--black);
   outline-offset: 3px;
+}
+
+.map-zoom-controls {
+  background: var(--land);
+  border: 1px solid var(--black);
+  bottom: clamp(18px, 3vw, 48px);
+  display: grid;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  right: clamp(18px, 3vw, 48px);
+  z-index: 3;
+}
+
+.map-zoom-controls button {
+  background: var(--land);
+  border: 0;
+  cursor: pointer;
+  font-size: 20px;
+  height: 32px;
+  line-height: 1;
+  padding: 0;
+  width: 32px;
+}
+
+.map-zoom-controls button + button {
+  border-top: 1px solid var(--black);
+}
+
+.map-zoom-controls button:disabled {
+  color: #737373;
+  cursor: default;
 }
 
 .telemetry {
@@ -720,6 +763,16 @@ button:focus-visible {
   .map-stage {
     bottom: 288px;
     right: 0;
+  }
+
+  .map-zoom-controls {
+    bottom: 16px;
+    right: 16px;
+  }
+
+  .map-zoom-controls button {
+    height: 44px;
+    width: 44px;
   }
 
   .controls {
