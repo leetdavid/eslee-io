@@ -476,7 +476,11 @@ export function QueueMap() {
                   data-selected={isSelected}
                   key={store.id}
                   onClick={() => setSelectedStore(store)}
-                  style={{ left: `${x}%`, top: `${y}%` }}
+                  style={{
+                    left: `${x}%`,
+                    top: `${y}%`,
+                    transform: `translate(-50%, -50%) scale(${1 / mapZoom})`,
+                  }}
                   type="button"
                 >
                   <strong>{store.wait}</strong>
