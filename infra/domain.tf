@@ -24,6 +24,10 @@ locals {
       name    = "blog.eslee.io"
       content = "869642ca4d27b8f0.vercel-dns-017.com."
     }
+    noai = {
+      name    = "noai.eslee.io"
+      content = "789jh5nz.up.railway.app"
+    }
   }
 }
 
