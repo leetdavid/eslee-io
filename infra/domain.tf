@@ -79,3 +79,11 @@ resource "cloudflare_dns_record" "eslee_io_google_site_verification" {
   ttl     = 3600
   proxied = false
 }
+
+resource "cloudflare_dns_record" "noai_railway_verification" {
+  zone_id = var.cloudflare_zone_id
+  type    = "TXT"
+  name    = "_railway-verify.noai"
+  content = "railway-verify=db6d0a70d5684117cfc4a867864e6fbac46496232d1d55b7c46a8c92d50b4154"
+  ttl     = 1
+}
