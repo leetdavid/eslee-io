@@ -28,6 +28,10 @@ locals {
       name    = "noai.eslee.io"
       content = "789jh5nz.up.railway.app"
     }
+    noai_api = {
+      name    = "api.noai.eslee.io"
+      content = "nql8oew3.up.railway.app"
+    }
   }
 }
 
