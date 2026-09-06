@@ -1,5 +1,14 @@
 locals {
   railway_cnames_map = {
+    noai = {
+      name = "noai"
+      content = "789jh5nz.up.railway.app"
+      proxied = false
+      verification = {
+        name="_railway-verify.noai"
+        content="railway-verify=db6d0a70d5684117cfc4a867864e6fbac46496232d1d55b7c46a8c92d50b4154"
+      }
+    }
     api_noai = {
       name    = "api.noai"
       content = "nql8oew3.up.railway.app"
