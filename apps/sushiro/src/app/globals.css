@@ -1107,8 +1107,17 @@ button:focus-visible {
   }
 
   .grid-card-tickets {
+    align-content: end;
+    column-gap: 2px;
+    flex-wrap: wrap;
     font-size: 9px;
-    gap: 0;
     letter-spacing: -0.1em;
+    line-height: 0.95;
+    justify-content: center;
+    white-space: normal;
+  }
+
+  .grid-card-tickets span {
+    white-space: nowrap;
   }
 }
