@@ -1,5 +1,5 @@
-import { QueueMap } from "@/components/queue-map";
+import { QueueGrid } from "@/components/queue-grid";
 
 export default function Home() {
-  return <QueueMap />;
+  return <QueueGrid />;
 }

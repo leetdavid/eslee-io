@@ -1,7 +1,6 @@
 import { sushiroQueueSnapshot } from "@eslee/db/schema";
 import { asc, gte, sql } from "drizzle-orm";
 import {
-  type HistoryRange,
   historyRanges,
   type QueueHistory,
   type QueueHistoryPoint,
@@ -11,7 +10,12 @@ import {
 export const dynamic = "force-dynamic";
 
 const defaultHours = 24;
-const bucketMinutes: Record<HistoryRange, number> = {
+const chartHistoryRanges = [12, ...historyRanges] as const;
+
+type ChartHistoryRange = (typeof chartHistoryRanges)[number];
+
+const bucketMinutes: Record<ChartHistoryRange, number> = {
+  12: 5,
   24: 5,
   168: 30,
   720: 120,
@@ -23,14 +27,14 @@ function parseHours(value: string | null) {
   }
 
   const hours = Number(value);
-  return historyRanges.find((range) => range === hours);
+  return chartHistoryRanges.find((range) => range === hours);
 }
 
 export async function GET(request: Request) {
   const hours = parseHours(new URL(request.url).searchParams.get("hours"));
 
   if (hours === undefined) {
-    return Response.json({ error: "Hours must be 24, 168, or 720" }, { status: 400 });
+    return Response.json({ error: "Hours must be 12, 24, 168, or 720" }, { status: 400 });
   }
 
   const from = new Date(Date.now() - hours * 60 * 60 * 1_000);

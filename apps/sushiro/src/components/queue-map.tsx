@@ -2,105 +2,18 @@
 
 import Image from "next/image";
 import { type PointerEvent, useEffect, useRef, useState, type WheelEvent } from "react";
+import { AppNavigation } from "@/components/app-navigation";
 import { QueueChart } from "@/components/queue-chart";
+import { StoreSheet } from "@/components/store-sheet";
+import { copy, type Language, queueBand } from "@/lib/queue-presentation";
 import {
   type HistoryRange,
   historyRanges,
   isActiveStore,
-  isTicketing,
   type QueueHistory,
   type QueueSnapshot,
   type QueueStore,
 } from "@/lib/queues";
-
-type Language = "en" | "zh-HK";
-
-const copy = {
-  "zh-HK": {
-    activeStores: "間正在派籌",
-    address: "地址",
-    calledTickets: "店鋪籌號",
-    counter: "吧檯",
-    dataSource: "非官方工具，資料來自壽司郎香港。",
-    groups: "組",
-    long: "輪候較多",
-    language: "語言",
-    mapLabel: "香港壽司郎籌號",
-    moderate: "輪候中等",
-    noQueue: "暫無輪候",
-    pair: "二人枱",
-    queueBreakdown: "輪候分類",
-    refresh: "更新",
-    retry: "重試",
-    close: "關閉",
-    loading: "載入中",
-    short: "輪候較少",
-    table: "餐桌",
-    ticketing: "派籌中",
-    ticketingPaused: "停止派籌",
-    unavailable: "未能載入籌號資料",
-    waitingGroups: "輪候組數",
-    closed: "閉店中",
-    history: "輪候趨勢",
-    historyEmpty: "首次收集後將顯示趨勢。",
-    historyPeriod: {
-      24: "過去 24 小時",
-      168: "過去 7 日",
-      720: "過去 30 日",
-    },
-    historyRange: {
-      24: "24 小時",
-      168: "7 日",
-      720: "30 日",
-    },
-    globalQueues: "全港輪候組數",
-    open: "營業中",
-    zoomIn: "放大地圖",
-    zoomOut: "縮小地圖",
-  },
-  en: {
-    activeStores: "issuing tickets",
-    address: "Address",
-    calledTickets: "Called tickets",
-    counter: "Counter",
-    dataSource: "Unofficial tool. Data from Sushiro Hong Kong.",
-    groups: "groups",
-    long: "Long queue",
-    language: "Language",
-    mapLabel: "Sushiro Hong Kong Queue",
-    moderate: "Moderate queue",
-    noQueue: "No queue",
-    pair: "Pair seating",
-    queueBreakdown: "Queue breakdown",
-    refresh: "Refresh",
-    retry: "Retry",
-    close: "Close",
-    loading: "Loading",
-    short: "Short queue",
-    table: "Table",
-    ticketing: "Issuing tickets",
-    ticketingPaused: "Ticketing paused",
-    unavailable: "Unable to load queue data",
-    waitingGroups: "Waiting groups",
-    closed: "Closed",
-    history: "Queue trends",
-    historyEmpty: "Trends will appear after the first collection.",
-    historyPeriod: {
-      24: "Last 24 hours",
-      168: "Last 7 days",
-      720: "Last 30 days",
-    },
-    historyRange: {
-      24: "24h",
-      168: "7d",
-      720: "30d",
-    },
-    globalQueues: "All-store queue",
-    open: "Open",
-    zoomIn: "Zoom in",
-    zoomOut: "Zoom out",
-  },
-} as const;
 
 const minMapZoom = 1;
 const maxMapZoom = 3;
@@ -138,26 +51,6 @@ function clampMapPosition(
   };
 }
 
-function queueBand(store: QueueStore) {
-  if (!isActiveStore(store)) {
-    return "muted";
-  }
-
-  if (store.wait === 0) {
-    return "none";
-  }
-
-  if (store.wait <= 10) {
-    return "short";
-  }
-
-  if (store.wait <= 30) {
-    return "moderate";
-  }
-
-  return "long";
-}
-
 type PositionedStore = {
   store: QueueStore;
   x: number;
@@ -190,25 +83,6 @@ function layoutStores(stores: QueueStore[]) {
   }
 
   return positioned;
-}
-
-function queueBandLabel(store: QueueStore, language: Language) {
-  const text = copy[language];
-  const band = queueBand(store);
-
-  if (band === "none") {
-    return text.noQueue;
-  }
-
-  if (band === "short") {
-    return text.short;
-  }
-
-  if (band === "moderate") {
-    return text.moderate;
-  }
-
-  return band === "long" ? text.long : null;
 }
 
 export function QueueMap() {
@@ -436,8 +310,19 @@ export function QueueMap() {
 
   return (
     <main className="queue-app">
+      <a className="skip-link" href="#map-content">
+        {text.map}
+      </a>
+      <AppNavigation
+        activePage="map"
+        isRefreshing={isRefreshing}
+        language={language}
+        onLanguageChange={changeLanguage}
+        onRefresh={refreshQueues}
+      />
       {status === "ready" && snapshot ? (
         <div
+          id="map-content"
           className="map-stage"
           data-dragging={isDraggingMap}
           data-pannable={mapZoom > minMapZoom}
@@ -522,34 +407,6 @@ export function QueueMap() {
         </section>
       ) : null}
 
-      <div className="controls">
-        <fieldset aria-label={text.language} className="language-toggle">
-          <button
-            aria-pressed={language === "zh-HK"}
-            onClick={() => changeLanguage("zh-HK")}
-            type="button"
-          >
-            中
-          </button>
-          <button
-            aria-pressed={language === "en"}
-            onClick={() => changeLanguage("en")}
-            type="button"
-          >
-            EN
-          </button>
-        </fieldset>
-        <button
-          className="refresh-control"
-          aria-busy={isRefreshing}
-          disabled={isRefreshing}
-          onClick={refreshQueues}
-          type="button"
-        >
-          {text.refresh}
-        </button>
-      </div>
-
       <aside aria-labelledby="history-heading" className="history-sidebar">
         <header>
           <div>
@@ -627,88 +484,11 @@ export function QueueMap() {
       ) : null}
 
       {selectedStore ? (
-        <>
-          <button
-            aria-label={text.close}
-            className="sheet-backdrop"
-            onClick={() => setSelectedStore(null)}
-            tabIndex={-1}
-            type="button"
-          />
-          <aside
-            aria-label={language === "en" ? selectedStore.nameEn : selectedStore.name}
-            className="store-sheet"
-          >
-            <div className="sheet-handle" />
-            <div className="sheet-heading">
-              <div>
-                <p>{selectedStore.area}</p>
-                <h1>
-                  {language === "en"
-                    ? selectedStore.nameEn || selectedStore.name
-                    : selectedStore.name}
-                </h1>
-              </div>
-              <button
-                aria-label={text.close}
-                className="close-sheet"
-                onClick={() => setSelectedStore(null)}
-                type="button"
-              >
-                {text.close}
-              </button>
-            </div>
-
-            <div className="store-status">
-              <span>{selectedStore.storeStatus === "OPEN" ? text.open : text.closed}</span>
-              <span>{isTicketing(selectedStore) ? text.ticketing : text.ticketingPaused}</span>
-              {queueBandLabel(selectedStore, language) ? (
-                <span className={`status-dot status-dot-${queueBand(selectedStore)}`}>
-                  {queueBandLabel(selectedStore, language)}
-                </span>
-              ) : null}
-            </div>
-
-            <div className="wait-stat">
-              <span>{text.waitingGroups}</span>
-              <strong className={`count-${queueBand(selectedStore)}`}>{selectedStore.wait}</strong>
-              <small>{text.groups}</small>
-            </div>
-
-            <div className="sheet-grid">
-              <div>
-                <p>{text.address}</p>
-                <span>{selectedStore.address}</span>
-              </div>
-              <div>
-                <p>{text.calledTickets}</p>
-                <span>{selectedStore.storeQueue.join(", ") || "—"}</span>
-              </div>
-            </div>
-
-            <section className="breakdown">
-              <p>{text.queueBreakdown}</p>
-              <table>
-                <thead>
-                  <tr>
-                    <th>{text.table}</th>
-                    <th>{text.counter}</th>
-                    <th>{text.pair}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>{selectedStore.waitingGroupTable}</td>
-                    <td>{selectedStore.waitingGroupCounter}</td>
-                    <td>{selectedStore.waitingGroupPair}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </section>
-
-            <footer>{text.dataSource}</footer>
-          </aside>
-        </>
+        <StoreSheet
+          language={language}
+          onClose={() => setSelectedStore(null)}
+          store={selectedStore}
+        />
       ) : null}
     </main>
   );

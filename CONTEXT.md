@@ -56,6 +56,54 @@ _Avoid_: map tiles, street map
 The fixed, all-Hong-Kong basemap shown without pan or zoom controls. It fills the available viewport while preserving geographic aspect ratio, and its store labels scale responsively. Store markers are its only interactive elements.
 _Avoid_: viewport, interactive map
 
+**Grid home**:
+The default Home view: a curated geographic grid of Sushiro locations. It is distinct from, and does not simplify, the Map view.
+_Avoid_: table view, store list
+
+**Grid queue card**:
+A selectable grid-home representation of one store that shows its localized name, current waiting groups, called ticket numbers, and a comparable queue trend. Selecting it opens the store detail sheet.
+_Avoid_: marker, popup card
+
+**Grid chart window**:
+The trailing 12-hour period plotted behind every grid queue card. All cards use a shared zero-based vertical scale, based on the largest plotted waiting-group count, so their area charts can be compared accurately.
+_Avoid_: per-card scale, relative chart
+
+**Grid language**:
+Grid Home follows the app-wide visitor language selection: Cantonese in Traditional Chinese by default, with English as the alternative. The curated grid determines a store's position only; it does not determine its display name.
+_Avoid_: English-only grid, translated store name
+
+**Inactive grid card**:
+A grid queue card for a closed store or a store not issuing tickets. It remains in its geographic cell with the muted treatment, even when the upstream source reports a nonzero waiting-group count.
+_Avoid_: colour by inactive wait, hidden inactive store
+
+**Mobile grid**:
+The complete six-column geographic grid scaled to fit the phone viewport. Its locations are never reordered or replaced by a list at narrow widths.
+_Avoid_: mobile list, reflowed geography
+
+**Grid history-loading state**:
+The temporary chart state after current store data loads and before 12-hour history is available. Cards show their current operational information and remain selectable while the background chart is absent.
+_Avoid_: blocked grid, cached chart
+
+**Empty grid chart**:
+The intentionally blank trend area on a grid queue card with no 12-hour snapshots. It contains no explanatory copy so the current queue information remains the visual priority.
+_Avoid_: no-history label, chart error
+
+**App navigation**:
+The compact persistent strip that links to Grid Home and Map, contains an unavailable Stats item with a translated “Coming soon” tooltip, and provides the shared language switcher and manual refresh action.
+_Avoid_: map-only controls, active Stats page
+
+**Grid home header**:
+The Grid Home top area, containing only app navigation and its shared controls. It deliberately does not repeat the Map view's network total or active-store count.
+_Avoid_: grid telemetry, home summary
+
+**Grid queue colour**:
+The pale full-card surface tint assigned from a grid queue card's queue band. It uses the established green through red urgency scale while preserving high-contrast black content and chart marks.
+_Avoid_: saturated card, colour-only information
+
+**Grid called tickets**:
+The upstream called ticket numbers shown at the bottom of a grid queue card. The seating breakdown remains available only in the store detail sheet.
+_Avoid_: card seating breakdown, queue-category values
+
 **Network total**:
 The sum of waiting groups at stores that are both open and issuing tickets, accompanied by their count. It is shown in the header as an at-a-glance Hong Kong queue summary.
 _Avoid_: total wait time, all-store total
@@ -87,6 +135,10 @@ _Avoid_: www feature, CMS page
 **Initial map state**:
 The state after a successful first load: telemetry and all store markers are visible, but no store detail sheet is open.
 _Avoid_: default selection, selected store
+
+**Unplaced section**:
+A clearly labelled non-geographic section on the grid home that contains a live store not yet represented in the curated geographic grid. It keeps every current store visible while signalling that the grid layout needs maintenance.
+_Avoid_: hidden store, auto-placed location
 
 **Store label**:
 The always-visible map annotation for a store, showing its localized upstream name and waiting-group count. The complete label is the store's selection target; it has no hover, clustering, or collision-resolution behavior.
