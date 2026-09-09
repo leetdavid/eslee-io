@@ -31,7 +31,7 @@ The selected store's table in the detail sheet, showing the upstream `waitingGro
 _Avoid_: map queue categories, wait-time detail
 
 **Refresh cycle**:
-A full retrieval of the Sushiro store list and each store's queue data, performed at page load and every 60 seconds thereafter. Visitors can also trigger it manually.
+A full retrieval of the Sushiro store list and each store's queue data at most once every 60 seconds. Page load, automatic refresh, and manual refresh all receive the same current snapshot during a cycle.
 _Avoid_: polling interval, background update
 
 **Unavailable state**:
@@ -43,6 +43,10 @@ _Avoid_: stale data, offline cache
 **Queue source**:
 The two official Sushiro Hong Kong endpoints supplying store details and queue data. The app accesses them through its own server-side proxy route rather than from the browser.
 _Avoid_: queue API, client API
+
+**Queue snapshot**:
+A time-stamped complete record of the queue data for every store, captured every five minutes for the Grid chart window.
+_Avoid_: chart cache, database row
 
 **Queue band**:
 The colour and label assigned from a store's waiting-group count: no queue (0), short (1-10), moderate (11-30), or long (31+). The count colour moves from green through yellow to red as urgency increases; names remain monochrome. A closed store or one not issuing tickets is always muted.
@@ -65,7 +69,7 @@ A selectable grid-home representation of one store that shows its localized name
 _Avoid_: marker, popup card
 
 **Grid chart window**:
-The trailing 12-hour period plotted behind every grid queue card. All cards use a shared zero-based vertical scale, based on the largest plotted waiting-group count, so their area charts can be compared accurately.
+The trailing 12-hour period plotted behind every grid queue card. It incorporates each newly captured Queue snapshot on its next request. All cards use a shared zero-based vertical scale, based on the largest plotted waiting-group count, so their area charts can be compared accurately.
 _Avoid_: per-card scale, relative chart
 
 **Grid language**:

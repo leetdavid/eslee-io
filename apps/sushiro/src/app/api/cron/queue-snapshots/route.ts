@@ -1,6 +1,6 @@
 import { sushiroQueueSnapshot, sushiroStoreHours } from "@eslee/db/schema";
 import { sql } from "drizzle-orm";
-import { getQueues } from "@/lib/queue-cache";
+import { getQueues, invalidateGridChartHistory } from "@/lib/queue-cache";
 import { fetchStoreHours } from "@/lib/store-hours";
 
 export const maxDuration = 60;
@@ -26,6 +26,7 @@ export async function GET(request: Request) {
         collectedAt,
       })),
     );
+    await invalidateGridChartHistory();
 
     const storedHours = await db.select().from(sushiroStoreHours);
     const needsStoreHours =

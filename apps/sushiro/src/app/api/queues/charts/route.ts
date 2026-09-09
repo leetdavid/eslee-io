@@ -1,5 +1,6 @@
 import { sushiroQueueSnapshot } from "@eslee/db/schema";
 import { asc, gte, sql } from "drizzle-orm";
+import { getGridChartHistory } from "@/lib/queue-cache";
 import {
   historyRanges,
   type QueueHistory,
@@ -30,13 +31,7 @@ function parseHours(value: string | null) {
   return chartHistoryRanges.find((range) => range === hours);
 }
 
-export async function GET(request: Request) {
-  const hours = parseHours(new URL(request.url).searchParams.get("hours"));
-
-  if (hours === undefined) {
-    return Response.json({ error: "Hours must be 12, 24, 168, or 720" }, { status: 400 });
-  }
-
+async function loadChartHistory(hours: ChartHistoryRange): Promise<QueueHistory> {
   const from = new Date(Date.now() - hours * 60 * 60 * 1_000);
   const bucketInterval = sql.raw(`${bucketMinutes[hours]} * interval '1 minute'`);
   const bucketedAt = sql<string>`date_bin(${bucketInterval}, ${sushiroQueueSnapshot.collectedAt}, timestamptz '2000-01-01')`;
@@ -89,5 +84,20 @@ export async function GET(request: Request) {
     ),
   };
 
-  return Response.json(history);
+  return history;
+}
+
+export async function GET(request: Request) {
+  const hours = parseHours(new URL(request.url).searchParams.get("hours"));
+
+  if (hours === undefined) {
+    return Response.json({ error: "Hours must be 12, 24, 168, or 720" }, { status: 400 });
+  }
+
+  const history =
+    hours === 12
+      ? await getGridChartHistory(() => loadChartHistory(hours))
+      : await loadChartHistory(hours);
+
+  return Response.json(history, { headers: { "Cache-Control": "no-store" } });
 }

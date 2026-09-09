@@ -1,11 +1,14 @@
 import { Redis } from "@upstash/redis";
-import type { QueueSnapshot } from "@/lib/queues";
+import type { QueueHistory, QueueSnapshot } from "@/lib/queues";
 import { fetchQueues } from "@/lib/sushiro";
 
 const cacheKey = "sushiro:queues";
 const lockKey = "sushiro:queues:refresh-lock";
 const cacheDuration = 60;
 const lockDuration = 15;
+const gridChartCacheKey = "sushiro:queues:charts:grid";
+const gridChartLockKey = "sushiro:queues:charts:grid:refresh-lock";
+const gridChartCacheDuration = 5 * 60;
 
 function redis() {
   const hasVercelRedis = Boolean(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
@@ -45,6 +48,52 @@ async function refreshQueues(cache: Redis) {
   return fetchQueues();
 }
 
+async function refreshGridChart(cache: Redis, loadHistory: () => Promise<QueueHistory>) {
+  let lock: string | null;
+
+  try {
+    lock = await cache.set(gridChartLockKey, "1", { ex: lockDuration, nx: true });
+  } catch {
+    return loadHistory();
+  }
+
+  if (lock) {
+    try {
+      const history = await loadHistory();
+
+      try {
+        await cache.set(gridChartCacheKey, history, { ex: gridChartCacheDuration });
+      } catch {
+        // A cache write must not discard freshly aggregated chart data.
+      }
+
+      return history;
+    } finally {
+      try {
+        await cache.del(gridChartLockKey);
+      } catch {
+        // The lock's TTL still releases it if Redis rejects the delete.
+      }
+    }
+  }
+
+  for (let attempt = 0; attempt < lockDuration * 2; attempt += 1) {
+    await wait(500);
+
+    try {
+      const history = await cache.get<QueueHistory>(gridChartCacheKey);
+
+      if (history) {
+        return history;
+      }
+    } catch {
+      return loadHistory();
+    }
+  }
+
+  return loadHistory();
+}
+
 export async function getQueues() {
   const cache = redis();
 
@@ -56,5 +105,39 @@ export async function getQueues() {
     return (await cache.get<QueueSnapshot>(cacheKey)) ?? (await refreshQueues(cache));
   } catch {
     return fetchQueues();
+  }
+}
+
+export async function getGridChartHistory(loadHistory: () => Promise<QueueHistory>) {
+  const cache = redis();
+
+  if (!cache) {
+    return loadHistory();
+  }
+
+  try {
+    const history = await cache.get<QueueHistory>(gridChartCacheKey);
+
+    if (history) {
+      return history;
+    }
+  } catch {
+    return loadHistory();
+  }
+
+  return refreshGridChart(cache, loadHistory);
+}
+
+export async function invalidateGridChartHistory() {
+  const cache = redis();
+
+  if (!cache) {
+    return;
+  }
+
+  try {
+    await cache.del(gridChartCacheKey);
+  } catch {
+    // Invalidation is best-effort; the five-minute TTL remains the fallback.
   }
 }
