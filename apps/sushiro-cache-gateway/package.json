@@ -1,0 +1,19 @@
+{
+  "name": "@eslee/sushiro-cache-gateway",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "redis": "^5.11.0"
+  },
+  "devDependencies": {
+    "@eslee/tsconfig": "workspace:*",
+    "@types/node": "catalog:node",
+    "typescript": "catalog:"
+  }
+}
