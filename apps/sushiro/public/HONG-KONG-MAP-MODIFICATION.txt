@@ -1,1 +1,18 @@
 hong-kong.png was rasterized from hong-kong.svg at high resolution and composited into a single white land mask. District seams were closed; sea remains transparent.
+
+Geographic calibration for marker placement:
+https://mapsvg.com/maps/geo-calibrated/hong-kong.svg
+
+The original SVG declares mapsvg:geoViewBox="113.834541 22.562136 114.441018 22.153152"
+and dimensions 612.52246 by 444.19733. Its paths use the same coordinate system as
+the local SVG, whose viewBox was rounded up to 613 by 445.
+
+Markers use MapSVG's Mercator conversion: longitude determines horizontal position
+and the uniform projection scale from the original width. Mercator latitude is
+anchored at the northern boundary. Coordinates are then expressed as percentages
+of the local 613 by 445 viewBox. The bottom latitude is not used to stretch the
+vertical scale. This preserves the source projection and the local image padding.
+
+Store latitude and longitude come directly from Sushiro's store-list API. Marker
+centers are not displaced to avoid overlaps. The underlying coastline is simplified
+and its white mask has been dilated, so it is not a street-level basemap.

@@ -6,6 +6,7 @@ import { AppShell } from "@/components/app-shell";
 import { MapViewport } from "@/components/map-viewport";
 import { QueueChart } from "@/components/queue-chart";
 import { StoreSheet } from "@/components/store-sheet";
+import { projectMapLocation } from "@/lib/map-projection";
 import { copy, type Language, queueBand } from "@/lib/queue-presentation";
 import {
   type HistoryRange,
@@ -15,40 +16,6 @@ import {
   type QueueSnapshot,
   type QueueStore,
 } from "@/lib/queues";
-
-type PositionedStore = {
-  store: QueueStore;
-  x: number;
-  y: number;
-};
-
-function layoutStores(stores: QueueStore[]) {
-  const positioned: PositionedStore[] = [];
-
-  for (const store of [...stores].sort((left, right) => left.id - right.id)) {
-    const baseX = ((store.longitude - 113.79) / 0.67) * 100;
-    const baseY = ((22.58 - store.latitude) / 0.44) * 100;
-    let x = baseX;
-    let y = baseY;
-
-    for (let step = 0; step < 80; step += 1) {
-      const overlaps = positioned.some((other) => Math.hypot(other.x - x, other.y - y) < 2.15);
-
-      if (!overlaps) {
-        break;
-      }
-
-      const angle = step * 2.4;
-      const radius = 1 + Math.floor(step / 8) * 0.85;
-      x = baseX + Math.cos(angle) * radius;
-      y = baseY + Math.sin(angle) * radius;
-    }
-
-    positioned.push({ store, x, y });
-  }
-
-  return positioned;
-}
 
 export function QueueMap() {
   const [language, setLanguage] = useState<Language>("zh-HK");
@@ -176,7 +143,6 @@ export function QueueMap() {
 
   const text = copy[language];
   const activeStores = snapshot?.stores.filter(isActiveStore) ?? [];
-  const positionedStores = snapshot ? layoutStores(snapshot.stores) : [];
   const total = activeStores.reduce((sum, store) => sum + store.wait, 0);
   const historyStores = history
     ? [...history.stores].sort((left, right) => {
@@ -221,7 +187,8 @@ export function QueueMap() {
             src="/hong-kong.png"
             width={3072}
           />
-          {positionedStores.map(({ store, x, y }) => {
+          {snapshot.stores.map((store) => {
+            const { x, y } = projectMapLocation(store);
             const storeName = language === "en" ? store.nameEn || store.name : store.name;
             const band = queueBand(store);
             const isSelected = selectedStore?.id === store.id;
