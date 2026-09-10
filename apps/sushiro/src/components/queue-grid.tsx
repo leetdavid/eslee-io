@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AppNavigation } from "@/components/app-navigation";
+import { AppShell } from "@/components/app-shell";
 import { QueueAreaChart } from "@/components/queue-area-chart";
 import { StoreSheet } from "@/components/store-sheet";
 import { copy, type Language, queueBand } from "@/lib/queue-presentation";
@@ -166,18 +166,14 @@ export function QueueGrid() {
   );
 
   return (
-    <div className="grid-app">
-      <a className="skip-link" href="#grid-content">
-        {text.grid}
-      </a>
-      <AppNavigation
-        activePage="grid"
-        isRefreshing={isRefreshing}
-        language={language}
-        onLanguageChange={changeLanguage}
-        onRefresh={refreshQueues}
-      />
-      <main className="grid-home" id="grid-content">
+    <AppShell
+      activePage="grid"
+      isRefreshing={isRefreshing}
+      language={language}
+      onLanguageChange={changeLanguage}
+      onRefresh={refreshQueues}
+    >
+      <div className="grid-home">
         {status === "ready" && snapshot ? (
           <section aria-label={text.mapLabel} className="store-grid">
             {storeGridCells.map(({ key, name: gridName }) => {
@@ -251,7 +247,7 @@ export function QueueGrid() {
             </button>
           </section>
         ) : null}
-      </main>
+      </div>
       <div aria-hidden="true" className="general-stats-space" />
 
       {selectedStore ? (
@@ -261,6 +257,6 @@ export function QueueGrid() {
           store={selectedStore}
         />
       ) : null}
-    </div>
+    </AppShell>
   );
 }

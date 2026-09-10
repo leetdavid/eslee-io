@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { type PointerEvent, useEffect, useRef, useState, type WheelEvent } from "react";
-import { AppNavigation } from "@/components/app-navigation";
+import { AppShell } from "@/components/app-shell";
 import { QueueChart } from "@/components/queue-chart";
 import { StoreSheet } from "@/components/store-sheet";
 import { copy, type Language, queueBand } from "@/lib/queue-presentation";
@@ -309,20 +309,15 @@ export function QueueMap() {
   }
 
   return (
-    <main className="queue-app">
-      <a className="skip-link" href="#map-content">
-        {text.map}
-      </a>
-      <AppNavigation
-        activePage="map"
-        isRefreshing={isRefreshing}
-        language={language}
-        onLanguageChange={changeLanguage}
-        onRefresh={refreshQueues}
-      />
+    <AppShell
+      activePage="map"
+      isRefreshing={isRefreshing}
+      language={language}
+      onLanguageChange={changeLanguage}
+      onRefresh={refreshQueues}
+    >
       {status === "ready" && snapshot ? (
         <div
-          id="map-content"
           className="map-stage"
           data-dragging={isDraggingMap}
           data-pannable={mapZoom > minMapZoom}
@@ -490,6 +485,6 @@ export function QueueMap() {
           store={selectedStore}
         />
       ) : null}
-    </main>
+    </AppShell>
   );
 }

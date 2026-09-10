@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { copy, type Language } from "@/lib/queue-presentation";
 
-type AppNavigationProps = {
+export type AppNavigationProps = {
   activePage: "grid" | "map";
   isRefreshing: boolean;
   language: Language;

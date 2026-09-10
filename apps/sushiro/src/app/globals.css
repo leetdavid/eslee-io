@@ -31,6 +31,21 @@ button {
   color: inherit;
 }
 
+.app-shell {
+  background: var(--sea);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.app-content {
+  isolation: isolate;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+}
+
 .skip-link {
   background: var(--black);
   color: var(--land);
@@ -49,12 +64,15 @@ button {
 .app-navigation {
   align-items: center;
   background: var(--land);
-  border: 1px solid var(--black);
+  border-bottom: 1px solid var(--black);
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   justify-content: space-between;
   min-height: 34px;
   padding: 3px;
+  position: relative;
+  z-index: 1;
 }
 
 .app-navigation-links,
@@ -110,23 +128,9 @@ button {
   opacity: 1;
 }
 
-.queue-app {
-  background: var(--sea);
-  min-height: 100dvh;
-  overflow: hidden;
-  position: relative;
-}
-
-.queue-app > .app-navigation {
-  left: clamp(18px, 3vw, 48px);
-  position: absolute;
-  right: calc(var(--history-sidebar-width) + clamp(18px, 3vw, 48px));
-  top: clamp(18px, 3vw, 48px);
-  z-index: 3;
-}
-
 .map-stage {
   bottom: 0;
+  container-type: size;
   left: 0;
   overflow: hidden;
   position: absolute;
@@ -144,7 +148,7 @@ button {
   top: 50%;
   transform: translate(-50%, -50%);
   transform-origin: center;
-  width: min(calc(100% - 64px), calc(100dvh * 1.378));
+  width: min(calc(100% - 64px), calc((100cqh - 64px) * 1.378));
 }
 
 .map-stage[data-pannable="true"] .map-canvas {
@@ -254,7 +258,7 @@ button {
 .telemetry {
   left: clamp(18px, 3vw, 48px);
   position: absolute;
-  top: clamp(62px, calc(3vw + 44px), 92px);
+  top: clamp(18px, 3vw, 48px);
   z-index: 1;
 }
 
@@ -297,18 +301,9 @@ button {
   z-index: 1;
 }
 
-.grid-app {
-  background: var(--sea);
+.grid-page {
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr) clamp(96px, 14dvh, 160px);
-  height: 100dvh;
-  overflow: hidden;
-}
-
-.grid-app > .app-navigation {
-  border-left: 0;
-  border-right: 0;
-  border-top: 0;
+  grid-template-rows: minmax(0, 1fr) clamp(96px, 14dvh, 160px);
 }
 
 .grid-home {
@@ -805,7 +800,7 @@ button {
   bottom: 20px;
   left: calc((100% - var(--history-sidebar-width)) / 2);
   max-width: min(640px, calc(100% - var(--history-sidebar-width) - 40px));
-  max-height: calc(100dvh - 40px);
+  max-height: calc(100% - 40px);
   overflow-y: auto;
   padding: 20px;
   position: absolute;
@@ -1025,18 +1020,12 @@ button:focus-visible {
   }
 
   .map-canvas {
-    width: min(calc(100vw - 32px), calc((100dvh - 320px) * 1.378));
+    width: min(calc(100% - 32px), calc((100cqh - 32px) * 1.378));
   }
 
   .map-stage {
     bottom: 288px;
     right: 0;
-  }
-
-  .queue-app > .app-navigation {
-    left: 12px;
-    right: 12px;
-    top: 12px;
   }
 
   .map-zoom-controls {
@@ -1065,6 +1054,7 @@ button:focus-visible {
   .store-sheet {
     bottom: 288px;
     left: 50%;
+    max-height: calc(100% - 300px);
     max-width: none;
     padding: 20px 16px 16px;
     width: 100%;
@@ -1079,19 +1069,20 @@ button:focus-visible {
   }
 }
 
-.grid-app .store-sheet {
+.grid-page .store-sheet {
   left: 50%;
+  max-height: calc(100% - 40px);
   max-width: min(640px, calc(100% - 40px));
   position: fixed;
   width: calc(100% - 40px);
 }
 
-.grid-app .sheet-backdrop {
+.grid-page .sheet-backdrop {
   position: fixed;
 }
 
 @media (max-width: 600px) {
-  .grid-app .store-sheet {
+  .grid-page .store-sheet {
     bottom: 12px;
     max-width: calc(100% - 24px);
     width: calc(100% - 24px);
