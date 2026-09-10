@@ -1,5 +1,8 @@
 hong-kong.png was rasterized from hong-kong.svg at high resolution and composited into a single white land mask. District seams were closed; sea remains transparent.
 
+The interactive map now renders hong-kong.svg directly at the zoomed display size
+to retain vector detail. The PNG is a legacy raster export.
+
 Geographic calibration for marker placement:
 https://mapsvg.com/maps/geo-calibrated/hong-kong.svg
 

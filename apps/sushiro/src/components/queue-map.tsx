@@ -182,10 +182,10 @@ export function QueueMap() {
           <Image
             alt=""
             className="basemap"
-            height={2229}
+            height={445}
             priority
-            src="/hong-kong.png"
-            width={3072}
+            src="/hong-kong.svg"
+            width={613}
           />
           {snapshot.stores.map((store) => {
             const { x, y } = projectMapLocation(store);

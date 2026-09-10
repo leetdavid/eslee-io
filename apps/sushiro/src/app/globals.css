@@ -153,9 +153,14 @@ button {
   left: 0;
   position: absolute;
   top: 0;
-  transform-origin: 0 0;
   width: min(calc(100% - 64px), calc((100cqh - 64px) * 1.378));
-  will-change: transform;
+}
+
+/* Lay out the vector and markers at the zoomed size so text is never scaled. */
+.map-render-layer {
+  height: calc(100% * var(--map-zoom, 1));
+  position: absolute;
+  width: calc(100% * var(--map-zoom, 1));
 }
 
 .basemap {
@@ -182,7 +187,7 @@ button {
   padding: 0;
   position: absolute;
   place-items: center;
-  transform: translate(-50%, -50%) scale(calc(1 / var(--map-zoom, 1)));
+  transform: translate(-50%, -50%);
   z-index: 2;
 }
 

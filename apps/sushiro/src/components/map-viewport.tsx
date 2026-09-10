@@ -68,7 +68,7 @@ export function MapViewport({ children, language }: MapViewportProps) {
         );
       })
       .on("zoom", ({ transform }: D3ZoomEvent<HTMLDivElement, unknown>) => {
-        canvas.style.transform = `translate(${transform.x}px, ${transform.y}px) scale(${transform.k})`;
+        canvas.style.transform = `translate(${transform.x}px, ${transform.y}px)`;
         canvas.style.setProperty("--map-zoom", String(transform.k));
         setScale(transform.k);
       })
@@ -177,7 +177,7 @@ export function MapViewport({ children, language }: MapViewportProps) {
         {text.mapInstructions}
       </p>
       <div className="map-canvas" ref={canvasRef}>
-        {children}
+        <div className="map-render-layer">{children}</div>
       </div>
       <fieldset aria-label={text.mapLabel} className="map-zoom-controls">
         <button

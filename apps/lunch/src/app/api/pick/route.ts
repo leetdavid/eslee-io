@@ -1,5 +1,10 @@
+import { mapsUrl } from "@/data/presets";
+
 type LunchItem = {
   name: string;
+};
+
+type LunchChoice = LunchItem & {
   googleMapsLink: string;
 };
 
@@ -26,24 +31,12 @@ function parseItems(value: unknown): LunchItem[] | null {
   for (const item of value) {
     if (!item || typeof item !== "object") return null;
 
-    const { name, googleMapsLink } = item as Record<string, unknown>;
-    if (
-      typeof name !== "string" ||
-      !name.trim() ||
-      typeof googleMapsLink !== "string" ||
-      !googleMapsLink.trim()
-    ) {
+    const { name } = item as Record<string, unknown>;
+    if (typeof name !== "string" || !name.trim()) {
       return null;
     }
 
-    try {
-      const url = new URL(googleMapsLink);
-      if (url.protocol !== "https:") return null;
-    } catch {
-      return null;
-    }
-
-    items.push({ name: name.trim(), googleMapsLink: googleMapsLink.trim() });
+    items.push({ name: name.trim() });
   }
 
   return items;
@@ -74,7 +67,6 @@ export function GET() {
       items: [
         {
           name: "Lunch spot",
-          googleMapsLink: "https://www.google.com/maps/search/?api=1&query=Lunch+spot",
         },
       ],
       topN: 3,
@@ -98,7 +90,7 @@ export async function POST(request: Request) {
   const items = parseItems(rawItems);
   if (!items) {
     return response(
-      { error: "items must be a non-empty list of { name, googleMapsLink } objects." },
+      { error: "items must be a non-empty list of { name } objects." },
       { status: 400 },
     );
   }
@@ -107,6 +99,9 @@ export async function POST(request: Request) {
     return response({ error: "topN must be a positive integer." }, { status: 400 });
   }
 
-  const choices = choose(items, Math.min(rawTopN, items.length));
+  const choices: LunchChoice[] = choose(items, Math.min(rawTopN, items.length)).map((item) => ({
+    ...item,
+    googleMapsLink: mapsUrl(item.name),
+  }));
   return response({ choices });
 }
