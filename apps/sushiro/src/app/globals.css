@@ -131,35 +131,35 @@ button {
 .map-stage {
   bottom: 0;
   container-type: size;
+  cursor: grab;
   left: 0;
   overflow: hidden;
   position: absolute;
   right: var(--history-sidebar-width);
   touch-action: none;
   top: 0;
+  user-select: none;
+}
+
+.map-stage:focus-visible {
+  outline: 2px solid var(--black);
+  outline-offset: -2px;
 }
 
 .map-canvas {
   aspect-ratio: 613 / 445;
   container-type: inline-size;
   height: auto;
-  left: 50%;
+  left: 0;
   position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  transform-origin: center;
+  top: 0;
+  transform-origin: 0 0;
   width: min(calc(100% - 64px), calc((100cqh - 64px) * 1.378));
-}
-
-.map-stage[data-pannable="true"] .map-canvas {
-  cursor: grab;
-}
-
-.map-stage[data-dragging="true"] .map-canvas {
-  cursor: grabbing;
+  will-change: transform;
 }
 
 .basemap {
+  display: block;
   filter: drop-shadow(0 0 0.75px var(--black));
   height: 100%;
   pointer-events: none;
@@ -177,12 +177,12 @@ button {
   display: grid;
   font-size: clamp(9px, 1.2cqw, 13px);
   font-weight: 700;
-  min-height: clamp(23px, 2.8cqw, 31px);
-  min-width: clamp(23px, 2.8cqw, 31px);
+  min-height: clamp(24px, 2.8cqw, 31px);
+  min-width: clamp(24px, 2.8cqw, 31px);
   padding: 0;
   position: absolute;
   place-items: center;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%) scale(calc(1 / var(--map-zoom, 1)));
   z-index: 2;
 }
 
@@ -223,6 +223,11 @@ button {
   outline-offset: 3px;
 }
 
+.map-stage[data-dragging="true"],
+.map-stage[data-dragging="true"] .store-marker {
+  cursor: grabbing;
+}
+
 .map-zoom-controls {
   background: var(--land);
   border: 1px solid var(--black);
@@ -255,9 +260,14 @@ button {
   cursor: default;
 }
 
+.map-zoom-controls .map-fit-control {
+  font-size: 11px;
+}
+
 .telemetry {
   left: clamp(18px, 3vw, 48px);
   position: absolute;
+  pointer-events: none;
   top: clamp(18px, 3vw, 48px);
   z-index: 1;
 }
@@ -1017,6 +1027,7 @@ button:focus-visible {
 @media (max-width: 600px) {
   :root {
     --history-sidebar-width: 100%;
+    --history-panel-height: min(288px, 32dvh);
   }
 
   .map-canvas {
@@ -1024,7 +1035,7 @@ button:focus-visible {
   }
 
   .map-stage {
-    bottom: 288px;
+    bottom: var(--history-panel-height);
     right: 0;
   }
 
@@ -1045,16 +1056,16 @@ button:focus-visible {
   .history-sidebar {
     border-left: 0;
     border-top: 1px solid var(--black);
-    height: 288px;
+    height: var(--history-panel-height);
     padding: 16px;
     top: auto;
     width: 100%;
   }
 
   .store-sheet {
-    bottom: 288px;
+    bottom: var(--history-panel-height);
     left: 50%;
-    max-height: calc(100% - 300px);
+    max-height: calc(100% - var(--history-panel-height) - 12px);
     max-width: none;
     padding: 20px 16px 16px;
     width: 100%;

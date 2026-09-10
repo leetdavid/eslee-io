@@ -16,6 +16,9 @@
   },
   "dependencies": {
     "@eslee/db": "workspace:*",
+    "d3-selection": "^3.0.0",
+    "d3-transition": "^3.0.1",
+    "d3-zoom": "^3.0.0",
     "drizzle-orm": "catalog:",
     "next": "catalog:",
     "react": "catalog:react19",
@@ -23,6 +26,9 @@
   },
   "devDependencies": {
     "@eslee/tsconfig": "workspace:*",
+    "@types/d3-selection": "^3.0.11",
+    "@types/d3-transition": "^3.0.9",
+    "@types/d3-zoom": "^3.0.8",
     "@types/node": "catalog:node",
     "@types/react": "catalog:react19",
     "@types/react-dom": "catalog:react19",
