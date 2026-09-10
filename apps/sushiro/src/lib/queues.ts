@@ -19,6 +19,7 @@ export type QueueSnapshot = {
   stores: QueueStore[];
 };
 
+export const gridHistoryHours = 6;
 export const historyRanges = [24, 168, 720] as const;
 
 export type HistoryRange = (typeof historyRanges)[number];

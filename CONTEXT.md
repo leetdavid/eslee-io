@@ -69,7 +69,7 @@ A selectable grid-home representation of one store that shows its localized name
 _Avoid_: marker, popup card
 
 **Grid chart window**:
-The trailing 12-hour period plotted behind every grid queue card. It incorporates each newly captured Queue snapshot on its next request. All cards use a shared zero-based vertical scale, based on the largest plotted waiting-group count, so their area charts can be compared accurately.
+The trailing 6-hour period plotted behind every grid queue card. It incorporates each newly captured Queue snapshot on its next request. All cards use a shared zero-based vertical scale, based on the largest plotted waiting-group count, so their area charts can be compared accurately. Each chart has a solid queue-band-coloured line and a fill that fades to transparent at the baseline.
 _Avoid_: per-card scale, relative chart
 
 **Grid language**:
@@ -85,11 +85,11 @@ The complete six-column geographic grid scaled to fit the phone viewport. Its lo
 _Avoid_: mobile list, reflowed geography
 
 **Grid history-loading state**:
-The temporary chart state after current store data loads and before 12-hour history is available. Cards show their current operational information and remain selectable while the background chart is absent.
+The temporary chart state after current store data loads and before 6-hour history is available. Cards show their current operational information and remain selectable while the background chart is absent.
 _Avoid_: blocked grid, cached chart
 
 **Empty grid chart**:
-The intentionally blank trend area on a grid queue card with no 12-hour snapshots. It contains no explanatory copy so the current queue information remains the visual priority.
+The intentionally blank trend area on a grid queue card with no 6-hour snapshots. It contains no explanatory copy so the current queue information remains the visual priority.
 _Avoid_: no-history label, chart error
 
 **App navigation**:
@@ -101,7 +101,7 @@ The Grid Home top area, containing only app navigation and its shared controls. 
 _Avoid_: grid telemetry, home summary
 
 **Grid queue colour**:
-The pale full-card surface tint assigned from a grid queue card's queue band. It uses the established green through red urgency scale while preserving high-contrast black content and chart marks.
+The pale full-card surface tint assigned from a grid queue card's queue band. It uses the established green through red urgency scale while preserving high-contrast black content. The chart line and gradient use a darker colour from the same queue band.
 _Avoid_: saturated card, colour-only information
 
 **Grid called tickets**:

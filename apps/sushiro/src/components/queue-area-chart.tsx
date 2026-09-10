@@ -1,3 +1,6 @@
+"use client";
+
+import { useId } from "react";
 import type { QueueHistoryPoint } from "@/lib/queues";
 
 type QueueAreaChartProps = {
@@ -8,6 +11,8 @@ type QueueAreaChartProps = {
 };
 
 export function QueueAreaChart({ end, maximumWait, points, start }: QueueAreaChartProps) {
+  const gradientId = useId();
+
   if (points.length === 0) {
     return null;
   }
@@ -30,9 +35,15 @@ export function QueueAreaChart({ end, maximumWait, points, start }: QueueAreaCha
       aria-hidden="true"
       className="grid-card-chart"
       preserveAspectRatio="none"
-      viewBox="0 0 100 100"
+      viewBox="0 -2 100 104"
     >
-      <path d={area} />
+      <defs>
+        <linearGradient id={gradientId} x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor="currentColor" stopOpacity={0.4} />
+          <stop offset="100%" stopColor="currentColor" stopOpacity={0} />
+        </linearGradient>
+      </defs>
+      <path d={area} fill={`url(#${gradientId})`} />
       <polyline points={line} />
     </svg>
   );

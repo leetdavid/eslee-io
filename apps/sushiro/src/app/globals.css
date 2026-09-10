@@ -340,6 +340,7 @@ button {
 }
 
 .grid-queue-card {
+  --grid-chart-color: var(--green);
   appearance: none;
   background: #e7f3e8;
   border: 0;
@@ -355,18 +356,22 @@ button {
 }
 
 .grid-queue-card[data-band="short"] {
+  --grid-chart-color: var(--lime);
   background: #edf5dc;
 }
 
 .grid-queue-card[data-band="moderate"] {
+  --grid-chart-color: var(--yellow);
   background: #f9f1cf;
 }
 
 .grid-queue-card[data-band="long"] {
+  --grid-chart-color: var(--red);
   background: #f9dfdc;
 }
 
 .grid-queue-card[data-band="muted"] {
+  --grid-chart-color: #737373;
   background: #e7e7e7;
   color: #595959;
 }
@@ -378,24 +383,21 @@ button {
 }
 
 .grid-card-chart {
-  color: var(--black);
+  color: var(--grid-chart-color);
   display: block;
   height: 100%;
   inset: 0;
-  opacity: 0.23;
   pointer-events: none;
   position: absolute;
   width: 100%;
 }
 
-.grid-card-chart path {
-  fill: currentColor;
-}
-
 .grid-card-chart polyline {
   fill: none;
   stroke: currentColor;
-  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.5;
   vector-effect: non-scaling-stroke;
 }
 

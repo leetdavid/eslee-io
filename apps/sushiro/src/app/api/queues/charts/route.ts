@@ -2,6 +2,7 @@ import { sushiroQueueSnapshot } from "@eslee/db/schema";
 import { asc, gte, sql } from "drizzle-orm";
 import { getGridChartHistory } from "@/lib/queue-cache";
 import {
+  gridHistoryHours,
   historyRanges,
   type QueueHistory,
   type QueueHistoryPoint,
@@ -11,12 +12,12 @@ import {
 export const dynamic = "force-dynamic";
 
 const defaultHours = 24;
-const chartHistoryRanges = [12, ...historyRanges] as const;
+const chartHistoryRanges = [gridHistoryHours, ...historyRanges] as const;
 
 type ChartHistoryRange = (typeof chartHistoryRanges)[number];
 
 const bucketMinutes: Record<ChartHistoryRange, number> = {
-  12: 5,
+  [gridHistoryHours]: 5,
   24: 5,
   168: 30,
   720: 120,
@@ -91,11 +92,14 @@ export async function GET(request: Request) {
   const hours = parseHours(new URL(request.url).searchParams.get("hours"));
 
   if (hours === undefined) {
-    return Response.json({ error: "Hours must be 12, 24, 168, or 720" }, { status: 400 });
+    return Response.json(
+      { error: `Hours must be ${gridHistoryHours}, 24, 168, or 720` },
+      { status: 400 },
+    );
   }
 
   const history =
-    hours === 12
+    hours === gridHistoryHours
       ? await getGridChartHistory(() => loadChartHistory(hours))
       : await loadChartHistory(hours);
 

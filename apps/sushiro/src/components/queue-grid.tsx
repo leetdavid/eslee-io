@@ -5,7 +5,12 @@ import { AppShell } from "@/components/app-shell";
 import { QueueAreaChart } from "@/components/queue-area-chart";
 import { StoreSheet } from "@/components/store-sheet";
 import { copy, type Language, queueBand } from "@/lib/queue-presentation";
-import type { QueueHistory, QueueSnapshot, QueueStore } from "@/lib/queues";
+import {
+  gridHistoryHours,
+  type QueueHistory,
+  type QueueSnapshot,
+  type QueueStore,
+} from "@/lib/queues";
 import { storeGridCells } from "@/lib/store-grid";
 
 function normalizedStoreName(name: string) {
@@ -18,7 +23,7 @@ export function QueueGrid() {
   const [history, setHistory] = useState<QueueHistory | null>(null);
   const [historyWindow, setHistoryWindow] = useState(() => {
     const end = Date.now();
-    return { end, start: end - 12 * 60 * 60 * 1_000 };
+    return { end, start: end - gridHistoryHours * 60 * 60 * 1_000 };
   });
   const [status, setStatus] = useState<"error" | "loading" | "ready">("loading");
   const [selectedStore, setSelectedStore] = useState<QueueStore | null>(null);
@@ -90,7 +95,9 @@ export function QueueGrid() {
 
     async function loadHistory() {
       try {
-        const response = await fetch("/api/queues/charts?hours=12", { cache: "no-store" });
+        const response = await fetch(`/api/queues/charts?hours=${gridHistoryHours}`, {
+          cache: "no-store",
+        });
 
         if (!response.ok) {
           throw new Error("Unable to load queue history");
@@ -101,7 +108,7 @@ export function QueueGrid() {
 
         if (!cancelled) {
           setHistory(nextHistory);
-          setHistoryWindow({ end, start: end - 12 * 60 * 60 * 1_000 });
+          setHistoryWindow({ end, start: end - gridHistoryHours * 60 * 60 * 1_000 });
         }
       } catch {
         if (!cancelled) {
@@ -154,12 +161,18 @@ export function QueueGrid() {
     storeGridCells.flatMap(({ name }) => (name ? [normalizedStoreName(name)] : [])),
   );
   const historyByStoreId = new Map(
-    (history?.stores ?? []).map((store) => [store.storeId, store.points]),
+    (history?.stores ?? []).map((store) => [
+      store.storeId,
+      store.points.filter((point) => {
+        const timestamp = new Date(point.collectedAt).valueOf();
+        return timestamp >= historyWindow.start && timestamp <= historyWindow.end;
+      }),
+    ]),
   );
   const maximumWait = Math.max(
     1,
     ...(snapshot?.stores.map((store) => store.wait) ?? []),
-    ...(history?.stores.flatMap((store) => store.points.map((point) => point.wait)) ?? []),
+    ...[...historyByStoreId.values()].flatMap((points) => points.map((point) => point.wait)),
   );
   const unplacedStores = (snapshot?.stores ?? []).filter(
     (store) => !configuredNames.has(normalizedStoreName(store.nameEn || store.name)),
