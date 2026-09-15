@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { QueueChartSeries } from "@/components/queue-chart-series";
 import type { QueueHistoryPoint } from "@/lib/queues";
 
 type QueueChartProps = {
@@ -93,19 +94,12 @@ export function QueueChart({
               y1={chartHeight - 1}
               y2={chartHeight - 1}
             />
-            {points.length === 1 ? (
-              <circle
-                className="queue-chart-line"
-                cx={coordinates[0]?.x}
-                cy={coordinates[0]?.y}
-                r="2.5"
-              />
-            ) : (
-              <polyline
-                className="queue-chart-line"
-                points={coordinates.map(({ x, y }) => `${x.toFixed(2)},${y.toFixed(2)}`).join(" ")}
-              />
-            )}
+            <QueueChartSeries
+              baseline={chartHeight - chartPadding}
+              coordinates={coordinates}
+              left={chartPadding}
+              right={chartWidth - chartPadding}
+            />
             {hoveredPoint ? (
               <circle
                 className="queue-chart-hover-dot"

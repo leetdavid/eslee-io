@@ -269,6 +269,7 @@ export function QueueMap() {
                   <button
                     aria-label={`${storeName}: ${matchingStore?.wait ?? store.latestWait} ${text.groups}`}
                     className="history-store"
+                    data-band={matchingStore ? queueBand(matchingStore) : "muted"}
                     disabled={!matchingStore}
                     key={store.storeId}
                     onClick={() => matchingStore && setSelectedStore(matchingStore)}

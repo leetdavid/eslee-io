@@ -339,8 +339,32 @@ button {
   min-height: 0;
 }
 
+.grid-queue-card,
+.history-store {
+  --queue-chart-color: var(--green);
+}
+
+.grid-queue-card[data-band="short"],
+.history-store[data-band="short"] {
+  --queue-chart-color: var(--lime);
+}
+
+.grid-queue-card[data-band="moderate"],
+.history-store[data-band="moderate"] {
+  --queue-chart-color: var(--yellow);
+}
+
+.grid-queue-card[data-band="long"],
+.history-store[data-band="long"] {
+  --queue-chart-color: var(--red);
+}
+
+.grid-queue-card[data-band="muted"],
+.history-store[data-band="muted"] {
+  --queue-chart-color: #737373;
+}
+
 .grid-queue-card {
-  --grid-chart-color: var(--green);
   appearance: none;
   background: #e7f3e8;
   border: 0;
@@ -356,22 +380,18 @@ button {
 }
 
 .grid-queue-card[data-band="short"] {
-  --grid-chart-color: var(--lime);
   background: #edf5dc;
 }
 
 .grid-queue-card[data-band="moderate"] {
-  --grid-chart-color: var(--yellow);
   background: #f9f1cf;
 }
 
 .grid-queue-card[data-band="long"] {
-  --grid-chart-color: var(--red);
   background: #f9dfdc;
 }
 
 .grid-queue-card[data-band="muted"] {
-  --grid-chart-color: #737373;
   background: #e7e7e7;
   color: #595959;
 }
@@ -383,22 +403,13 @@ button {
 }
 
 .grid-card-chart {
-  color: var(--grid-chart-color);
+  color: var(--queue-chart-color);
   display: block;
   height: 100%;
   inset: 0;
   pointer-events: none;
   position: absolute;
   width: 100%;
-}
-
-.grid-card-chart polyline {
-  fill: none;
-  stroke: currentColor;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 1.5;
-  vector-effect: non-scaling-stroke;
 }
 
 .grid-queue-card > :not(.grid-card-chart) {
@@ -677,6 +688,7 @@ button {
 }
 
 .queue-chart svg {
+  color: var(--queue-chart-color, var(--black));
   cursor: crosshair;
   display: block;
   height: 52px;
@@ -691,19 +703,16 @@ button {
 
 .queue-chart-line {
   fill: none;
-  stroke: var(--black);
+  stroke: currentColor;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-width: 2;
-}
-
-.queue-chart circle.queue-chart-line {
-  fill: var(--black);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
 }
 
 .queue-chart-hover-dot {
   fill: var(--land);
-  stroke: var(--black);
+  stroke: currentColor;
   stroke-width: 2;
 }
 
@@ -784,8 +793,8 @@ button {
   cursor: default;
 }
 
-.history-store:not(:disabled):is(:hover, :focus-visible) .queue-chart-line {
-  stroke: var(--red);
+.history-store:not(:disabled):is(:hover, :focus-visible) {
+  background: var(--sea);
 }
 
 .history-store:active:not(:disabled) {
