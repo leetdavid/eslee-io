@@ -25,6 +25,7 @@
     "react-dom": "catalog:react19"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "catalog:",
     "@eslee/tsconfig": "workspace:*",
     "@types/d3-selection": "^3.0.11",
     "@types/d3-transition": "^3.0.9",
@@ -33,6 +34,7 @@
     "@types/react": "catalog:react19",
     "@types/react-dom": "catalog:react19",
     "dotenv-cli": "catalog:",
+    "tailwindcss": "catalog:",
     "typescript": "catalog:",
     "vitest": "^5.0.0"
   }

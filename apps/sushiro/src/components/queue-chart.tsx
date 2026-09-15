@@ -14,7 +14,7 @@ type QueueChartProps = {
 
 const chartWidth = 260;
 const chartHeight = 52;
-const chartPadding = 3;
+const chartPadding = 4;
 
 export function QueueChart({
   label,
@@ -67,7 +67,7 @@ export function QueueChart({
   }
 
   return (
-    <div className="queue-chart">
+    <div className="queue-chart min-w-0 max-w-full">
       <div className="queue-chart-caption">
         <span>{label}</span>
         <strong>
@@ -78,6 +78,7 @@ export function QueueChart({
         <div className="queue-chart-plot">
           <svg
             aria-label={`${label}: ${latestWait} ${valueLabel}`}
+            className="min-w-0 max-w-full"
             onPointerLeave={() => setHoveredPointIndex(null)}
             onPointerMove={(event) => {
               const { left, width } = event.currentTarget.getBoundingClientRect();
@@ -89,8 +90,8 @@ export function QueueChart({
           >
             <line
               className="queue-chart-baseline"
-              x1="0"
-              x2={chartWidth}
+              x1={chartPadding}
+              x2={chartWidth - chartPadding}
               y1={chartHeight - 1}
               y2={chartHeight - 1}
             />

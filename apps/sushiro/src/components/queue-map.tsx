@@ -228,13 +228,13 @@ export function QueueMap() {
         </section>
       ) : null}
 
-      <aside aria-labelledby="history-heading" className="history-sidebar">
+      <aside aria-labelledby="history-heading" className="history-sidebar min-w-0">
         <header>
-          <div>
+          <div className="min-w-0">
             <h2 id="history-heading">{text.history}</h2>
             <p>{text.historyPeriod[historyRange]}</p>
           </div>
-          <fieldset aria-label={text.history} className="history-range">
+          <fieldset aria-label={text.history} className="history-range shrink-0">
             {historyRanges.map((range) => (
               <button
                 aria-pressed={historyRange === range}
@@ -252,7 +252,7 @@ export function QueueMap() {
           <p className="history-empty">{text.historyEmpty}</p>
         ) : null}
         {history && history.global.length > 0 ? (
-          <div className="history-charts">
+          <div className="history-charts min-w-0">
             <QueueChart
               label={text.globalQueues}
               latestWait={snapshot ? total : undefined}
@@ -268,7 +268,7 @@ export function QueueMap() {
                 return (
                   <button
                     aria-label={`${storeName}: ${matchingStore?.wait ?? store.latestWait} ${text.groups}`}
-                    className="history-store"
+                    className="history-store min-w-0"
                     data-band={matchingStore ? queueBand(matchingStore) : "muted"}
                     disabled={!matchingStore}
                     key={store.storeId}
