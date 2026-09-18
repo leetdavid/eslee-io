@@ -8,6 +8,44 @@ This context describes the public queue-status viewer for Sushiro stores in Hong
 The language presented when a visitor first opens the queue map: Cantonese written in Traditional Chinese. English is an optional visitor-selected alternative.
 _Avoid_: primary language, fallback language
 
+## Queue planning
+
+**Same-day queue planning**:
+A diner's decision about approximately when to join a Sushiro queue to eat there that day.
+_Avoid_: shortest queue now, future-day planning
+
+**Future-day planning**:
+A diner's choice of a visiting time on a later date, informed by historical queue patterns.
+_Avoid_: same-day queue planning, live queue status
+
+**Estimated wait**:
+A prediction, shown as a duration range, of the time from taking a Sushiro ticket until that ticket is called. It does not include any delay between being called and being seated.
+_Avoid_: time until seated, observed waiting duration
+
+**Overall branch estimate**:
+An estimated wait for a branch without selecting a particular seating category.
+_Avoid_: seating-specific estimate, Hong Kong-wide wait estimate
+
+**Queue-now estimate**:
+An estimated wait for a ticket taken now at a particular branch, informed by its current queue conditions.
+_Avoid_: typical weekday wait, future time-slot estimate
+
+**Observed wait**:
+The measured duration between taking a specific ticket at a branch and that ticket being called, using the actual event times.
+_Avoid_: estimated wait, snapshot-derived wait
+
+**Plan a meal page**:
+A dedicated page of weekday time-slot waiting-duration estimates that helps diners choose when to join a Sushiro queue. It shows all Hong Kong branches by default, with branch selection optional.
+_Avoid_: Stats page, store detail sheet
+
+**Typical week**:
+Recurring weekday time-slot estimates for a branch, informed by historical queue behavior. These describe weekday patterns rather than forecasts for named future dates.
+_Avoid_: forecast calendar, By date planner
+
+**Stats page**:
+A primarily informational page of observed Sushiro queue statistics. Its Daily history view shows recorded data for a selected date; its Patterns view shows historical patterns and comparisons.
+_Avoid_: meal planner, queue forecast
+
 ## Map
 
 **Queue marker**:
@@ -19,7 +57,7 @@ A fixed bottom sheet containing the selected store's API-backed queue statistics
 _Avoid_: card, popup
 
 **Waiting groups**:
-The upstream `wait` value: the number of groups currently waiting at a store. It is not a duration estimate.
+The number of groups currently waiting at a store. It is a count of groups, not an estimated waiting duration.
 _Avoid_: wait time, minutes waiting
 
 **Called ticket numbers**:
@@ -45,7 +83,7 @@ The two official Sushiro Hong Kong endpoints supplying store details and queue d
 _Avoid_: queue API, client API
 
 **Queue snapshot**:
-A time-stamped complete record of the queue data for every store, captured every five minutes for the Grid chart window.
+A time-stamped record of the collected queue data for every store, used for historical charts and queue analysis.
 _Avoid_: chart cache, database row
 
 **Queue band**:

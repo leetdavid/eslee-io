@@ -509,6 +509,9 @@ importers:
       '@eslee/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/typescript
+      '@tailwindcss/postcss':
+        specifier: 'catalog:'
+        version: 4.2.1
       '@types/d3-selection':
         specifier: ^3.0.11
         version: 3.0.11
@@ -530,6 +533,12 @@ importers:
       dotenv-cli:
         specifier: 'catalog:'
         version: 7.4.2
+      tailwindcss:
+        specifier: 'catalog:'
+        version: 4.2.1
+      tsx:
+        specifier: ^4.20.6
+        version: 4.20.6
       typescript:
         specifier: 'catalog:'
         version: 5.9.3

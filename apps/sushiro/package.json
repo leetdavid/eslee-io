@@ -8,6 +8,7 @@
     "dev": "pnpm with-env next dev -p 3005 --turbopack",
     "start": "pnpm with-env next start -p 3005",
     "test": "vitest run",
+    "estimates:backtest": "pnpm with-env tsx scripts/backtest-estimates.ts",
     "lint": "biome lint .",
     "check": "biome check .",
     "check:fix": "biome check --write .",
@@ -35,6 +36,7 @@
     "@types/react-dom": "catalog:react19",
     "dotenv-cli": "catalog:",
     "tailwindcss": "catalog:",
+    "tsx": "^4.20.6",
     "typescript": "catalog:",
     "vitest": "^5.0.0"
   }
