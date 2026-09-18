@@ -17,12 +17,6 @@
   margin-bottom: 24px;
 }
 
-.ticket-page-heading > p:first-child {
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  margin: 0 0 12px;
-}
-
 .ticket-page h1 {
   font-size: 32px;
   letter-spacing: -0.03em;
@@ -40,6 +34,10 @@
   align-items: start;
   display: grid;
   gap: 40px;
+  grid-template-columns: minmax(0, 340px);
+}
+
+.ticket-layout-has-reports {
   grid-template-columns: minmax(0, 340px) minmax(0, 1fr);
 }
 
@@ -158,7 +156,6 @@
   margin: 0;
 }
 
-.ticket-browser-note,
 .ticket-sighting,
 .ticket-thanks {
   color: #454545;
@@ -183,14 +180,6 @@
   font-size: 13px;
   line-height: 1.5;
   margin: 0 0 20px;
-}
-
-.ticket-empty {
-  border-top: 1px solid var(--line);
-  color: #454545;
-  font-size: 14px;
-  margin: 0;
-  padding-top: 20px;
 }
 
 .ticket-report {

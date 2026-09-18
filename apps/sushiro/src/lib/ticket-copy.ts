@@ -1,8 +1,7 @@
 export const ticketCopy = {
   en: {
     title: "Share your wait",
-    intro:
-      "Add your ticket, then tell us when it was called. Your times help improve queue estimates.",
+    intro: "Share your ticket to help improve wait estimates.",
     newTicket: "Add a ticket",
     branch: "Branch",
     chooseBranch: "Choose your branch",
@@ -15,8 +14,6 @@ export const ticketCopy = {
     save: "Save ticket",
     saving: "Saving…",
     reports: "Your tickets",
-    empty: "Your saved tickets will appear here.",
-    browser: "Use the same browser to return to your reports. All times are Hong Kong time.",
     waiting: "Waiting",
     seen: "Seen in feed",
     confirmed: "Call time saved",
@@ -53,7 +50,7 @@ export const ticketCopy = {
   },
   "zh-HK": {
     title: "記低輪候時間",
-    intro: "記低攞籌同叫號時間，幫手改善輪候估算。",
+    intro: "記低籌號，幫手改善輪候估算。",
     newTicket: "加入籌號",
     branch: "分店",
     chooseBranch: "選擇你的分店",
@@ -66,8 +63,6 @@ export const ticketCopy = {
     save: "儲存籌號",
     saving: "儲存中…",
     reports: "你的籌號",
-    empty: "儲存後，你的籌號會顯示喺呢度。",
-    browser: "用返同一個瀏覽器，就可以繼續更新紀錄。所有時間均為香港時間。",
     waiting: "輪候中",
     seen: "已喺叫號資料出現",
     confirmed: "已記錄叫號時間",

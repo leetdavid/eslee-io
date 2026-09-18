@@ -33,6 +33,7 @@ export function TicketTracker({ initialStoreId }: { initialStoreId: string }) {
   const form = useRef<HTMLFormElement>(null);
   const mutationVersion = useRef(0);
   const text = ticketCopy[language];
+  const hasReports = Boolean(data?.reports.length);
 
   useEffect(() => {
     const stored = localStorage.getItem("sushiro-language");
@@ -118,7 +119,7 @@ export function TicketTracker({ initialStoreId }: { initialStoreId: string }) {
       setNumber("");
       setJustNow(true);
       setAnnouncement(text.added);
-      document.getElementById("ticket-reports")?.focus();
+      requestAnimationFrame(() => document.getElementById("ticket-reports")?.focus());
     } catch {
       setSaveError(true);
     } finally {
@@ -139,7 +140,6 @@ export function TicketTracker({ initialStoreId }: { initialStoreId: string }) {
     >
       <div className="ticket-page">
         <header className="ticket-page-heading">
-          <p>SUSHIRO / HK</p>
           <h1>{text.title}</h1>
           <p>{text.intro}</p>
         </header>
@@ -159,7 +159,7 @@ export function TicketTracker({ initialStoreId }: { initialStoreId: string }) {
             {text.feedUnavailable}
           </p>
         ) : null}
-        <div className="ticket-layout">
+        <div className={hasReports ? "ticket-layout ticket-layout-has-reports" : "ticket-layout"}>
           <section className="ticket-entry" aria-labelledby="ticket-entry-heading">
             <h2 id="ticket-entry-heading">{text.newTicket}</h2>
             <form
@@ -181,7 +181,7 @@ export function TicketTracker({ initialStoreId }: { initialStoreId: string }) {
                   aria-invalid={Boolean(errors.storeId)}
                   aria-describedby={errors.storeId ? "store-error" : undefined}
                 >
-                  <option value="">{text.chooseBranch}</option>
+                  <option value="">{!data && refreshing ? text.loading : text.chooseBranch}</option>
                   {[...(data?.stores ?? [])]
                     .sort((a, b) =>
                       (language === "en" ? a.nameEn : a.name).localeCompare(
@@ -285,25 +285,26 @@ export function TicketTracker({ initialStoreId }: { initialStoreId: string }) {
                 </p>
               ) : null}
             </form>
-            <p className="ticket-browser-note">{text.browser}</p>
           </section>
-          <section className="ticket-reports" aria-labelledby="ticket-reports">
-            <h2 id="ticket-reports" tabIndex={-1}>
-              {text.reports}
-            </h2>
-            {!data && refreshing ? <p role="status">{text.loading}</p> : null}
-            {data?.reports.length === 0 ? <p className="ticket-empty">{text.empty}</p> : null}
-            {data?.reports.map((report) => (
-              <TicketReportCard
-                key={report.id}
-                report={report}
-                language={language}
-                now={now}
-                store={loadError ? undefined : data.stores.find(({ id }) => id === report.storeId)}
-                onUpdate={updateReport}
-              />
-            ))}
-          </section>
+          {hasReports && data ? (
+            <section className="ticket-reports" aria-labelledby="ticket-reports">
+              <h2 id="ticket-reports" tabIndex={-1}>
+                {text.reports}
+              </h2>
+              {data.reports.map((report) => (
+                <TicketReportCard
+                  key={report.id}
+                  report={report}
+                  language={language}
+                  now={now}
+                  store={
+                    loadError ? undefined : data.stores.find(({ id }) => id === report.storeId)
+                  }
+                  onUpdate={updateReport}
+                />
+              ))}
+            </section>
+          ) : null}
         </div>
       </div>
     </AppShell>
