@@ -12,6 +12,20 @@ Weekday schedules, special-day adjustments, and monthly patterns are later plann
 
 "Today's conditions" referred to live queue counts and ticket progression. The user also raised weather as a possible input, but it is not an agreed first-version dependency.
 
+## Ticket collection mini app
+
+The user wants a small web app asking diners for their ticket number and when they took the ticket. Each report also needs a branch, since ticket numbers are not unique across branches. Store ticket-taking time separately from submission time.
+
+Agreed flow, now implemented at `/tickets`:
+
+1. Open a dedicated collection page within the existing Sushiro app, following its current minimal visual style.
+2. Select a branch, enter the ticket number, and choose "Just now" or the actual ticket-taking time.
+3. After submitting, see the ticket and current called numbers. Account creation is not proposed for this first version.
+4. Match exact ticket sightings in the source data, preserving observation timestamps rather than treating them as exact call times.
+5. Offer an optional "My ticket was called" action with an editable event time to collect independent user-reported call observations.
+
+The user agreed to automatic feed matching plus optional call confirmation. Feed sightings and user-reported call times are stored separately. See [the ticket collection implementation notes](../../apps/sushiro/docs/ticket-collection.md) for the data fields, ownership model, matching rules and verification.
+
 ## Model-first progress
 
 An offline throughput baseline and evaluation runner now exist. See [the model experiment and pilot instructions](../../apps/sushiro/docs/queue-estimation.md).
@@ -64,7 +78,7 @@ Start from historical branch/weekday/time-slot patterns. Special-day profiles or
 
 Keep overall estimates attached to individual branches in the all-Hong-Kong overview. Optional manually chosen area and branch filters are under consideration. Location-based filtering is out of scope.
 
-For validation, use private-pilot observations recording branch, ticket number, ticket-taking time, and actual call time. Include the date in both event timestamps. The collection interface remains undecided. A pilot would test assumptions about reconstructing waits, while wider sampling would be needed to assess accuracy across branches and conditions.
+For validation, use observations recording branch, ticket number, ticket-taking time, and actual call time. Include the date in both event timestamps. A ticket-collection mini app is now requested; the completion flow is under discussion. A pilot would test assumptions about reconstructing waits, while wider sampling would be needed to assess accuracy across branches and conditions.
 
 A candidate baseline divides the number of waiting groups ahead of a new ticket by a validated ticket-call rate. This assumes compatible counts, queue ordering, and reasonably stable throughput. Ticket skips, recalls, multiple numbering sequences, missing calls, and changing service rates must be investigated. Future time slots also require estimates of the queue and call rate at the future joining time.
 

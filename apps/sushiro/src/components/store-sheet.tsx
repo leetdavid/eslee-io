@@ -1,5 +1,7 @@
+import Link from "next/link";
 import { copy, type Language, queueBand, queueBandLabel } from "@/lib/queue-presentation";
 import { isTicketing, type QueueStore } from "@/lib/queues";
+import { ticketCopy } from "@/lib/ticket-copy";
 
 type StoreSheetProps = {
   language: Language;
@@ -83,6 +85,9 @@ export function StoreSheet({ language, onClose, store }: StoreSheetProps) {
           </table>
         </section>
 
+        <Link className="ticket-track-link" href={`/tickets?storeId=${store.id}`}>
+          {ticketCopy[language].link}
+        </Link>
         <footer>{text.dataSource}</footer>
       </aside>
     </>

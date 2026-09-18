@@ -1,6 +1,320 @@
 @import "tailwindcss/theme";
 @import "tailwindcss/utilities";
 
+.app-content.tickets-page {
+  overflow: auto;
+}
+
+.ticket-page {
+  box-sizing: border-box;
+  margin: 0 auto;
+  max-width: 1080px;
+  padding: 40px 28px 64px;
+}
+
+.ticket-page-heading {
+  max-width: 640px;
+  margin-bottom: 24px;
+}
+
+.ticket-page-heading > p:first-child {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  margin: 0 0 12px;
+}
+
+.ticket-page h1 {
+  font-size: 32px;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  margin: 0 0 12px;
+}
+
+.ticket-page-heading > p:last-child {
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.ticket-layout {
+  align-items: start;
+  display: grid;
+  gap: 40px;
+  grid-template-columns: minmax(0, 340px) minmax(0, 1fr);
+}
+
+.ticket-page h2 {
+  font-size: 18px;
+  margin: 0 0 20px;
+}
+
+.ticket-entry {
+  background: var(--land);
+  border: 1px solid var(--line);
+  padding: 24px;
+}
+
+.ticket-entry form,
+.ticket-call-form,
+.ticket-field {
+  display: grid;
+  gap: 8px;
+}
+
+.ticket-entry form {
+  gap: 20px;
+}
+
+.ticket-page label,
+.ticket-page legend {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.ticket-label-note {
+  display: block;
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.ticket-page input:not([type="radio"]),
+.ticket-page select {
+  background: var(--land);
+  border: 1px solid #909090;
+  border-radius: 2px;
+  box-sizing: border-box;
+  color: var(--black);
+  font: inherit;
+  font-size: 16px;
+  min-height: 44px;
+  min-width: 0;
+  padding: 8px;
+  width: 100%;
+}
+
+.ticket-page input[aria-invalid="true"],
+.ticket-page select[aria-invalid="true"] {
+  border-color: var(--red);
+}
+
+:where(.ticket-page) button,
+.ticket-track-link {
+  background: var(--land);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  color: var(--black);
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1.4;
+  min-height: 44px;
+  padding: 10px 14px;
+}
+
+.ticket-page button:hover:not(:disabled),
+.ticket-track-link:hover {
+  border-color: var(--black);
+}
+
+.ticket-page .ticket-primary {
+  background: var(--black);
+  border-color: var(--black);
+  color: var(--land);
+}
+
+.ticket-page button:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.ticket-page :is(button, input, select):focus-visible,
+.ticket-track-link:focus-visible {
+  outline: 2px solid var(--black);
+  outline-offset: 3px;
+}
+
+.ticket-when {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.ticket-when > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+}
+
+.ticket-when label {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  gap: 8px;
+  min-height: 44px;
+}
+
+.ticket-when input {
+  accent-color: var(--black);
+  margin: 0;
+}
+
+.ticket-browser-note,
+.ticket-sighting,
+.ticket-thanks {
+  color: #454545;
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 16px 0 0;
+}
+
+.ticket-error {
+  color: var(--red);
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 4px 0 0;
+}
+
+.ticket-announcement:empty {
+  margin: 0;
+}
+
+.ticket-announcement,
+.ticket-feed-notice {
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0 0 20px;
+}
+
+.ticket-empty {
+  border-top: 1px solid var(--line);
+  color: #454545;
+  font-size: 14px;
+  margin: 0;
+  padding-top: 20px;
+}
+
+.ticket-report {
+  border-top: 1px solid var(--black);
+  padding: 20px 0 28px;
+}
+
+.ticket-report-heading {
+  align-items: start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.ticket-report h3 {
+  font-size: 15px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.ticket-number {
+  font-size: 40px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  margin: 8px 0 0;
+  overflow-wrap: anywhere;
+}
+
+.ticket-number > span {
+  display: block;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.ticket-status {
+  border: 1px solid var(--line);
+  font-size: 11px;
+  padding: 4px 7px;
+}
+
+.ticket-status-confirmed {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.ticket-times {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 20px 0;
+}
+
+.ticket-times dt {
+  color: #454545;
+  font-size: 11px;
+  margin-bottom: 4px;
+}
+
+.ticket-times dd {
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.ticket-live-numbers {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+}
+
+.ticket-live-numbers > span {
+  color: #454545;
+  font-size: 11px;
+}
+
+.ticket-live-numbers strong {
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.ticket-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.ticket-call-form {
+  margin-top: 20px;
+}
+
+.ticket-track-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+  text-decoration: none;
+}
+
+@media (max-width: 700px) {
+  .ticket-page {
+    padding: 28px 16px 40px;
+  }
+
+  .ticket-layout {
+    gap: 32px;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ticket-entry {
+    padding: 20px;
+  }
+
+  .ticket-page h1 {
+    font-size: 28px;
+  }
+}
+
 :root {
   --black: #000;
   --line: #d4d4d4;

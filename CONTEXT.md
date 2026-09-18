@@ -34,6 +34,18 @@ _Avoid_: typical weekday wait, future time-slot estimate
 The measured duration between taking a specific ticket at a branch and that ticket being called, using the actual event times.
 _Avoid_: estimated wait, snapshot-derived wait
 
+**Ticket report**:
+A diner's submission identifying a Sushiro branch, their ticket number, and when they took the ticket. It supplies the start of a wait; the call time is a separate observation.
+_Avoid_: observed wait, queue snapshot
+
+**Feed sighting**:
+An observation of a reported ticket's complete number in its branch's called-ticket feed on the same Hong Kong date. Its observation time is distinct from the actual time the ticket was called.
+_Avoid_: confirmed call time, inferred seating time
+
+**Call confirmation**:
+A diner's report of when their ticket was actually called, which can be entered or corrected after the event. It is stored separately from automatic feed sightings.
+_Avoid_: feed sighting, seating confirmation
+
 **Plan a meal page**:
 A dedicated page of weekday time-slot waiting-duration estimates that helps diners choose when to join a Sushiro queue. It shows all Hong Kong branches by default, with branch selection optional.
 _Avoid_: Stats page, store detail sheet

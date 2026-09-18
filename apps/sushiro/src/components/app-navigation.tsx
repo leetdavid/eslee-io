@@ -4,7 +4,7 @@ import Link from "next/link";
 import { copy, type Language } from "@/lib/queue-presentation";
 
 export type AppNavigationProps = {
-  activePage: "grid" | "map";
+  activePage: "grid" | "map" | "tickets";
   isRefreshing: boolean;
   language: Language;
   onLanguageChange: (language: Language) => void;
@@ -28,6 +28,9 @@ export function AppNavigation({
         </Link>
         <Link aria-current={activePage === "map" ? "page" : undefined} href="/map">
           {text.map}
+        </Link>
+        <Link aria-current={activePage === "tickets" ? "page" : undefined} href="/tickets">
+          {text.tickets}
         </Link>
         <span className="stats-link">
           <button aria-describedby="stats-coming-soon" aria-disabled="true" type="button">

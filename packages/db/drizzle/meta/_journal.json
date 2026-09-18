@@ -43,6 +43,13 @@
       "when": 1788318378843,
       "tag": "0005_wooden_bedlam",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1789717828323,
+      "tag": "0006_sushiro_ticket_reports",
+      "breakpoints": true
     }
   ]
 }

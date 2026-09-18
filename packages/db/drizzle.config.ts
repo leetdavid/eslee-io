@@ -18,5 +18,6 @@ export default {
     "verification",
     "sushiro_queue_snapshot",
     "sushiro_store_hours",
+    "sushiro_ticket_report",
   ],
 } satisfies Config;

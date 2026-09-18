@@ -2,6 +2,7 @@ import { sushiroQueueSnapshot, sushiroStoreHours } from "@eslee/db/schema";
 import { sql } from "drizzle-orm";
 import { getQueues, invalidateGridChartHistory } from "@/lib/queue-cache";
 import { fetchStoreHours } from "@/lib/store-hours";
+import { reconcileTicketReports } from "@/lib/ticket-reports.server";
 
 export const maxDuration = 60;
 
@@ -17,6 +18,7 @@ export async function GET(request: Request) {
   try {
     const collectedAt = new Date();
     const { stores } = await getQueues();
+    const observedAt = new Date();
     const { db } = await import("@eslee/db/client");
 
     await db.insert(sushiroQueueSnapshot).values(
@@ -27,6 +29,12 @@ export async function GET(request: Request) {
       })),
     );
     await invalidateGridChartHistory();
+
+    try {
+      await reconcileTicketReports(stores, observedAt);
+    } catch (error) {
+      console.error("Unable to reconcile submitted tickets", error);
+    }
 
     const storedHours = await db.select().from(sushiroStoreHours);
     const needsStoreHours =
