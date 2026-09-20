@@ -17,6 +17,10 @@ on:
 permissions:
   contents: read
 
+env:
+  RAILWAY_PROJECT_ID: 28fa81db-2e0a-44f6-a2f6-6f2296b2fad1
+  RAILWAY_ENVIRONMENT_ID: 52f8807d-84a4-4fbc-ae43-50ebdeb98649
+
 concurrency:
   group: railway-config-${{ github.event_name == 'pull_request' && github.ref || 'production' }}
   cancel-in-progress: false
@@ -30,9 +34,7 @@ jobs:
       - uses: ./tooling/github/setup
       - run: pnpm --allow-build=@railway/cli add --global @railway/cli@5.47.1
       - name: Plan Railway configuration
-        run: |
-          railway link --project 28fa81db-2e0a-44f6-a2f6-6f2296b2fad1 --environment 52f8807d-84a4-4fbc-ae43-50ebdeb98649
-          railway config plan
+        run: railway config plan
         env:
           RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
@@ -61,7 +63,6 @@ jobs:
       - name: Plan and apply Railway configuration
         if: steps.source.outputs.current == 'true'
         run: |
-          railway link --project 28fa81db-2e0a-44f6-a2f6-6f2296b2fad1 --environment 52f8807d-84a4-4fbc-ae43-50ebdeb98649
           railway config plan
           railway config apply --yes
         env:
