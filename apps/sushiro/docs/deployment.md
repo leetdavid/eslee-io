@@ -44,7 +44,7 @@ Repository secrets in `leetdavid/eslee-io`:
 
 | Secret | Purpose |
 | --- | --- |
-| `RAILWAY_TOKEN` | Existing production-environment project token. Reads service variables and applies infrastructure configuration. |
+| `RAILWAY_TOKEN` | Railway account/workspace API token, injected as `RAILWAY_API_TOKEN`. Reads service variables and applies infrastructure configuration. Commands explicitly target the Sushiro project and production environment. |
 | `SUSHIRO_VERCEL_TOKEN` | Dedicated Vercel access token scoped to the `eslee` team. Deploys Sushiro, manages its database variables, verifies protected candidates, and promotes production. |
 
 GitHub supplies `github.token` for repository-state checks. No production database URL needs to be duplicated in GitHub secrets. Connection strings and generated passwords are masked before use in Actions. Rotate the Vercel token by updating `SUSHIRO_VERCEL_TOKEN` before its chosen expiration date.

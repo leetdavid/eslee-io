@@ -29,5 +29,5 @@ jobs:
         env:
           DEPLOY_PR_NUMBER: ${{ github.event.pull_request.number }}
           GH_TOKEN: ${{ github.token }}
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           VERCEL_TOKEN: ${{ secrets.SUSHIRO_VERCEL_TOKEN }}

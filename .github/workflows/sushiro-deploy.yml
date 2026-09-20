@@ -48,7 +48,7 @@ jobs:
           DEPLOY_BRANCH: ${{ inputs.branch }}
           DEPLOY_HEAD_SHA: ${{ inputs.head-sha }}
           DEPLOY_PR_NUMBER: ${{ inputs.pr-number }}
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           GH_TOKEN: ${{ github.token }}
           VERCEL_ORG_ID: team_tPjktSIurawh0LBAXsKia7HA
