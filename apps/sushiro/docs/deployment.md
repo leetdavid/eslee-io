@@ -10,7 +10,7 @@ Every push to `main`, including a direct push, runs this sequence in `.github/wo
 2. Apply Railway configuration and reconcile database TCP proxies, TLS connection variables, and production backup schedules.
 3. Read the current production database URL from Railway and run `pnpm --filter @eslee/sushiro db:migrate`.
 4. Synchronize `SUSHIRO_DATABASE_URL` with the Vercel production environment and build a production deployment with `--skip-domain`.
-5. Request the candidate's `/api/health` endpoint through Vercel's authenticated protection bypass. This checks all three Sushiro tables and their columns.
+5. Request the candidate's `/api/health` endpoint with a temporary Vercel automation bypass, then revoke that bypass. This checks all three Sushiro tables and their columns.
 6. Verify that the commit is still the current `main` head, then promote the candidate to `sushiro.eslee.io`.
 
 A failed check, migration, build, or health check stops the sequence. The existing production deployment retains its domains until promotion. The deployment job serializes production releases and checks for superseded source both before migration and before promotion. Infrastructure applies also reject superseded source.
@@ -35,6 +35,7 @@ CI starts disposable Postgres 18, applies the Sushiro migrations twice, then run
 - Concurrent migrations against an empty database.
 - Cross-PR connection denial and inability to create another database.
 - Preview rebuilds preserving rows and repeated cleanup leaving other PR databases intact.
+- Unhealthy candidates blocking release and temporary health-check bypasses being revoked on success or failure.
 
 Tests fail immediately in CI if `SUSHIRO_TEST_DATABASE_URL` is absent. The database integration tests may be skipped in local unit-only runs.
 

@@ -1,7 +1,7 @@
 import { appendFile } from "node:fs/promises";
 import { command, databaseUrl, vercelProjectId } from "./deployment-tools";
 import { createPreviewDatabase } from "./preview-database";
-import { setDatabaseEnvironment } from "./vercel-api";
+import { checkDeploymentHealth, setDatabaseEnvironment } from "./vercel-api";
 
 const target = process.env.DEPLOY_TARGET;
 const sha = process.env.DEPLOY_HEAD_SHA;
@@ -65,23 +65,7 @@ try {
     ...authentication,
   ]);
   const deploymentUrl = new URL(deployment).toString();
-  const health = JSON.parse(
-    await command("vercel", [
-      ...authentication,
-      "curl",
-      "/api/health",
-      "--deployment",
-      deploymentUrl,
-      "--",
-      "--fail",
-      "--silent",
-      "--show-error",
-      "--max-time",
-      "30",
-    ]),
-  );
-  if (health.ok !== true)
-    throw new Error("The candidate deployment failed its database health check");
+  await checkDeploymentHealth(deploymentUrl);
 
   if (!(await isCurrent())) {
     console.log("Candidate passed its health check, but the source changed; skipping promotion");
