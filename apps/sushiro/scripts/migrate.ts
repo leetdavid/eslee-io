@@ -8,10 +8,13 @@ if (!url) throw new Error("Missing SUSHIRO_DATABASE_URL");
 
 const connection = postgres(url, { max: 1, connect_timeout: 10 });
 try {
+  await connection`set lock_timeout = '60s'`;
+  await connection`select pg_advisory_lock(hashtext('sushiro:migrations'))`;
   await migrate(drizzle(connection), {
     migrationsFolder: fileURLToPath(new URL("../drizzle", import.meta.url)),
   });
   console.log("Sushiro database migrations applied");
 } finally {
+  // The dedicated connection releases the migration lock on close or failure.
   await connection.end();
 }

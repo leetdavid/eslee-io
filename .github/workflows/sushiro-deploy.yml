@@ -1,0 +1,55 @@
+name: Sushiro Deployment
+
+on:
+  workflow_call:
+    inputs:
+      target:
+        type: string
+        required: true
+      branch:
+        type: string
+        required: true
+      head-sha:
+        type: string
+        required: true
+      pr-number:
+        type: number
+        default: 0
+    secrets:
+      RAILWAY_TOKEN:
+        required: true
+      VERCEL_TOKEN:
+        required: true
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    concurrency:
+      group: sushiro-deploy-${{ inputs.target }}-${{ inputs.pr-number }}
+      cancel-in-progress: false
+    environment:
+      name: sushiro-${{ inputs.target }}${{ inputs.pr-number != 0 && format('-{0}', inputs.pr-number) || '' }}
+      url: ${{ steps.deploy.outputs.url }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./tooling/github/setup
+      - name: Install deployment CLIs
+        run: pnpm --allow-build=@railway/cli --allow-build=esbuild add --global vercel@58.9.5 @railway/cli@5.47.1
+      - name: Migrate, build, verify, and promote
+        id: deploy
+        run: pnpm --filter @eslee/sushiro deploy:ci
+        env:
+          DEPLOY_TARGET: ${{ inputs.target }}
+          DEPLOY_BRANCH: ${{ inputs.branch }}
+          DEPLOY_HEAD_SHA: ${{ inputs.head-sha }}
+          DEPLOY_PR_NUMBER: ${{ inputs.pr-number }}
+          RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+          VERCEL_ORG_ID: team_tPjktSIurawh0LBAXsKia7HA
+          VERCEL_PROJECT_ID: prj_gfTnc5u6lO9BLdsovERkpQ51vc8p

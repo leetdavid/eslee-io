@@ -19,6 +19,8 @@ pnpm --filter @eslee/sushiro db:migrate
 
 The migration command uses the same Postgres.js driver as the app, including its TLS connection behavior. The root `db:migrate` command manages the other apps' shared database and does not migrate Sushiro's Railway database.
 
+GitHub Actions automatically runs Sushiro migrations before production and preview deployments. It serializes migration runners with a database advisory lock and verifies the candidate's schema before production promotion. See [deployment.md](deployment.md) for the full pipeline and preview isolation.
+
 ## September 20, 2026 incident
 
 The collector repeatedly crashed after three HTTP 502 responses. The snapshot endpoint swallowed the database exception, making it look like an upstream Sushiro failure. Vercel chart logs and a direct database connection exposed PostgreSQL code `53000` with the message `Your account or project has exceeded the quota. Upgrade your plan to increase limits.`

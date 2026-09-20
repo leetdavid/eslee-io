@@ -3,9 +3,14 @@ name: CI
 on:
   pull_request:
     branches: ["*"]
+    types: [opened, synchronize, reopened, ready_for_review]
   push:
     branches: ["main"]
   merge_group:
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -32,7 +37,7 @@ jobs:
         run: cp .env.example .env
 
       - name: Lint
-        run: pnpm lint && pnpm lint:fix
+        run: pnpm lint
 
   format:
     runs-on: ubuntu-latest
@@ -55,3 +60,70 @@ jobs:
 
       - name: Typecheck
         run: pnpm typecheck
+
+  sushiro-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: sushiro_ci
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres -d sushiro_ci"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      SUSHIRO_DATABASE_URL: postgres://postgres:postgres@localhost:5432/sushiro_ci
+      SUSHIRO_TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/sushiro_ci
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./tooling/github/setup
+      - name: Apply migrations and verify reruns
+        run: |
+          pnpm --filter @eslee/sushiro db:migrate
+          pnpm --filter @eslee/sushiro db:migrate
+      - name: Test Sushiro and database lifecycle
+        run: pnpm --filter @eslee/sushiro test
+
+  railway-infrastructure:
+    needs: [lint, format, typecheck, sushiro-tests]
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    permissions:
+      contents: read
+    uses: ./.github/workflows/railway-config.yml
+    secrets:
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+  sushiro-production:
+    needs: [lint, format, typecheck, sushiro-tests, railway-infrastructure]
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    permissions:
+      contents: read
+      pull-requests: read
+    uses: ./.github/workflows/sushiro-deploy.yml
+    with:
+      target: production
+      branch: main
+      head-sha: ${{ github.sha }}
+    secrets:
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      VERCEL_TOKEN: ${{ secrets.SUSHIRO_VERCEL_TOKEN }}
+
+  sushiro-preview:
+    needs: [lint, format, typecheck, sushiro-tests]
+    if: github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'main' && github.event.pull_request.head.repo.full_name == github.repository && !github.event.pull_request.draft
+    permissions:
+      contents: read
+      pull-requests: read
+    uses: ./.github/workflows/sushiro-deploy.yml
+    with:
+      target: preview
+      branch: ${{ github.head_ref }}
+      head-sha: ${{ github.event.pull_request.head.sha }}
+      pr-number: ${{ github.event.pull_request.number }}
+    secrets:
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      VERCEL_TOKEN: ${{ secrets.SUSHIRO_VERCEL_TOKEN }}

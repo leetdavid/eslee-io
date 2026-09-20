@@ -2,32 +2,73 @@ name: Railway Configuration
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, closed]
-    paths: [".railway/**"]
+    types: [opened, synchronize, reopened]
+    paths:
+      - ".railway/**"
+      - ".github/workflows/railway-config.yml"
+      - "apps/sushiro/scripts/configure-infrastructure.ts"
+      - "apps/sushiro/scripts/deployment-tools.ts"
+  workflow_call:
+    secrets:
+      RAILWAY_TOKEN:
+        required: true
+  workflow_dispatch:
 
 permissions:
   contents: read
-  pull-requests: write
+
+env:
+  RAILWAY_PROJECT_ID: 28fa81db-2e0a-44f6-a2f6-6f2296b2fad1
+  RAILWAY_ENVIRONMENT_ID: 52f8807d-84a4-4fbc-ae43-50ebdeb98649
+
+concurrency:
+  group: railway-config-${{ github.event_name == 'pull_request' && github.ref || 'production' }}
+  cancel-in-progress: false
 
 jobs:
   plan:
-    if: github.event.action != 'closed' && github.event.pull_request.head.repo.full_name == github.repository
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: railwayapp/config@v1
-        with:
-          command: plan
-          railway-token: ${{ secrets.RAILWAY_TOKEN }}
+      - uses: ./tooling/github/setup
+      - run: pnpm --allow-build=@railway/cli add --global @railway/cli@5.47.1
+      - name: Plan Railway configuration
+        run: railway config plan
+        env:
+          RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
   apply:
-    if: github.event.action == 'closed' && github.event.pull_request.merged && github.event.pull_request.head.repo.full_name == github.repository
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v6
-        with:
-          ref: ${{ github.event.pull_request.merge_commit_sha }}
-      - uses: railwayapp/config@v1
-        with:
-          command: apply
-          railway-token: ${{ secrets.RAILWAY_TOKEN }}
+      - name: Check that this is still the current main commit
+        id: source
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          latest=$(gh api "repos/$GITHUB_REPOSITORY/commits/main" --jq .sha)
+          if [ "$latest" = "$GITHUB_SHA" ]; then
+            echo "current=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Skipping infrastructure changes from a superseded commit"
+            echo "current=false" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: ./tooling/github/setup
+        if: steps.source.outputs.current == 'true'
+      - run: pnpm --allow-build=@railway/cli add --global @railway/cli@5.47.1
+        if: steps.source.outputs.current == 'true'
+      - name: Plan and apply Railway configuration
+        if: steps.source.outputs.current == 'true'
+        run: |
+          railway config plan
+          railway config apply --yes
+        env:
+          RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      - name: Reconcile database networking and backup schedules
+        if: steps.source.outputs.current == 'true'
+        run: pnpm --filter @eslee/sushiro infra:configure
+        env:
+          RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
