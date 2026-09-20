@@ -39,7 +39,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: ./tooling/github/setup
       - name: Install deployment CLIs
-        run: pnpm add --global vercel@58.9.5 @railway/cli@5.47.1
+        run: pnpm --allow-build=@railway/cli --allow-build=esbuild add --global vercel@58.9.5 @railway/cli@5.47.1
       - name: Migrate, build, verify, and promote
         id: deploy
         run: pnpm --filter @eslee/sushiro deploy:ci

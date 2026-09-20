@@ -23,7 +23,7 @@ jobs:
         with:
           ref: main
       - uses: ./tooling/github/setup
-      - run: pnpm add --global @railway/cli@5.47.1
+      - run: pnpm --allow-build=@railway/cli add --global @railway/cli@5.47.1
       - name: Remove the PR database, login, and Vercel variable
         run: pnpm --filter @eslee/sushiro preview:cleanup
         env:

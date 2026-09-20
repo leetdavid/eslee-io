@@ -28,7 +28,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: ./tooling/github/setup
-      - run: pnpm add --global @railway/cli@5.47.1
+      - run: pnpm --allow-build=@railway/cli add --global @railway/cli@5.47.1
       - name: Plan Railway configuration
         run: railway config plan --yes
         env:
@@ -54,7 +54,7 @@ jobs:
           fi
       - uses: ./tooling/github/setup
         if: steps.source.outputs.current == 'true'
-      - run: pnpm add --global @railway/cli@5.47.1
+      - run: pnpm --allow-build=@railway/cli add --global @railway/cli@5.47.1
         if: steps.source.outputs.current == 'true'
       - name: Plan and apply Railway configuration
         if: steps.source.outputs.current == 'true'
