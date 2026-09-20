@@ -1,0 +1,33 @@
+name: Sushiro Preview Cleanup
+
+on:
+  pull_request_target:
+    types: [closed]
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  cleanup:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: sushiro-deploy-preview-${{ github.event.pull_request.number }}
+      cancel-in-progress: false
+    steps:
+      # Always use trusted main code, never code from the closed pull request.
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+      - uses: ./tooling/github/setup
+      - run: pnpm add --global @railway/cli@5.47.1
+      - name: Remove the PR database, login, and Vercel variable
+        run: pnpm --filter @eslee/sushiro preview:cleanup
+        env:
+          DEPLOY_PR_NUMBER: ${{ github.event.pull_request.number }}
+          GH_TOKEN: ${{ github.token }}
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          VERCEL_TOKEN: ${{ secrets.SUSHIRO_VERCEL_TOKEN }}

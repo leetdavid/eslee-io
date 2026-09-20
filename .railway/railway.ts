@@ -17,8 +17,8 @@ export default defineRailway((ctx) => {
     alerts: { usage: { "80": {}, "95": {}, "100": {} } },
   });
   const sushiroDatabase = postgres("sushiro-postgres", { region: "asia-southeast1-eqsg3a" });
-  // The database helper does not round-trip TCP proxies or backup schedules.
-  // Their production settings and verification commands are in README.md.
+  // configure-infrastructure.ts reconciles TCP proxies and backup schedules,
+  // which the database helper does not round-trip through IaC.
   sushiroDatabase.variables = {
     DATABASE_PUBLIC_URL: {
       type: "literal",
@@ -27,6 +27,16 @@ export default defineRailway((ctx) => {
         "postgresql://${{PGUSER}}:${{PGPASSWORD}}@${{RAILWAY_TCP_PROXY_DOMAIN}}:${{RAILWAY_TCP_PROXY_PORT}}/${{PGDATABASE}}?sslmode=require",
     },
   };
+  const previewDatabase = postgres("sushiro-preview-postgres", {
+    region: "asia-southeast1-eqsg3a",
+  });
+  previewDatabase.variables = sushiroDatabase.variables;
+  const previewVolume = volume("sushiro-preview-postgres-volume", {
+    region: "asia-southeast1-eqsg3a",
+    sizeMB: 50000,
+    allowOnlineResize: true,
+    alerts: { usage: { "80": {}, "95": {}, "100": {} } },
+  });
   const redisCache = redis("Redis", { region: "asia-southeast1-eqsg3a" });
   redisCache.deploy = {
     startCommand:
@@ -79,6 +89,8 @@ export default defineRailway((ctx) => {
       cacheGateway,
       sushiroDatabase,
       sushiroVolume,
+      previewDatabase,
+      previewVolume,
     ],
   });
 });
