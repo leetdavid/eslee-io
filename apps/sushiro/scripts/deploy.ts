@@ -67,11 +67,11 @@ try {
   const deploymentUrl = new URL(deployment).toString();
   const health = JSON.parse(
     await command("vercel", [
+      ...authentication,
       "curl",
       "/api/health",
       "--deployment",
       deploymentUrl,
-      ...authentication,
       "--",
       "--fail",
       "--silent",
