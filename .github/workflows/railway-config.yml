@@ -30,7 +30,7 @@ jobs:
       - uses: ./tooling/github/setup
       - run: pnpm --allow-build=@railway/cli add --global @railway/cli@5.47.1
       - name: Plan Railway configuration
-        run: railway config plan --yes
+        run: railway config plan
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
@@ -59,7 +59,7 @@ jobs:
       - name: Plan and apply Railway configuration
         if: steps.source.outputs.current == 'true'
         run: |
-          railway config plan --yes
+          railway config plan
           railway config apply --yes
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
