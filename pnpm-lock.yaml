@@ -499,6 +499,9 @@ importers:
       next:
         specifier: 'catalog:'
         version: 15.5.9(@babel/core@7.29.7)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.1.4(react@19.1.4))(react@19.1.4)(sass@1.77.4)
+      postgres:
+        specifier: 'catalog:'
+        version: 3.4.5
       react:
         specifier: catalog:react19
         version: 19.1.4
@@ -533,6 +536,9 @@ importers:
       dotenv-cli:
         specifier: 'catalog:'
         version: 7.4.2
+      drizzle-kit:
+        specifier: 'catalog:'
+        version: 0.31.8
       tailwindcss:
         specifier: 'catalog:'
         version: 4.2.1
@@ -544,7 +550,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^5.0.0
-        version: 5.0.0(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(vite@8.2.2(@types/node@25.5.0)(jiti@2.6.1)(sass@1.77.4)(terser@5.34.1)(tsx@4.20.6))
+        version: 5.0.0(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(vite@8.2.2(@types/node@25.5.0)(esbuild@0.25.12)(jiti@2.6.1)(sass@1.77.4)(terser@5.34.1)(tsx@4.20.6))
 
   apps/sushiro-cache-gateway:
     dependencies:
@@ -12606,14 +12612,14 @@ snapshots:
       - utf-8-validate
     optional: true
 
-  '@vitest/mocker@5.0.0(vite@8.2.2(@types/node@25.5.0)(jiti@2.6.1)(sass@1.77.4)(terser@5.34.1)(tsx@4.20.6))':
+  '@vitest/mocker@5.0.0(vite@8.2.2(@types/node@25.5.0)(esbuild@0.25.12)(jiti@2.6.1)(sass@1.77.4)(terser@5.34.1)(tsx@4.20.6))':
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       '@vitest/spy': 5.0.0
       estree-walker: 3.0.3
       magic-string: 1.2.3
     optionalDependencies:
-      vite: 8.2.2(@types/node@25.5.0)(jiti@2.6.1)(sass@1.77.4)(terser@5.34.1)(tsx@4.20.6)
+      vite: 8.2.2(@types/node@25.5.0)(esbuild@0.25.12)(jiti@2.6.1)(sass@1.77.4)(terser@5.34.1)(tsx@4.20.6)
 
   '@vitest/spy@5.0.0': {}
 
@@ -17661,7 +17667,7 @@ snapshots:
       d3-time: 3.1.0
       d3-timer: 3.0.1
 
-  vite@8.2.2(@types/node@25.5.0)(jiti@2.6.1)(sass@1.77.4)(terser@5.34.1)(tsx@4.20.6):
+  vite@8.2.2(@types/node@25.5.0)(esbuild@0.25.12)(jiti@2.6.1)(sass@1.77.4)(terser@5.34.1)(tsx@4.20.6):
     dependencies:
       lightningcss: 1.33.0
       picomatch: 4.0.7
@@ -17670,16 +17676,17 @@ snapshots:
       tinyglobby: 0.2.17
     optionalDependencies:
       '@types/node': 25.5.0
+      esbuild: 0.25.12
       fsevents: 2.3.3
       jiti: 2.6.1
       sass: 1.77.4
       terser: 5.34.1
       tsx: 4.20.6
 
-  vitest@5.0.0(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(vite@8.2.2(@types/node@25.5.0)(jiti@2.6.1)(sass@1.77.4)(terser@5.34.1)(tsx@4.20.6)):
+  vitest@5.0.0(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(vite@8.2.2(@types/node@25.5.0)(esbuild@0.25.12)(jiti@2.6.1)(sass@1.77.4)(terser@5.34.1)(tsx@4.20.6)):
     dependencies:
       '@types/chai': 5.2.3
-      '@vitest/mocker': 5.0.0(vite@8.2.2(@types/node@25.5.0)(jiti@2.6.1)(sass@1.77.4)(terser@5.34.1)(tsx@4.20.6))
+      '@vitest/mocker': 5.0.0(vite@8.2.2(@types/node@25.5.0)(esbuild@0.25.12)(jiti@2.6.1)(sass@1.77.4)(terser@5.34.1)(tsx@4.20.6))
       chai: 6.2.2
       es-module-lexer: 2.3.2
       expect-type: 1.4.0
@@ -17690,7 +17697,7 @@ snapshots:
       tinybench: 6.1.4
       tinyexec: 1.3.0
       tinyglobby: 0.2.17
-      vite: 8.2.2(@types/node@25.5.0)(jiti@2.6.1)(sass@1.77.4)(terser@5.34.1)(tsx@4.20.6)
+      vite: 8.2.2(@types/node@25.5.0)(esbuild@0.25.12)(jiti@2.6.1)(sass@1.77.4)(terser@5.34.1)(tsx@4.20.6)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@opentelemetry/api': 1.9.0

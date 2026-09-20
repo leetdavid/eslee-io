@@ -21,7 +21,7 @@ export async function PATCH(request: NextRequest, context: { params: Promise<{ i
     return NextResponse.json({ error: "save" }, { status: 400 });
   const data = body as Record<string, unknown>;
   try {
-    const { db } = await import("@eslee/db/client");
+    const { db } = await import("@/lib/db");
     const ownership = and(eq(reports.id, id), eq(reports.ownerHash, owner.hash));
     const [existing] = await db
       .select({ takenAt: reports.takenAt })

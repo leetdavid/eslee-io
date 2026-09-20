@@ -4,7 +4,7 @@ The first model estimates the duration from taking a ticket now until it is call
 
 ## Run it
 
-From the repository root, with `DATABASE_URL` in the root `.env`:
+From the repository root, with `SUSHIRO_DATABASE_URL` in the root `.env`:
 
 ```bash
 pnpm -F @eslee/sushiro estimates:backtest --from 2026-09-01 --to 2026-09-18

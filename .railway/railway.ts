@@ -1,6 +1,32 @@
-import { defineRailway, image, preserve, project, redis, service, volume } from "railway/iac";
+import {
+  defineRailway,
+  image,
+  postgres,
+  preserve,
+  project,
+  redis,
+  service,
+  volume,
+} from "railway/iac";
 
 export default defineRailway((ctx) => {
+  const sushiroVolume = volume("sushiro-postgres-volume", {
+    region: "asia-southeast1-eqsg3a",
+    sizeMB: 50000,
+    allowOnlineResize: true,
+    alerts: { usage: { "80": {}, "95": {}, "100": {} } },
+  });
+  const sushiroDatabase = postgres("sushiro-postgres", { region: "asia-southeast1-eqsg3a" });
+  // The database helper does not round-trip TCP proxies or backup schedules.
+  // Their production settings and verification commands are in README.md.
+  sushiroDatabase.variables = {
+    DATABASE_PUBLIC_URL: {
+      type: "literal",
+      value:
+        // biome-ignore lint/suspicious/noTemplateCurlyInString: Railway resolves these references.
+        "postgresql://${{PGUSER}}:${{PGPASSWORD}}@${{RAILWAY_TCP_PROXY_DOMAIN}}:${{RAILWAY_TCP_PROXY_PORT}}/${{PGDATABASE}}?sslmode=require",
+    },
+  };
   const redisCache = redis("Redis", { region: "asia-southeast1-eqsg3a" });
   redisCache.deploy = {
     startCommand:
@@ -13,9 +39,9 @@ export default defineRailway((ctx) => {
     sizeMB: 50000,
   });
   const sushiroQueueCollector = service("sushiro-queue-collector", {
-    source: image("alpine:3.21"),
+    source: image("curlimages/curl:8.17.0"),
     start:
-      'sh -c \'n=0; until wget -qO- --header="Authorization: Bearer $CRON_SECRET" "$SUSHIRO_CRON_URL"; do n=$((n+1)); [ "$n" -ge 3 ] && exit 1; echo "retry $n after 502/error"; sleep 5; done\'',
+      'sh -c \'exec curl --fail-with-body --silent --show-error --connect-timeout 10 --max-time 65 --retry 2 --retry-delay 5 --retry-max-time 210 --header "Authorization: Bearer $CRON_SECRET" "$SUSHIRO_CRON_URL"\'',
     replicas: { "asia-southeast1-eqsg3a": 1 },
     deploy: {
       cronSchedule: "*/5 * * * *",
@@ -46,6 +72,13 @@ export default defineRailway((ctx) => {
   });
 
   return project("sushiro-queue-collector", {
-    resources: [sushiroQueueCollector, redisCache, redisVolume, cacheGateway],
+    resources: [
+      sushiroQueueCollector,
+      redisCache,
+      redisVolume,
+      cacheGateway,
+      sushiroDatabase,
+      sushiroVolume,
+    ],
   });
 });

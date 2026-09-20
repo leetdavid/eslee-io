@@ -15,11 +15,14 @@ export async function GET(request: Request) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  let stage = "fetch_queues";
+
   try {
     const collectedAt = new Date();
     const { stores } = await getQueues();
     const observedAt = new Date();
-    const { db } = await import("@eslee/db/client");
+    stage = "write_snapshots";
+    const { db } = await import("@/lib/db");
 
     await db.insert(sushiroQueueSnapshot).values(
       stores.map(({ id: storeId, ...store }) => ({
@@ -36,16 +39,17 @@ export async function GET(request: Request) {
       console.error("Unable to reconcile submitted tickets", error);
     }
 
-    const storedHours = await db.select().from(sushiroStoreHours);
-    const needsStoreHours =
-      storedHours.length !== stores.length ||
-      storedHours.some(
-        ({ updatedAt }) => Date.now() - updatedAt.valueOf() >= storeHoursRefreshInterval,
-      );
     let storeHoursUpdated = false;
 
-    if (needsStoreHours) {
-      try {
+    try {
+      const storedHours = await db.select().from(sushiroStoreHours);
+      const needsStoreHours =
+        storedHours.length !== stores.length ||
+        storedHours.some(
+          ({ updatedAt }) => Date.now() - updatedAt.valueOf() >= storeHoursRefreshInterval,
+        );
+
+      if (needsStoreHours) {
         const storeHours = await fetchStoreHours(stores);
         const existingHours = new Map(storedHours.map((store) => [store.storeId, store]));
         const nextStoreHours = storeHours.map((store) => {
@@ -77,9 +81,9 @@ export async function GET(request: Request) {
             target: sushiroStoreHours.storeId,
           });
         storeHoursUpdated = true;
-      } catch (error) {
-        console.error("Unable to collect Sushiro store hours", error);
       }
+    } catch (error) {
+      console.error("Unable to collect Sushiro store hours", error);
     }
 
     return Response.json({
@@ -87,7 +91,11 @@ export async function GET(request: Request) {
       storesCollected: stores.length,
       storeHoursUpdated,
     });
-  } catch {
-    return Response.json({ error: "Unable to collect Sushiro queue data" }, { status: 502 });
+  } catch (error) {
+    console.error("Unable to collect Sushiro queue data", { stage }, error);
+    return Response.json(
+      { error: "Unable to collect Sushiro queue data", stage },
+      { status: stage === "fetch_queues" ? 502 : 503 },
+    );
   }
 }

@@ -77,7 +77,7 @@ Pilot timestamps must have a timezone; pilot observations before the test period
     ? parsePilotObservations(JSON.parse(await readFile(values.pilot, "utf8")) as unknown)
     : [];
 
-  const { db } = await import("@eslee/db/client");
+  const { db } = await import("@/lib/db");
   let observations: QueueObservation[];
   try {
     const rows = await db.transaction(

@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
     const store = stores.find(({ id }) => id === parsed.data.storeId);
     if (!store) return NextResponse.json({ errors: { storeId: "store" } }, { status: 400 });
     const owner = ticketOwner(request);
-    const { db } = await import("@eslee/db/client");
+    const { db } = await import("@/lib/db");
     const inserted = await db
       .insert(reports)
       .values({

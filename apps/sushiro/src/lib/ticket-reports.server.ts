@@ -56,7 +56,7 @@ export const ticketReportFields = {
 };
 
 export async function ownTicketReports(ownerHash: string) {
-  const { db } = await import("@eslee/db/client");
+  const { db } = await import("@/lib/db");
   return db
     .select(ticketReportFields)
     .from(reports)
@@ -71,7 +71,7 @@ export async function reconcileTicketReports(
   observedAt: Date,
   ownerHash?: string,
 ) {
-  const { db } = await import("@eslee/db/client");
+  const { db } = await import("@/lib/db");
   const pending = await db
     .select({
       id: reports.id,

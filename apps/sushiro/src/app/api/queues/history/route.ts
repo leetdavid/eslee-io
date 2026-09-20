@@ -44,7 +44,7 @@ export async function GET(request: Request) {
     return Response.json({ error: "The from date must be before the to date" }, { status: 400 });
   }
 
-  const { db } = await import("@eslee/db/client");
+  const { db } = await import("@/lib/db");
   const snapshots = await db
     .select()
     .from(sushiroQueueSnapshot)

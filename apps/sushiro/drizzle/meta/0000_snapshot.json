@@ -1,0 +1,367 @@
+{
+  "id": "0e08656b-dc47-48f4-8eae-e285fe237fe7",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.sushiro_queue_snapshot": {
+      "name": "sushiro_queue_snapshot",
+      "schema": "",
+      "columns": {
+        "store_id": {
+          "name": "store_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "collected_at": {
+          "name": "collected_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "address": {
+          "name": "address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "area": {
+          "name": "area",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "latitude": {
+          "name": "latitude",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "longitude": {
+          "name": "longitude",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name_en": {
+          "name": "name_en",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "net_ticket_status": {
+          "name": "net_ticket_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "store_queue": {
+          "name": "store_queue",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "store_status": {
+          "name": "store_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "wait": {
+          "name": "wait",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "waiting_group_counter": {
+          "name": "waiting_group_counter",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "waiting_group_pair": {
+          "name": "waiting_group_pair",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "waiting_group_table": {
+          "name": "waiting_group_table",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "sushiro_queue_snapshot_collected_at_idx": {
+          "name": "sushiro_queue_snapshot_collected_at_idx",
+          "columns": [
+            {
+              "expression": "collected_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "sushiro_queue_snapshot_store_id_collected_at_pk": {
+          "name": "sushiro_queue_snapshot_store_id_collected_at_pk",
+          "columns": [
+            "store_id",
+            "collected_at"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.sushiro_store_hours": {
+      "name": "sushiro_store_hours",
+      "schema": "",
+      "columns": {
+        "store_id": {
+          "name": "store_id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "address": {
+          "name": "address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name_en": {
+          "name": "name_en",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "opening_hours": {
+          "name": "opening_hours",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "phone": {
+          "name": "phone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "source": {
+          "name": "source",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.sushiro_ticket_report": {
+      "name": "sushiro_ticket_report",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "owner_hash": {
+          "name": "owner_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "store_id": {
+          "name": "store_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "store_name": {
+          "name": "store_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "store_name_en": {
+          "name": "store_name_en",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ticket_number": {
+          "name": "ticket_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ticket_key": {
+          "name": "ticket_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "queue_date": {
+          "name": "queue_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "taken_at": {
+          "name": "taken_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "submitted_at": {
+          "name": "submitted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "called_at": {
+          "name": "called_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "call_reported_at": {
+          "name": "call_reported_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "first_seen_called_at": {
+          "name": "first_seen_called_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "last_checked_at": {
+          "name": "last_checked_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "left_at": {
+          "name": "left_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "sushiro_ticket_report_owner_ticket_idx": {
+          "name": "sushiro_ticket_report_owner_ticket_idx",
+          "columns": [
+            {
+              "expression": "owner_hash",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "store_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "queue_date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "ticket_key",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "sushiro_ticket_report_tracking_idx": {
+          "name": "sushiro_ticket_report_tracking_idx",
+          "columns": [
+            {
+              "expression": "queue_date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "first_seen_called_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

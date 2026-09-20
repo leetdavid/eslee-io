@@ -37,7 +37,7 @@ async function loadChartHistory(hours: ChartHistoryRange): Promise<QueueHistory>
   const bucketInterval = sql.raw(`${bucketMinutes[hours]} * interval '1 minute'`);
   const bucketedAt = sql<string>`date_bin(${bucketInterval}, ${sushiroQueueSnapshot.collectedAt}, timestamptz '2000-01-01')`;
   const activeWait = sql<number>`round(avg(case when ${sushiroQueueSnapshot.storeStatus} = 'OPEN' and (${sushiroQueueSnapshot.netTicketStatus} like '%MANUAL%' or ${sushiroQueueSnapshot.netTicketStatus} like '%ONLINE%') then ${sushiroQueueSnapshot.wait} else 0 end))::integer`;
-  const { db } = await import("@eslee/db/client");
+  const { db } = await import("@/lib/db");
   const snapshots = await db
     .select({
       collectedAt: bucketedAt,
