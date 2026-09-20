@@ -93,7 +93,6 @@ jobs:
     if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     permissions:
       contents: read
-      pull-requests: write
     uses: ./.github/workflows/railway-config.yml
     secrets:
       RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
