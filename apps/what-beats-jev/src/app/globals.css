@@ -1,0 +1,522 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-border: var(--border);
+  --color-hover: var(--hover);
+  --color-active: var(--active);
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --shadow-surface-1: var(--shadow-1);
+  --shadow-surface-2: var(--shadow-2);
+  --shadow-surface-3: var(--shadow-3);
+  --font-sans: var(--font-body);
+  @keyframes spinner-move {
+    to {
+      stroke-dashoffset: -100;
+    }
+  }
+  @keyframes spinner-dash {
+    0%,
+    100% {
+      stroke-dasharray: 15 85;
+    }
+    50% {
+      stroke-dasharray: 40 60;
+    }
+  }
+}
+
+:root {
+  color-scheme: light;
+  --background: oklch(0.968 0.011 274.896);
+  --foreground: oklch(0.314 0.071 271.975);
+  --primary: oklch(0.524 0.198 266.594);
+  --primary-foreground: var(--background);
+  --surface-1: var(--background);
+  --surface-2: color-mix(in oklab, oklch(0.943 0.027 269.67) 44%, var(--background));
+  --surface-3: oklch(0.943 0.027 269.67);
+  --challenge: oklch(0.921 0.122 94.388);
+  --discovery: oklch(0.882 0.061 358.94);
+  --muted-foreground: color-mix(in oklab, var(--foreground) 76%, var(--background));
+  --accent: var(--surface-3);
+  --border: color-mix(in oklab, var(--foreground) 20%, var(--background));
+  --shadow-color: color-mix(in oklab, var(--foreground) 18%, transparent);
+  --shadow-1: 0 0 0 1px var(--shadow-color);
+  --shadow-2: 0 0 0 1px var(--shadow-color), 0 1px 1px -0.5px var(--shadow-color);
+  --shadow-3:
+    0 0 0 1px var(--shadow-color), 0 1px 1px -0.5px var(--shadow-color),
+    0 3px 3px -1.5px var(--shadow-color);
+  --hover: color-mix(in oklab, var(--foreground) 5%, transparent);
+  --active: color-mix(in oklab, var(--foreground) 9%, transparent);
+  --tint: color-mix(in oklab, var(--foreground) 8%, transparent);
+  --tint-hover: color-mix(in oklab, var(--foreground) 12%, transparent);
+  --focus-ring: var(--primary);
+  --fs-subtitle: 17px;
+  --lh-subtitle: 25px;
+  --fs-body: 15px;
+  --lh-body: 22px;
+  --fs-caption: 13px;
+  --lh-caption: 18px;
+  --fs-micro: 12px;
+  --lh-micro: 16px;
+}
+
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body), sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+button,
+textarea {
+  font: inherit;
+}
+a {
+  color: inherit;
+}
+button:not(:disabled) {
+  cursor: pointer;
+}
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 4px;
+}
+[data-composer]:has(textarea:focus-visible) {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 4px;
+}
+button::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+}
+::selection {
+  background: var(--discovery);
+  color: var(--foreground);
+}
+.game-shell {
+  max-width: 70rem;
+  margin-inline: auto;
+  padding-inline: 2rem;
+}
+.skip-link {
+  position: absolute;
+  top: -5rem;
+  padding: 0.5rem 1rem;
+  background: var(--background);
+  z-index: 10;
+}
+.skip-link:focus {
+  top: 0.5rem;
+}
+.game-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding-block: 2rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.game-brand {
+  font-family: var(--font-display), sans-serif;
+  font-size: 1.5625rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+}
+.game-brand span {
+  color: var(--primary);
+}
+.game-score {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+}
+.game-score strong {
+  font-family: var(--font-display), sans-serif;
+  font-size: 1.75rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.game-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 16.25rem;
+  gap: 4.5rem;
+  align-items: start;
+  padding-block: 3rem 2.25rem;
+}
+.play-area {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-width: 0;
+  min-height: 35.3125rem;
+}
+.game-intro {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.game-intro p {
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+  margin: 0;
+}
+.game-intro h1 {
+  font-family: var(--font-display), sans-serif;
+  font-size: 2.25rem;
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  margin: 0;
+}
+.challenge-piece {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1.75rem;
+  min-height: 10.625rem;
+  padding: 1.75rem 2rem;
+  background: var(--challenge);
+  border-radius: 1.75rem 2rem 1.625rem 1.875rem;
+  border: 1px solid color-mix(in oklab, var(--foreground) 28%, var(--challenge));
+  box-shadow: 0 4px 0 color-mix(in oklab, var(--foreground) 14%, var(--challenge));
+}
+.rock-art {
+  width: 7.25rem;
+  height: 7rem;
+  flex-shrink: 0;
+}
+.challenge-name {
+  font-family: var(--font-display), sans-serif;
+  font-size: 4rem;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.challenge-phrase .challenge-name {
+  font-size: 2.25rem;
+  line-height: 1.3;
+}
+.challenge-long .challenge-name {
+  font-family: var(--font-body), sans-serif;
+  font-size: 1.25rem;
+  line-height: 1.5;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+.challenge-spark {
+  position: absolute;
+  right: 1.375rem;
+  top: 0.9375rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  opacity: 0.7;
+}
+.verdict-region:empty {
+  display: none;
+}
+.verdict-region > p {
+  margin: 0;
+  font-size: 0.875rem;
+}
+.verdict-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+}
+.verdict-note {
+  color: var(--muted-foreground);
+}
+.confidence {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.125rem;
+  font-size: 0.875rem;
+}
+.confidence strong,
+.character-count {
+  font-variant-numeric: tabular-nums;
+}
+.confidence-help {
+  flex-shrink: 0;
+}
+.answer-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+.answer-field label {
+  font-weight: 600;
+}
+.character-count {
+  font-size: 0.8125rem;
+  color: var(--muted-foreground);
+}
+.character-count[data-over-limit="true"] {
+  color: var(--foreground);
+  font-weight: 600;
+}
+.game-rules {
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+  margin: 0;
+}
+.answer-error {
+  margin: 0;
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+}
+.answer-error:empty {
+  display: none;
+}
+.storage-warning {
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+  margin: 0;
+}
+.run-ended {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+.run-ended h2 {
+  font-family: var(--font-display), sans-serif;
+  font-size: 1.5rem;
+  line-height: 1.25;
+  margin: 0;
+}
+.run-ended p {
+  max-width: 48ch;
+  overflow-wrap: anywhere;
+  margin: 0;
+}
+.run-ended > button {
+  margin-top: 0.5rem;
+}
+.game-chain {
+  min-width: 0;
+  padding-top: 0.5rem;
+}
+.game-chain h2 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 1.25rem;
+}
+.game-chain h2 span {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--muted-foreground);
+}
+.chain-steps {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  margin: 0;
+}
+.chain-steps li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.75rem minmax(0, 1fr);
+  gap: 0.875rem;
+  align-items: start;
+  padding-bottom: 1.375rem;
+}
+.chain-steps li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  width: 1px;
+  left: 0.8125rem;
+  top: 2rem;
+  bottom: 0.375rem;
+  background: var(--border);
+}
+.step-number {
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+.current-step .step-number {
+  background: var(--challenge);
+  border-color: transparent;
+}
+.step-phrase {
+  display: block;
+  overflow-wrap: anywhere;
+  padding-top: 0.125rem;
+}
+.chain-steps small {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+.chain-empty {
+  max-width: 21ch;
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+.game-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-top: 0.75rem;
+  padding-block: 1.25rem 1.5rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+.game-footer a {
+  text-underline-offset: 3px;
+}
+.error-page {
+  padding-block: 5rem;
+}
+.error-page h1 {
+  font-family: var(--font-display), sans-serif;
+}
+
+@media (max-width: 53rem) {
+  .game-shell {
+    max-width: 37.5rem;
+    padding-inline: 1.5rem;
+  }
+  .game-header {
+    padding-block: 1.375rem 1.125rem;
+  }
+  .game-brand {
+    font-size: 1.4375rem;
+  }
+  .game-score {
+    gap: 0.5rem;
+    font-size: 0.75rem;
+  }
+  .game-score strong {
+    font-size: 1.5625rem;
+  }
+  .game-layout {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding-block: 1.75rem 1.5rem;
+  }
+  .play-area {
+    min-height: 0;
+    gap: 1.25rem;
+  }
+  .game-intro h1 {
+    font-size: 2rem;
+  }
+  .challenge-piece {
+    min-height: 9.625rem;
+    padding: 1.375rem 1.5rem;
+    gap: 1.375rem;
+    border-radius: 1.375rem;
+  }
+  .rock-art {
+    width: 6rem;
+    height: 6rem;
+  }
+  .challenge-name {
+    font-size: 3.25rem;
+  }
+  .challenge-phrase .challenge-name {
+    font-size: 1.875rem;
+  }
+  .challenge-long {
+    padding: 1.25rem;
+  }
+  .challenge-long .challenge-name {
+    font-size: 1.0625rem;
+  }
+  .game-chain {
+    padding-top: 0.25rem;
+  }
+  .game-chain h2 {
+    margin-bottom: 1rem;
+  }
+  .chain-steps li {
+    padding-bottom: 1rem;
+  }
+  .chain-empty {
+    max-width: none;
+    margin-top: 0;
+  }
+  .game-footer {
+    flex-direction: column;
+    gap: 0.375rem;
+    margin-top: 0;
+    padding-block: 1.125rem;
+  }
+}
+@media (max-width: 22.5rem) {
+  .game-shell {
+    padding-inline: 1.25rem;
+  }
+  .game-brand {
+    font-size: 1.3125rem;
+  }
+  .game-score {
+    gap: 0.375rem;
+  }
+  .game-score > span {
+    max-width: 2.5rem;
+    line-height: 1.2;
+  }
+  .challenge-piece {
+    gap: 1rem;
+    padding: 1.25rem;
+  }
+  .rock-art {
+    width: 5.125rem;
+    height: 5.125rem;
+  }
+  .challenge-name {
+    font-size: 2.75rem;
+  }
+  .challenge-phrase .challenge-name {
+    font-size: 1.75rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    /* biome-ignore lint/complexity/noImportantStyles: the user's reduced-motion preference overrides library effects. */
+    scroll-behavior: auto !important;
+    /* biome-ignore lint/complexity/noImportantStyles: the user's reduced-motion preference overrides library effects. */
+    transition: none !important;
+    /* biome-ignore lint/complexity/noImportantStyles: the user's reduced-motion preference overrides inline library animations. */
+    animation: none !important;
+  }
+}

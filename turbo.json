@@ -26,6 +26,11 @@
       "dependsOn": ["^topo", "^build"],
       "outputs": [".cache/tsbuildinfo.json"]
     },
+    "test": {
+      "dependsOn": ["^build"],
+      "outputs": [],
+      "env": ["SUSHIRO_TEST_DATABASE_URL", "WHAT_BEATS_JEV_TEST_DATABASE_URL"]
+    },
     "clean": {
       "cache": false
     },

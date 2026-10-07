@@ -88,6 +88,34 @@ jobs:
       - name: Test Sushiro and database lifecycle
         run: pnpm --filter @eslee/sushiro test
 
+  what-beats-jev-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: ghcr.io/railwayapp-templates/postgres-ssl:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: what_beats_jev_ci
+          PGDATA: /var/lib/postgresql/data/pgdata
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres -d what_beats_jev_ci"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      WHAT_BEATS_JEV_DATABASE_URL: postgres://postgres:postgres@localhost:5432/what_beats_jev_ci?sslmode=require
+      WHAT_BEATS_JEV_TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/what_beats_jev_ci?sslmode=require
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./tooling/github/setup
+      - name: Apply game migrations and verify reruns
+        run: |
+          pnpm --filter @eslee/what-beats-jev db:migrate
+          pnpm --filter @eslee/what-beats-jev db:migrate
+      - name: Test game rules and transactional matchup reuse
+        run: pnpm --filter @eslee/what-beats-jev test
+
   railway-infrastructure:
     needs: [lint, format, typecheck, sushiro-tests]
     if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')

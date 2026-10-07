@@ -1,6 +1,7 @@
 # Keep Vercel uploads free of local dependencies and generated output.
 **/.cache/
 **/.next/
+**/.next-dev/
 **/.turbo/
 **/dist/
 **/node_modules/
@@ -8,3 +9,5 @@
 infra/.terraform/
 .env
 .env.*
+**/.env
+**/.env.*
