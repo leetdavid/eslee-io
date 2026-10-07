@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import { getDatabase } from "@/server/database";
+import { closeDatabases } from "@/server/database";
 import { judgeMatchup } from "@/server/matchup";
 
 const testUrl = process.env.WHAT_BEATS_JEV_TEST_DATABASE_URL;
@@ -42,7 +42,7 @@ databaseTests("matchup judgments", () => {
     transport.mockClear();
   });
   afterAll(async () => {
-    await getDatabase().$client.end();
+    await closeDatabases();
     vi.unstubAllGlobals();
   });
 
@@ -107,4 +107,27 @@ databaseTests("matchup judgments", () => {
     });
     expect(transport).toHaveBeenCalledTimes(2);
   });
+
+  it("does not charge a concurrent cache follower against the model budget", async () => {
+    const now = vi.spyOn(Date, "now").mockReturnValue(Date.now());
+    const id = randomUUID();
+    const caller = `quota-test-${id}`;
+    const first = { challenge: "rock", answer: `quota ${id} first` };
+    try {
+      await Promise.all([judgeMatchup(first, caller), judgeMatchup(first, caller)]);
+      for (let index = 1; index < 30; index++) {
+        await expect(
+          judgeMatchup({ challenge: "rock", answer: `quota ${id} ${index}` }, caller),
+        ).resolves.toMatchObject({ source: "jev" });
+      }
+      expect(transport).toHaveBeenCalledTimes(30);
+      await expect(
+        judgeMatchup({ challenge: "rock", answer: `quota ${id} over limit` }, caller),
+      ).rejects.toMatchObject({ code: "TOO_MANY_REQUESTS" });
+      await expect(judgeMatchup(first, caller)).resolves.toMatchObject({ source: "cache" });
+      expect(transport).toHaveBeenCalledTimes(30);
+    } finally {
+      now.mockRestore();
+    }
+  }, 60_000);
 });

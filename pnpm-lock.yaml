@@ -621,6 +621,9 @@ importers:
       server-only:
         specifier: 0.0.1
         version: 0.0.1
+      unicode-case-folding:
+        specifier: ^1.1.2
+        version: 1.1.2
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -9190,6 +9193,9 @@ packages:
 
   unenv@1.10.0:
     resolution: {integrity: sha512-wY5bskBQFL9n3Eca5XnhH6KbUo/tfvkwm9OpcdCvLaeA7piBNbavbOKJySEwQ1V0RH6HvNlSAFRTpvTqgKRQXQ==}
+
+  unicode-case-folding@1.1.2:
+    resolution: {integrity: sha512-03vMM1kVkJbiSIPDW1D0hu42prq3Pe000yC5PaNMjhBJQxDuhAfh+R1V4TXXL21adjBqj7fUtBjZuWCRmiOQQQ==}
 
   unicorn-magic@0.1.0:
     resolution: {integrity: sha512-lRfVq8fE8gz6QMBuDM6a+LO3IAzTi05H6gCVaUpir2E1Rwpo4ZUog45KpNXKC/Mn3Yb9UDuHumeFTo9iV/D9FQ==}
@@ -18354,6 +18360,8 @@ snapshots:
       mime: 3.0.0
       node-fetch-native: 1.6.4
       pathe: 1.1.2
+
+  unicode-case-folding@1.1.2: {}
 
   unicorn-magic@0.1.0: {}
 

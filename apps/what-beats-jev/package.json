@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:live": "tsx scripts/verify-live.ts",
+    "evaluate:model": "NODE_OPTIONS=--conditions=react-server pnpm with-env tsx scripts/evaluate-model.ts",
     "db:generate": "pnpm with-env drizzle-kit generate",
     "db:migrate": "pnpm with-env tsx scripts/migrate.ts",
     "with-env": "dotenv -e .env.local -e ../../.env.local -e ../../.env --"
@@ -32,6 +33,7 @@
     "react": "catalog:react19",
     "react-dom": "catalog:react19",
     "server-only": "0.0.1",
+    "unicode-case-folding": "^1.1.2",
     "zod": "catalog:"
   },
   "devDependencies": {

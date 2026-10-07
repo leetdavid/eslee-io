@@ -9,8 +9,15 @@ import { Button } from "@/components/ui/button";
 import { InputMessage } from "@/components/ui/input-message";
 import { Tooltip, TooltipProvider } from "@/components/ui/tooltip";
 import { api } from "@/lib/api";
-import { answerError, countCharacters, phraseIdentity, STARTER } from "@/lib/game";
+import {
+  answerError,
+  countCharacters,
+  MAX_ANSWER_LENGTH,
+  phraseIdentity,
+  STARTER,
+} from "@/lib/game";
 import { applyJudgment, createRun, type GameRun, RUN_STORAGE_KEY, restoreRun } from "@/lib/run";
+import { cn } from "@/lib/utils";
 
 function Rock() {
   return (
@@ -111,6 +118,10 @@ export function Game() {
   const isLong = countCharacters(challenge) > 90;
   const isPhrase = countCharacters(challenge) > 12;
 
+  useEffect(() => {
+    if (run.ended) document.getElementById("game-prompt")?.focus();
+  }, [run.ended]);
+
   async function submit() {
     if (!hydrated || run.ended || pending.current) return;
     const validation = answerError(run.draft, run.chain);
@@ -188,7 +199,7 @@ export function Game() {
                     ? "Every chain ends somewhere. This one was yours."
                     : "One good counter can lead anywhere."}
                 </p>
-                <h1 id="game-prompt">
+                <h1 id="game-prompt" tabIndex={-1}>
                   {run.ended ? (
                     "Chain ended"
                   ) : (
@@ -199,7 +210,11 @@ export function Game() {
                 </h1>
               </div>
               <div
-                className={`challenge-piece${isLong ? "challenge-long" : isPhrase ? "challenge-phrase" : ""}`}
+                className={cn(
+                  "challenge-piece",
+                  isLong && "challenge-long",
+                  !isLong && isPhrase && "challenge-phrase",
+                )}
               >
                 {phraseIdentity(challenge) === STARTER && <Rock />}
                 <div className="challenge-name" dir="auto">
@@ -211,7 +226,13 @@ export function Game() {
               <div className="verdict-region" role="status" aria-live="polite" aria-atomic="true">
                 {checking ? (
                   <p>Checking this matchup...</p>
-                ) : last && !run.ended && !retry ? (
+                ) : last && run.ended ? (
+                  <p className="sr-only">
+                    Chain ended. {last.answer} didn&apos;t beat {last.challenge}. Your chain has{" "}
+                    {run.chain.length - 1} accepted answers. Jev confidence{" "}
+                    {Math.round(last.confidence * 100)} percent.
+                  </p>
+                ) : last && !retry ? (
                   <div className="verdict-summary">
                     <span>That works.</span>
                     <Confidence value={last.confidence} />
@@ -270,8 +291,11 @@ export function Game() {
                     showSendButton={false}
                     placeholder="e.g. a very persuasive pigeon"
                     leftSlot={
-                      <span className="character-count" data-over-limit={characters > 240}>
-                        {characters} / 240
+                      <span
+                        className="character-count"
+                        data-over-limit={characters > MAX_ANSWER_LENGTH}
+                      >
+                        {characters} / {MAX_ANSWER_LENGTH}
                       </span>
                     }
                     rightSlot={

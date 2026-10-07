@@ -5,7 +5,7 @@ import { GameMatchup, GameRateLimit } from "@eslee/db/what-beats-jev";
 import { TRPCError } from "@trpc/server";
 import { eq, lt, sql } from "drizzle-orm";
 import { type Judgment, phraseIdentity, type Submission } from "@/lib/game";
-import { getDatabase } from "@/server/database";
+import { getDatabase, getRequestBudgetDatabase } from "@/server/database";
 import { evaluateMatchup, JUDGE_VERSION } from "@/server/judge";
 
 async function reserveRequest(ip: string) {
@@ -15,7 +15,7 @@ async function reserveRequest(ip: string) {
   const minute = Math.floor(now / 60_000);
   const day = Math.floor(now / 86_400_000);
   const caller = createHmac("sha256", secret).update(`${day}:${ip}`).digest("hex");
-  const db = getDatabase();
+  const db = getRequestBudgetDatabase();
   await db.delete(GameRateLimit).where(lt(GameRateLimit.expiresAt, new Date(now)));
   const budgets = [
     { key: `${caller}:${minute}`, limit: 30, expiresAt: new Date((minute + 2) * 60_000) },
@@ -63,9 +63,6 @@ export async function judgeMatchup(input: Submission, ip: string): Promise<Judgm
     };
   }
 
-  // Commit the budget separately, so failed model requests still consume it.
-  await reserveRequest(ip);
-
   return db.transaction(async (tx) => {
     await tx.execute(sql`set local lock_timeout = '15s'`);
     await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${cacheKey}, 0))`);
@@ -83,6 +80,9 @@ export async function judgeMatchup(input: Submission, ip: string): Promise<Judgm
         isNewMatchup: false,
       };
     }
+    // Only the model-call owner consumes quota. The independent connection
+    // retains its charge even if inference fails, without charging followers.
+    await reserveRequest(ip);
     const verdict = await evaluateMatchup({ challenge, answer });
     await tx
       .insert(GameMatchup)

@@ -31,4 +31,13 @@ describe("answer submission", () => {
     );
     expect(answerError("a sheet of paper", ["rock", "paper", "scissors"])).toBeNull();
   });
+
+  it("treats Unicode capitalization variants as the same phrase", () => {
+    expect(answerError("STRASSE", ["rock", "Straße"])).toBe(
+      "Already in this chain. Try a different answer.",
+    );
+    expect(answerError("ΟΣ", ["rock", "ος"])).toBe(
+      "Already in this chain. Try a different answer.",
+    );
+  });
 });

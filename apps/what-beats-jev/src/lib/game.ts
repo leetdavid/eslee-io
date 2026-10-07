@@ -1,3 +1,4 @@
+import { caseFold } from "unicode-case-folding";
 import { z } from "zod";
 
 export const MAX_ANSWER_LENGTH = 240;
@@ -10,7 +11,7 @@ export function countCharacters(value: string): number {
 }
 
 export function phraseIdentity(value: string): string {
-  return value.trim().toLowerCase();
+  return caseFold(value.trim());
 }
 
 const phraseSchema = z

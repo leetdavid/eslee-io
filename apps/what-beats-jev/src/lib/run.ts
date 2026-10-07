@@ -4,6 +4,7 @@ import {
   countCharacters,
   type Judgment,
   judgmentSchema,
+  MAX_ANSWER_LENGTH,
   phraseIdentity,
   STARTER,
 } from "@/lib/game";
@@ -14,7 +15,13 @@ const runSchema = z
   .object({
     version: z.literal(1),
     chain: z
-      .array(z.string().refine((value) => value.trim().length > 0 && countCharacters(value) <= 240))
+      .array(
+        z
+          .string()
+          .refine(
+            (value) => value.trim().length > 0 && countCharacters(value) <= MAX_ANSWER_LENGTH,
+          ),
+      )
       .min(1),
     draft: z.string(),
     ended: z.boolean(),
