@@ -71,4 +71,4 @@ An initial animation-frame-based probe stalled in the browser environment. It wa
 
 The canvas frames remain illustrative design prototypes. The real Next.js application now exists under `apps/what-beats-jev` and uses the installed Fluid Functionalism components, live Jev, transactional PostgreSQL caching, reported confidence, and browser-local run persistence.
 
-Railway PostgreSQL is provisioned in the game's isolated project, migrations are applied, and daily/weekly backups are configured. Live Jev checks and browser play passed; the final production release is being verified. See [deployment](./deployment.md) for resource ownership and the release procedure.
+Railway PostgreSQL is provisioned in the game's isolated project, migrations are applied, and daily/weekly backups are configured. The production application is live at https://what-beats-jev.vercel.app and passed real Jev, database-cache, confidence, concurrency, browser-recovery, and accessibility checks. See [deployment](./deployment.md) for resource ownership and release evidence.

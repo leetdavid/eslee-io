@@ -1,6 +1,6 @@
 # What Beats Jev discovery
 
-Status: The user explicitly authorized full implementation, resource provisioning, pushing code, and production deployment. The real application and live judging are implemented and tested; production release verification is in progress. See [deployment](../../apps/what-beats-jev/docs/deployment.md).
+Status: Implemented, pushed, deployed, and verified at https://what-beats-jev.vercel.app. The user authorized full implementation and production deployment. See [deployment](../../apps/what-beats-jev/docs/deployment.md) for resource ownership, release evidence, and operating instructions.
 
 ## Confirmed direction
 
@@ -48,7 +48,7 @@ Discovery was completed before implementation. The user subsequently authorized 
 5. Pace and failure: the first rejection ends the run; invalid or repeated input is blocked without loss, and technical errors allow retrying. Keep the completed chain visible after loss, with a New run action. Restore the last completed state rather than a stuck pending request after refresh.
 6. First-version scope: anonymous play, database-backed matchup reuse, first-winning-matchup discovery, and browser-local persistence are implemented; accounts and a leaderboard are excluded. Public-facing request budgets and safe service-error handling are included.
 7. Design: the detailed light-theme palette, typography, accessibility baseline, and Fluid Functionalism component foundation are approved.
-8. Delivery: the standalone Next.js app, isolated Railway PostgreSQL, Vercel project, server-only variables, and GitHub connection are configured. The production deployment is the remaining release step.
+8. Delivery: the standalone Next.js app, isolated Railway PostgreSQL, Vercel project, server-only variables, and GitHub connection are configured. The production deployment is Ready and has passed live API and browser verification.
 
 ## Observed facts
 
@@ -76,7 +76,7 @@ Sources: the user's [TypeSafe announcement](https://typesafe.ai/blog/introducing
 
 ## Current readiness
 
-9/10. Implementation, local verification, database provisioning, and deployment configuration are complete; production rollout and its final live verification are in progress.
+10/10. The agreed scope is implemented, reviewed, pushed to main, and deployed with verified live Jev, caching, confidence, persistence, and anonymous play.
 
 ## Agreed reuse and novelty behavior
 

@@ -2,10 +2,12 @@
 
 An anonymous counter-chain game. Start with rock, type anything that might beat it, and keep going until Jev rejects an answer. Every accepted answer becomes the next challenge.
 
+Play at **https://what-beats-jev.vercel.app**.
+
 ## Rules
 
 - Answers are free-form text, up to 240 visible Unicode characters.
-- No repeated phrases within a run, including the starting rock. Case and surrounding whitespace do not create a different phrase; synonyms remain distinct.
+- No repeated phrases within a run, including the starting rock. Unicode capitalization and surrounding whitespace do not create a different phrase; synonyms remain distinct.
 - Jev is the sole judge. Confidence is informational, not a threshold for winning.
 - The shared PostgreSQL cache remembers both winning and losing ordered matchups. Only an unseen matchup calls Jev.
 - New matchup means the first successful result for that matchup, not a new phrase. Cached wins and fresh losses receive no notice.
@@ -28,6 +30,7 @@ pnpm turbo run build --filter=@eslee/what-beats-jev
 pnpm turbo run typecheck --filter=@eslee/what-beats-jev
 pnpm --filter @eslee/what-beats-jev test
 pnpm --filter @eslee/what-beats-jev test:live http://localhost:3010
+pnpm --filter @eslee/what-beats-jev evaluate:model
 ```
 
 Database integration tests use `WHAT_BEATS_JEV_TEST_DATABASE_URL`, require an isolated database ending in `_test` or `_ci`, and replace only the external TypeSafe HTTP transport. They never put fake judgments into the production cache. Run them with `pnpm --filter @eslee/what-beats-jev with-env vitest run` after migrating that database.

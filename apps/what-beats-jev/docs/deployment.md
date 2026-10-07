@@ -18,7 +18,9 @@ The game is isolated from Sushiro. Do not apply the root `.railway/railway.ts` t
 | Function region | `sin1`, close to the database |
 | GitHub source | `leetdavid/eslee-io`, branch `main` |
 
-The production application URL will be recorded after live deployment verification.
+Production: https://what-beats-jev.vercel.app
+
+The verified production deployment is `dpl_GKrpuCqPiSLeidCHjgxQpXqeAVV9`, with functions in `sin1`. Anonymous page access and `/api/health` returned HTTP 200, and the deployed live-check script passed. Implementation and review-fix commits are `f9a2b6f` and `5a461da`, pushed to `main`.
 
 ## Secrets
 
@@ -54,10 +56,30 @@ pnpm test
 pnpm turbo run build --filter=@eslee/what-beats-jev
 ```
 
-Deploy only to the linked game project and `eslee` scope. After a production deployment reaches Ready, run:
+Deploy from the monorepo root with the explicit game project IDs, without changing the portfolio's root link:
+
+```sh
+VERCEL_PROJECT_ID=prj_lbos9sWZDN4Q7onIxdysBDPva3nS \
+VERCEL_ORG_ID=team_tPjktSIurawh0LBAXsKia7HA \
+vercel deploy --prod --yes --scope eslee
+```
+
+Do not deploy from the app directory with its monorepo root setting, which duplicates the app path. After a production deployment reaches Ready, run:
 
 ```sh
 pnpm --filter @eslee/what-beats-jev test:live <production URL>
 ```
 
 This checks the migrated database, real Jev decisions, normalized cache reuse, preserved confidence, concurrent first-win discovery, and cached losses. Also verify anonymous browser play, validation, loss, refresh recovery, narrow layouts, and accessibility. A queued deployment or a passing build alone is not a completed release.
+
+## Verified release
+
+- Monorepo typechecking, Biome, production build, and full tests passed. The isolated game suite has 16 passing tests, including PostgreSQL concurrency, budget-boundary, and failure-recovery coverage.
+- Eight opt-in live model evaluations passed across conventional, abstract, unrelated, and prompt-injection cases. Run `pnpm --filter @eslee/what-beats-jev evaluate:model` to repeat them; they do not populate the cache.
+- Production live verification passed for real Jev, cached confidence, normalized cache hits, a single concurrent first-win notice, and cached losses.
+- Browser verification covered real win/loss, reload recovery, repeated input, offline/retry without loss, and a full 240-character challenge at 320px. Axe reported zero WCAG A/AA violations on play and loss states.
+- Unicode casefolding is shared by repeats and cache identity. An audit found no existing production identities needing rekeying. Request budgets are charged only to the model-call owner, with an independent connection so failed inference remains charged and cache followers remain free.
+- Standards and spec reviews were completed separately. Their substantive findings were fixed and rechecked, with no remaining identified defects.
+- [GitHub CI for the implementation](https://github.com/leetdavid/eslee-io/actions/runs/37680002845) completed successfully, including game database migrations/reruns and all game tests.
+
+Automated accessibility checks are not a guarantee of complete accessibility conformance. The rejection summary exists in a stable live region and receives result-focused navigation; production DOM checks confirmed the announced text and focus target.
