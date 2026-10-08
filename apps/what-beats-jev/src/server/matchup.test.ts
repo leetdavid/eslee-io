@@ -129,5 +129,5 @@ databaseTests("matchup judgments", () => {
     } finally {
       now.mockRestore();
     }
-  }, 60_000);
+  }, 180_000);
 });

@@ -2,7 +2,7 @@
 
 import { TRPCClientError } from "@trpc/client";
 import { MotionConfig } from "framer-motion";
-import { ArrowRight, Info, Sparkles } from "lucide-react";
+import { ArrowRight, Check, Info, Sparkles, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -117,6 +117,7 @@ export function Game() {
   const characters = countCharacters(run.draft);
   const isLong = countCharacters(challenge) > 90;
   const isPhrase = countCharacters(challenge) > 12;
+  const outcome = last && !checking && !retry ? (last.beats ? "success" : "failure") : "neutral";
 
   useEffect(() => {
     if (run.ended) document.getElementById("game-prompt")?.focus();
@@ -192,7 +193,7 @@ export function Game() {
             </div>
           </header>
           <main id="play" className="game-layout">
-            <section className="play-area" aria-labelledby="game-prompt">
+            <section className="play-area" data-outcome={outcome} aria-labelledby="game-prompt">
               <div className="game-intro">
                 <p>
                   {run.ended
@@ -234,7 +235,10 @@ export function Game() {
                   </p>
                 ) : last && !retry ? (
                   <div className="verdict-summary">
-                    <span>That works.</span>
+                    <span className="outcome-label outcome-success">
+                      <Check aria-hidden="true" />
+                      That works.
+                    </span>
                     <Confidence value={last.confidence} />
                     {last.isNewMatchup && (
                       <Badge color="pink" style={{ backgroundColor: "var(--discovery)" }}>
@@ -249,10 +253,16 @@ export function Game() {
               </div>
               {run.ended && last ? (
                 <section className="run-ended" aria-label="Run result">
+                  <span className="outcome-label outcome-failure">
+                    <X aria-hidden="true" />
+                    Doesn&apos;t beat
+                  </span>
                   <h2>Nice run.</h2>
                   <p>
-                    <strong dir="auto">{last.answer}</strong> didn&apos;t beat{" "}
-                    <span dir="auto">{last.challenge}</span>.
+                    <strong className="failed-answer" dir="auto">
+                      {last.answer}
+                    </strong>{" "}
+                    didn&apos;t beat <span dir="auto">{last.challenge}</span>.
                   </p>
                   <Confidence value={last.confidence} />
                   <p>

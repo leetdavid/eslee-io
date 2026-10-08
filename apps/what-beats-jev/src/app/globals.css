@@ -44,6 +44,12 @@
   --surface-3: oklch(0.943 0.027 269.67);
   --challenge: oklch(0.921 0.122 94.388);
   --discovery: oklch(0.882 0.061 358.94);
+  --success-background: oklch(0.942 0.039 155.915);
+  --success-foreground: oklch(0.425 0.095 154.608);
+  --success-border: oklch(0.615 0.131 154.616);
+  --failure-background: oklch(0.93 0.032 17.743);
+  --failure-foreground: oklch(0.485 0.165 21.683);
+  --failure-border: oklch(0.612 0.162 19.078);
   --muted-foreground: color-mix(in oklab, var(--foreground) 76%, var(--background));
   --accent: var(--surface-3);
   --border: color-mix(in oklab, var(--foreground) 20%, var(--background));
@@ -197,6 +203,46 @@ button::after {
   border-radius: 1.75rem 2rem 1.625rem 1.875rem;
   border: 1px solid color-mix(in oklab, var(--foreground) 28%, var(--challenge));
   box-shadow: 0 4px 0 color-mix(in oklab, var(--foreground) 14%, var(--challenge));
+}
+.play-area[data-outcome="success"] .challenge-piece {
+  background: var(--success-background);
+  color: var(--success-foreground);
+  border-color: var(--success-border);
+  box-shadow: 0 4px 0 color-mix(in oklab, var(--success-border) 55%, var(--success-background));
+}
+.play-area[data-outcome="failure"] .challenge-piece {
+  background: var(--failure-background);
+  color: var(--failure-foreground);
+  border-color: var(--failure-border);
+  box-shadow: 0 4px 0 color-mix(in oklab, var(--failure-border) 55%, var(--failure-background));
+}
+.play-area[data-outcome="failure"] .game-intro h1 {
+  color: var(--failure-foreground);
+}
+.outcome-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+.outcome-label svg {
+  width: 1rem;
+  height: 1rem;
+  stroke-width: 2;
+}
+.outcome-success {
+  background: var(--success-background);
+  color: var(--success-foreground);
+}
+.outcome-failure {
+  background: var(--failure-background);
+  color: var(--failure-foreground);
+}
+.failed-answer {
+  color: var(--failure-foreground);
 }
 .rock-art {
   width: 7.25rem;

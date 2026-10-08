@@ -28,6 +28,10 @@ Doop's curated inspiration search returned HTTP 403, so no gallery exemplar was 
 
 Use a light appearance for the first design. Colors are recorded as hex for review and should become semantic OKLCH tokens when implemented.
 
+The user subsequently requested clear outcome schemes. A successful verdict uses a green challenge surface and success label, while a rejecting verdict uses a red challenge surface, red loss heading, and rejection label. The initial and unresolved states retain the neutral/yellow challenge scheme. Cached verdicts use the same outcome colors. Validation and transport errors do not turn the game into a red loss state.
+
+Success colors: surface `#D8F4E1`, text `#155D36`, edge `#329B60`. Failure colors: surface `#FDE0E0`, text `#A82732`, edge `#D3535C`. Measured text/surface contrast is 6.77:1 for success and 5.64:1 for failure. Text and icons remain redundant cues, not color alone.
+
 | Role | Color | Physical reference |
 | --- | --- | --- |
 | Page ground | `#F2F4FC` | Pale blue workbench paper |
