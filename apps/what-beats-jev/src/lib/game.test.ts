@@ -13,6 +13,35 @@ describe("answer submission", () => {
     expect(() => parseSubmission({ challenge: "rock", answer: "a".repeat(241) })).toThrow("240");
   });
 
+  it.each(Array.from("0123456789"))("rejects digit %s in client and server validation", (digit) => {
+    const answer = `a rock crusher model ${digit}`;
+    expect(answerError(answer, ["rock"])).toBe("im bad at math");
+    expect(() => parseSubmission({ challenge: "rock", answer })).toThrow("im bad at math");
+  });
+
+  it.each([
+    "1 rock crusher",
+    "a9b",
+    "1️⃣",
+    `${"a".repeat(240)}0`,
+  ])("uses the math error for an answer containing digits: %s", (answer) => {
+    expect(answerError(answer, ["rock"])).toBe("im bad at math");
+    expect(() => parseSubmission({ challenge: "rock", answer })).toThrow("im bad at math");
+  });
+
+  it("allows numbers written as words", () => {
+    const answer = "one hundred rock crushers";
+    expect(answerError(answer, ["rock"])).toBeNull();
+    expect(parseSubmission({ challenge: "rock", answer }).answer).toBe(answer);
+  });
+
+  it("allows a digit-free answer against a challenge accepted before the digit ban", () => {
+    expect(parseSubmission({ challenge: "a rock crusher model 2", answer: "rust" })).toEqual({
+      challenge: "a rock crusher model 2",
+      answer: "rust",
+    });
+  });
+
   it("rejects empty answers and repeating the current challenge", () => {
     expect(() => parseSubmission({ challenge: "rock", answer: "   " })).toThrow();
     expect(() => parseSubmission({ challenge: "rock", answer: "  RoCK  " })).toThrow();

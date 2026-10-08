@@ -83,3 +83,13 @@ This checks the migrated database, real Jev decisions, normalized cache reuse, p
 - [GitHub CI for the implementation](https://github.com/leetdavid/eslee-io/actions/runs/37680002845) completed successfully, including game database migrations/reruns and all game tests.
 
 Automated accessibility checks are not a guarantee of complete accessibility conformance. The rejection summary exists in a stable live region and receives result-focused navigation; production DOM checks confirmed the announced text and focus target.
+
+## October 8 UI and input update
+
+Production deployment `dpl_2WeGyX5Vtbn6A8AGQc9utj36vZbZ` reached Ready and owns https://what-beats-jev.vercel.app, with functions in `sin1`.
+
+- Confidence now uses a native meter gauge. The composer has one rounded focus ring, and successful submissions keep the textbox focused for continuous entry.
+- Shared client/server validation blocks digits `0–9` with the exact error `im bad at math`, before cache lookup or judging. Invalid input preserves the draft and run. Previously saved numeric verdicts remain restorable.
+- Biome, monorepo typechecking and tests, the production build, and 44 targeted game/router tests passed. The five opt-in database tests were not rerun for this input-only change.
+- Production live verification passed for all ten digits, healthy database access, real Jev judging, cache reuse, confidence persistence, concurrent discovery, and cached losses.
+- Browser checks confirmed the exact error, focus retention, unchanged progress, no judging request for numeric input, and normal play after correction. The error layout fits 320px without overflow, and production axe checks reported zero WCAG A/AA violations.

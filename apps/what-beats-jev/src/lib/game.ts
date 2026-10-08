@@ -26,8 +26,13 @@ const phraseSchema = z
   )
   .transform((value) => value.trim());
 
+const answerSchema = z
+  .string()
+  .refine((value) => !/[0-9]/.test(value), "im bad at math")
+  .pipe(phraseSchema);
+
 export const submissionSchema = z
-  .object({ challenge: phraseSchema, answer: phraseSchema })
+  .object({ challenge: phraseSchema, answer: answerSchema })
   .refine((value) => phraseIdentity(value.challenge) !== phraseIdentity(value.answer), {
     path: ["answer"],
     message: "Already in this chain. Try a different answer.",
@@ -51,7 +56,7 @@ export function parseSubmission(value: unknown): Submission {
 }
 
 export function answerError(answer: string, chain: string[]): string | null {
-  const parsed = phraseSchema.safeParse(answer);
+  const parsed = answerSchema.safeParse(answer);
   if (!parsed.success) return parsed.error.issues[0]?.message ?? "Enter a valid answer.";
   if (chain.some((phrase) => phraseIdentity(phrase) === phraseIdentity(answer))) {
     return "Already in this chain. Try a different answer.";

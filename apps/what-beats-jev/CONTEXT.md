@@ -15,7 +15,7 @@ The thing the player's next answer must beat. Every run begins with rock, and an
 _Avoid_: opponent, question
 
 **Answer**:
-Free-form text describing what a player proposes to beat the current challenge, with a maximum of 240 visible Unicode characters. Answers may describe creative, absurd, or metaphorical counters.
+Free-form text describing what a player proposes to beat the current challenge, with a maximum of 240 visible Unicode characters. Answers may describe creative, absurd, or metaphorical counters, but must not contain digits `0–9`. Submitting digits shows the exact validation message `im bad at math` without ending the run or calling Jev. Numbers written as words remain valid input.
 _Avoid_: prompt, verdict
 
 **Phrase identity**:

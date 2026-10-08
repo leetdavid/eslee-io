@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
-import { createTRPCProxyClient, httpLink } from "@trpc/client";
+import { createTRPCProxyClient, httpLink, TRPCClientError } from "@trpc/client";
 import type { AppRouter } from "@/server/router";
 
 const url = process.argv[2];
@@ -12,6 +12,16 @@ const api = createTRPCProxyClient<AppRouter>({
 const health = await fetch(`${url}/api/health`);
 assert.equal(health.status, 200, "The deployed app must have a healthy migrated database");
 
+for (const digit of "0123456789") {
+  await assert.rejects(
+    api.matchup.mutate({ challenge: "rock", answer: `rock crusher ${digit}` }),
+    (error: unknown) =>
+      error instanceof TRPCClientError &&
+      error.data?.code === "BAD_REQUEST" &&
+      error.message.includes("im bad at math"),
+  );
+}
+
 const paper = await api.matchup.mutate({ challenge: "rock", answer: "paper" });
 assert.equal(paper.beats, true, "Jev should recognize the game's introductory convention");
 const remembered = await api.matchup.mutate({ challenge: " ROCK ", answer: " Paper " });
@@ -19,7 +29,8 @@ assert.equal(remembered.source, "cache");
 assert.equal(remembered.isNewMatchup, false);
 assert.equal(remembered.confidence, paper.confidence);
 
-const answer = `an industrial rock crusher with hardened steel jaws, serial ${randomUUID()}`;
+const serial = randomUUID().replace(/[0-9]/g, (digit) => "ghijklmnop".charAt(Number(digit)));
+const answer = `an industrial rock crusher with hardened steel jaws, serial ${serial}`;
 const concurrent = await Promise.all([
   api.matchup.mutate({ challenge: "rock", answer }),
   api.matchup.mutate({ challenge: "ROCK", answer: answer.toUpperCase() }),
@@ -50,6 +61,7 @@ console.log(
     url,
     checks: [
       "health",
+      "digit validation",
       "live Jev",
       "normalized cache reuse",
       "confidence persistence",

@@ -82,7 +82,7 @@ Use content-driven reflow, natural page scrolling, and bounded readable widths. 
 | First winning matchup | A New matchup notice, independent of whether the phrase was seen elsewhere |
 | Rejected answer | A clear ended run, the completed chain and count, and a New run action |
 | Newly judged loss | The loss state without any discovery notice |
-| Empty, over-limit, or repeated input | An inline correction, with the run unchanged and no judging call |
+| Empty, over-limit, repeated, or digit-containing input | An inline correction, with the run unchanged and no judging call |
 | Technical error | An explanation and Retry action, preserving the run and answer |
 | Long content | Fully readable 240-character challenges and a usable long chain without horizontal overflow |
 
@@ -96,6 +96,7 @@ Confirmed behavior:
 - Global novelty is the first successful result for an ordered matchup. A newly judged loss and replaying a cached win do not qualify; phrase novelty is irrelevant. This replaces the earlier decision at the user's explicit request.
 - Case and surrounding whitespace do not create a new identity; original wording remains visible. Synonyms and rewordings remain distinct.
 - Phrases already in the current chain, including its starting challenge, cannot be reused. Validation and technical failures do not end the run.
+- Answers containing any digit `0–9` are rejected by shared client/server validation with the exact message `im bad at math`, before any cache lookup or Jev call. Number words are allowed, and saved verdicts from before the ban remain restorable.
 - Unfinished runs are saved locally in the browser, separately from the shared judgment database.
 
 Approved defaults:
@@ -110,6 +111,10 @@ Approved defaults:
 
 The approved accessibility baseline is WCAG AA, with semantic controls, visible labels, full keyboard access, visible focus, reduced-motion support, and comfortably sized touch targets. Announce results and corrections without relying on color. Retain full free-form text and allow page zoom.
 
+The answer composer uses a single rounded external focus ring, not simultaneous container and textarea outlines. The inner outline is suppressed only when the container's replacement is supported; older browsers retain the generic focus fallback.
+
+Submitting keeps the textarea focused and temporarily read-only rather than disabled. After a successful judgment or retryable error, focus returns to the editable textbox for the next submission. A rejecting verdict ends the run and retains result-focused navigation.
+
 ## 7. Content requirements
 
 Use short, authored copy. Jev returns structured decisions, so no screen may imply it generated a custom explanation.
@@ -120,7 +125,7 @@ Use short, authored copy. Jev returns structured decisions, so no screen may imp
 | Input label | Your answer |
 | Input example | e.g. a very persuasive pigeon |
 | Primary action | Try this |
-| Rules | Anything goes. No repeats. Up to 240 characters. |
+| Rules | No digits. No repeats. Up to 240 characters. |
 | Busy status | Checking this matchup... |
 | Accepted result | That works. |
 | Novelty | New matchup |
@@ -131,6 +136,7 @@ Use short, authored copy. Jev returns structured decisions, so no screen may imp
 | Empty input | Enter something that could beat the current challenge. |
 | Repeat | Already in this chain. Try a different answer. |
 | Length error | Keep your answer within 240 characters. |
+| Digit error | im bad at math |
 | Technical error | Couldn't check this answer. Your chain is safe. Try again. |
 | Retry action | Retry |
 
@@ -145,6 +151,7 @@ On Doop `oJGrvv12x1`, create desktop and narrow-viewport play frames using the s
 ## 9. Open questions and implementation dependencies
 
 - The implemented confidence percentage uses Jev's reported Choice confidence, including cached verdicts and losses. It is informational; the no-confidence-gate rule remains unchanged.
+- Confidence is shown as a read-only 0–100% gauge bar with a percentage label and native meter semantics, not just a number. Its fill stays cobalt so confidence is not confused with the separate green/red verdict scheme.
 - The user approved the brief and its defaults; original Doop screens may now be created.
 - Confirm the final public name and deployment domain before publishing.
 - Railway PostgreSQL is the approved database provider. Confirm project placement and provision the game database before implementation is considered operational. Do not repurpose Sushiro's infrastructure without explicit approval.

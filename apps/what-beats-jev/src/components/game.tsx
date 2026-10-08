@@ -52,29 +52,39 @@ function Rock() {
 }
 
 function Confidence({ value }: { value: number }) {
+  const percentage = new Intl.NumberFormat("en", {
+    style: "percent",
+    maximumFractionDigits: 0,
+  }).format(value);
   return (
     <span className="confidence">
-      <span>
-        Jev confidence{" "}
-        <strong>
-          {new Intl.NumberFormat("en", { style: "percent", maximumFractionDigits: 0 }).format(
-            value,
-          )}
-        </strong>
-      </span>
-      <Tooltip
-        content="How strongly Jev favored this verdict, not your probability of winning."
-        side="top"
-      >
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label="About Jev confidence"
-          className="confidence-help"
+      <span className="confidence-heading">
+        <span>Jev confidence</span>
+        <strong>{percentage}</strong>
+        <Tooltip
+          content="How strongly Jev favored this verdict, not your probability of winning."
+          side="top"
         >
-          <Info />
-        </Button>
-      </Tooltip>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="About Jev confidence"
+            className="confidence-help"
+          >
+            <Info />
+          </Button>
+        </Tooltip>
+      </span>
+      <meter
+        className="confidence-meter"
+        min={0}
+        max={1}
+        value={value}
+        aria-label="Jev confidence"
+        aria-valuetext={`${percentage} confidence in the verdict`}
+      >
+        {percentage}
+      </meter>
     </span>
   );
 }
@@ -137,6 +147,8 @@ export function Game() {
     const abort = new AbortController();
     controller.current = abort;
     pending.current = true;
+    // Keep the text-entry context, including when submission came from the button.
+    document.getElementById("answer")?.focus({ preventScroll: true });
     setChecking(true);
     setError(null);
     const timeout = window.setTimeout(() => abort.abort(), 25_000);
@@ -161,6 +173,11 @@ export function Game() {
       if (requestId.current === id) {
         pending.current = false;
         setChecking(false);
+        // Wait for React to remove readOnly or replace the field on game over.
+        requestAnimationFrame(() => {
+          if (requestId.current !== id) return;
+          document.getElementById("answer")?.focus({ preventScroll: true });
+        });
       }
     }
   }
@@ -294,7 +311,7 @@ export function Game() {
                     onSend={() => {
                       void submit();
                     }}
-                    disabled={checking || !hydrated}
+                    disabled={!hydrated}
                     minRows={2}
                     maxRows={8}
                     allowEmptySend
@@ -321,6 +338,7 @@ export function Game() {
                     textareaProps={{
                       id: "answer",
                       name: "answer",
+                      readOnly: checking,
                       dir: "auto",
                       "aria-label": "Your answer",
                       "aria-invalid": !!error && !retry,
@@ -330,7 +348,7 @@ export function Game() {
                     }}
                   />
                   <p id="answer-rules" className="game-rules">
-                    Anything goes. No repeats. Up to 240 characters.
+                    No digits. No repeats. Up to 240 characters.
                   </p>
                   <p id="answer-error" className="answer-error" role="status">
                     {error}

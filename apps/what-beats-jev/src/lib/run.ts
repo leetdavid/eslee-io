@@ -11,21 +11,20 @@ import {
 
 export const RUN_STORAGE_KEY = "what-beats-jev:run:v1";
 
+// Saved verdicts keep their original wording when submission rules change.
+const savedPhraseSchema = z
+  .string()
+  .refine((value) => value.trim().length > 0 && countCharacters(value) <= MAX_ANSWER_LENGTH);
+
 const runSchema = z
   .object({
     version: z.literal(1),
-    chain: z
-      .array(
-        z
-          .string()
-          .refine(
-            (value) => value.trim().length > 0 && countCharacters(value) <= MAX_ANSWER_LENGTH,
-          ),
-      )
-      .min(1),
+    chain: z.array(savedPhraseSchema).min(1),
     draft: z.string(),
     ended: z.boolean(),
-    lastJudgment: judgmentSchema.extend({ challenge: z.string(), answer: z.string() }).nullable(),
+    lastJudgment: judgmentSchema
+      .extend({ challenge: savedPhraseSchema, answer: savedPhraseSchema })
+      .nullable(),
   })
   .refine(
     (value) =>
@@ -38,7 +37,9 @@ const runSchema = z
     const current = value.chain.at(-1);
     if (value.ended) {
       return (
-        !last.beats && last.challenge === current && answerError(last.answer, value.chain) === null
+        !last.beats &&
+        last.challenge === current &&
+        !value.chain.some((phrase) => phraseIdentity(phrase) === phraseIdentity(last.answer))
       );
     }
     return last.beats && last.answer === current && last.challenge === value.chain.at(-2);
