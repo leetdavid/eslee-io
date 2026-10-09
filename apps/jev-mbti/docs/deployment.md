@@ -38,7 +38,7 @@ Deployed functions authenticate to AI Gateway with the project's OIDC token, so 
 
 ## Choosing the LLM
 
-`JEV_MBTI_LLM_MODEL` picks the model and the route:
+The owner chose to stay on Gemini 2.5 Flash on October 9, so it is also the default when `JEV_MBTI_LLM_MODEL` is unset. The variable picks the model and the route:
 
 - A plain id such as `google/gemini-2.5-flash` goes through Vercel AI Gateway. The eslee team's gateway is on the free tier, which serves Gemini 2.5 Flash but blocks every Gemini 3.x model until credit is added.
 - An id prefixed with `openrouter:`, such as `openrouter:google/gemini-3.8-flash`, goes through OpenRouter and needs `OPENROUTER_API_KEY` as a sensitive variable. OpenRouter charges the same list price for Gemini 3.8 Flash as the gateway.
@@ -96,11 +96,23 @@ Production deployment `dpl_7TDB4Ym3x9M25DkbZPa5iUKYtJyH` reached Ready with func
 
 ## Example charts
 
-The owner picks home page examples from reviewed charts. Run these with `JEV_MBTI_DATABASE_URL` set to the production URL:
+The home page features the six questions from the approved design, created on production on October 9:
+
+| Question | Chart | Kind | Grade |
+| --- | --- | --- | --- |
+| 여행 계획은 누가 짤까? | `wtwyvpxh` | One axis | 16/16 |
+| MBTI별 이별 후 반응 | `6r2gqnnk` | Two axes | 16/16 |
+| 좀비 사태에서 끝까지 살아남는 MBTI는? | `7n2t858z` | One axis | 13/16 |
+| MBTI별 카톡 답장 스타일 | `udachzpe` | Two axes | 16/16 |
+| 영화 보다가 제일 먼저 우는 MBTI는? | `8ytb8vhm` | One axis | 14/16 |
+| 회식 2차까지 가는 MBTI는? | `bcgnjmph` | One axis | 16/16 |
+
+They were asked in Auto mode, so visitors who type the same question reopen these charts. The owner can swap examples at any time. Run these with `JEV_MBTI_DATABASE_URL` set to the production URL:
 
 ```sh
 pnpm --filter @eslee/jev-mbti examples list
 pnpm --filter @eslee/jev-mbti examples add <chart id>
+pnpm --filter @eslee/jev-mbti examples remove <chart id>
 ```
 
 ## Local development

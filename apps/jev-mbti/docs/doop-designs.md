@@ -90,4 +90,4 @@ Deliberate deviations from the frames:
 - On mobile, type detail uses Fluid's centered Dialog rather than a bottom sheet. The registry Dialog positions itself with animation transforms.
 - The composer's send action is InputMessage's built-in icon button. Its accessible name and tooltip say "배치하기 / Place them", and the hint line explains Enter.
 - Share images set the question in Noto Sans KR, which Google can subset as TrueType for image rendering, instead of Pretendard.
-- Reviews currently run on Gemini 2.5 Flash, because the team's AI Gateway free tier blocks Gemini 3.x. The interface credits whichever model actually wrote each review.
+- Reviews run on Gemini 2.5 Flash rather than 3.8 Flash. The team's AI Gateway free tier blocks Gemini 3.x, and the owner chose not to pay for it. The interface credits whichever model actually wrote each review.

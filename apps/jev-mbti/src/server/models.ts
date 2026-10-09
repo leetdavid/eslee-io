@@ -7,13 +7,14 @@ import type { JSONValue, LanguageModel } from "ai";
 export const JEV_MODEL = "jev-1.13.0";
 
 const OPENROUTER_PREFIX = "openrouter:";
-const configured = process.env.JEV_MBTI_LLM_MODEL ?? "google/gemini-3.8-flash";
+const configured = process.env.JEV_MBTI_LLM_MODEL ?? "google/gemini-2.5-flash";
 
 /**
  * The LLM that writes axes and the review. A plain id such as
- * `google/gemini-3.8-flash` goes through Vercel AI Gateway, where Gemini 3.x
- * needs paid credit. An id prefixed with `openrouter:`, such as
- * `openrouter:openrouter/free`, goes through OpenRouter with `OPENROUTER_API_KEY`.
+ * `google/gemini-2.5-flash` goes through Vercel AI Gateway, whose free tier
+ * blocks Gemini 3.x. An id prefixed with `openrouter:`, such as
+ * `openrouter:google/gemini-3.8-flash`, goes through OpenRouter with
+ * `OPENROUTER_API_KEY`.
  */
 export const LLM_PROVIDER = configured.startsWith(OPENROUTER_PREFIX) ? "openrouter" : "gateway";
 export const LLM_MODEL =

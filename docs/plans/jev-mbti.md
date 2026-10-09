@@ -1,13 +1,13 @@
 # Jev MBTI discovery
 
-Status: Live at https://jev-mbti.vercel.app on an isolated Railway database, verified end to end in production. The user approved every frame on Doop canvas `l2R2l7AW3M`, including the grade, the "참 잘했어요" stamp, and the "Lore Jev read" chips, and approved provisioning and deployment. See the [design brief](../../apps/jev-mbti/docs/design-brief.md), the [frame index and implementation notes](../../apps/jev-mbti/docs/doop-designs.md), and the [deployment runbook](../../apps/jev-mbti/docs/deployment.md). Production runs on Gemini 2.5 Flash until the user chooses how to pay for Gemini 3.8 Flash.
+Status: Live at https://jev-mbti.vercel.app on an isolated Railway database, verified end to end in production. The user approved every frame on Doop canvas `l2R2l7AW3M`, including the grade, the "참 잘했어요" stamp, and the "Lore Jev read" chips, and approved provisioning and deployment. See the [design brief](../../apps/jev-mbti/docs/design-brief.md), the [frame index and implementation notes](../../apps/jev-mbti/docs/doop-designs.md), and the [deployment runbook](../../apps/jev-mbti/docs/deployment.md). Production runs on Gemini 2.5 Flash by the user's choice.
 
 ## Implementation decisions
 
 - The pipeline has three stages. Gemini chooses axes, refuses unsafe questions, and selects lore topics; that draft is signed so the next step can't be forged. Jev places all 16 types with one Score request per type, in parallel, at about 0.5 seconds. Gemini then streams the review, which any viewer's browser starts and which polling shows to everyone.
 - Each axis has seven Score levels written by the LLM. Each level is a concrete situation on one fixed scenario, calibrated so that only the one or two most extreme stereotypes reach either end.
 - The lore library covers 16 types across 17 topics plus 8 letters, in both languages, with sources in `apps/jev-mbti/src/lore/SOURCES.md`. Four delegated research attempts produced no files, so the library was written directly from the cited Korean sources and broad community consensus.
-- The team's AI Gateway is on the free tier, which blocks every Gemini 3.x model. `JEV_MBTI_LLM_MODEL` chooses the model, defaulting to `google/gemini-3.8-flash`; an `openrouter:` prefix routes through OpenRouter instead, which sells Gemini 3.8 Flash at the same list price. Verification ran on `google/gemini-2.5-flash`, where axes take 7 to 14 seconds with a small thinking budget and reviews about 7 seconds.
+- The team's AI Gateway is on the free tier, which blocks every Gemini 3.x model. Offered gateway credit or the existing OpenRouter balance for Gemini 3.8 Flash, the user chose to stay on `google/gemini-2.5-flash`, which is now the default. Axes take 7 to 14 seconds with a small thinking budget and reviews about 7 seconds. `JEV_MBTI_LLM_MODEL` switches models, and an `openrouter:` prefix routes through OpenRouter.
 - At the user's request, free OpenRouter models were evaluated as an option. None was usable: the `openrouter/free` router took 37 seconds or more per axis request and often timed out, Nemotron 3 Super refused every question, and Gemma 4 31B was rate-limited upstream. The full comparison is in the deployment runbook.
 - A live evaluation (`pnpm evaluate:model`) checks direction (F above T for crying, J above P for trip planning), custom ends, forced two-axis charts, refusal of a question about a named coworker, and review streaming. It passed on Gemini 2.5 Flash.
 
@@ -100,6 +100,6 @@ Sources: [Score](https://docs.typesafe.ai/primitives/score), [Models](https://do
 
 ## Current readiness
 
-9/10. The site is live, tested (29 tests, typecheck, Biome, production build), and verified end to end in production with real Jev and LLM output. Two decisions remain with the user: how to pay for Gemini 3.8 Flash (gateway credit or the existing OpenRouter balance), and the public name and a custom domain.
+9/10. The site is live, tested (29 tests, typecheck, Biome, production build), and verified end to end in production with real Jev and LLM output. The home page features the six example questions from the approved design. One decision remains with the user: the public name and a custom domain.
 
 A rough cost per chart is about $0.03, almost all of it LLM output. It assumes about 2k tokens of lore per Jev Score and a review that writes about 4k tokens of explanations in both languages. Jev's share is about $0.001.
