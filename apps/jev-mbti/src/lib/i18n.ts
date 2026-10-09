@@ -133,7 +133,8 @@ const en = {
   missingAction: "Ask a question",
   stamp: "Well done!",
   stampAria: "Well done: the red pen changed nothing",
-  translation: "Translation",
+  /** Labels the original wording under a translated question; an English viewer only sees Korean originals. */
+  originalQuestion: "Korean original",
   footerPlaced: (model: string) => `Placed by Jev (TypeSafe), reviewed by ${model}.`,
   footerLore: "Lore comes from Korean social media memes, not psychology.",
   jevSpotAria: (type: string) => `${type}: Jev's original spot`,
@@ -248,7 +249,7 @@ const ko: Messages = {
   missingAction: "질문하러 가기",
   stamp: "참 잘했어요",
   stampAria: "참 잘했어요: 빨간 펜이 고친 유형이 없어요",
-  translation: "번역",
+  originalQuestion: "영어 원문",
   footerPlaced: (model) => `Jev(TypeSafe)가 배치하고 ${model}가 첨삭해요.`,
   footerLore: "MBTI 정보는 한국 SNS 밈을 바탕으로 했고, 심리 검사가 아니에요.",
   jevSpotAria: (type) => `${type}: Jev 원래 자리`,

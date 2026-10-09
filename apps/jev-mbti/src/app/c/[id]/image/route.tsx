@@ -1,11 +1,21 @@
 import { ImageResponse } from "next/og";
-import { type ChartData, correctedTypes, gradeOf, isReviewComplete, pointsFor } from "@/lib/chart";
-import { MESSAGES } from "@/lib/i18n";
+import {
+  type ChartData,
+  correctedTypes,
+  gradeOf,
+  isReviewComplete,
+  pointsFor,
+  questionIn,
+} from "@/lib/chart";
+import { isLocale, type Locale, MESSAGES } from "@/lib/i18n";
 import {
   type ChartLayout,
+  COMPACT_SIZES,
   DESKTOP_SIZES,
+  estimateTextWidth,
   layoutHorizontal,
   layoutPlane,
+  MOBILE_SIZES,
   type Sizes,
 } from "@/lib/layout";
 import { groupOf, MBTI_TYPES, type MbtiType } from "@/lib/mbti";
@@ -15,6 +25,9 @@ export const runtime = "nodejs";
 
 const WIDTH = 1200;
 const HEIGHT = 630;
+const PADDING = { top: 36, side: 48, bottom: 28 };
+const CONTENT_WIDTH = WIDTH - 2 * PADDING.side;
+const CONTENT_HEIGHT = HEIGHT - PADDING.top - PADDING.bottom;
 const COLORS = { nt: "#cbbdf6", nf: "#b6e5c4", sj: "#b9d9f5", sp: "#f8de84" } as const;
 const INK = "#1d2550";
 const RED = "#c8282e";
@@ -45,6 +58,23 @@ function arrowHead(d: string) {
   return `M${wing(0.45)} L${x} ${y} L${wing(-0.45)}`;
 }
 
+/** Estimated wrapped line count. Bold glyphs run wider than the layout estimate, hence the margin. */
+function lineCount(text: string, fontSize: number, width: number, widthFactor = 1.1) {
+  return Math.max(1, Math.ceil((estimateTextWidth(text, fontSize) * widthFactor) / width));
+}
+
+/**
+ * The largest font size that wraps within the first line limit it can meet,
+ * trying the stricter limits first, or the smallest size at the loosest limit.
+ */
+function fitText(text: string, width: number, sizes: number[], limits: number[]) {
+  for (const limit of limits) {
+    const size = sizes.find((candidate) => lineCount(text, candidate, width) <= limit);
+    if (size) return { size, lines: lineCount(text, size, width) };
+  }
+  return { size: sizes[sizes.length - 1] ?? 24, lines: limits[limits.length - 1] ?? 3 };
+}
+
 function Chart({
   layout,
   sizes,
@@ -58,6 +88,7 @@ function Chart({
   height: number;
   axis: React.ReactNode;
 }) {
+  const stickerFont = Math.round(sizes.sticker.h / 2);
   return (
     <div style={{ position: "relative", display: "flex", width, height }}>
       <svg
@@ -103,9 +134,9 @@ function Chart({
             width: sizes.spot.w,
             height: sizes.spot.h,
             border: "2px dashed #6b7285",
-            borderRadius: 8,
+            borderRadius: Math.round(sizes.spot.h * 0.3),
             color: "#6b7285",
-            fontSize: 12,
+            fontSize: Math.max(10, Math.round(sizes.spot.h * 0.46)),
             fontFamily: "Noto",
             display: "flex",
             alignItems: "center",
@@ -129,11 +160,11 @@ function Chart({
             alignItems: "center",
             justifyContent: "center",
             background: COLORS[groupOf(sticker.type)],
-            border: "3px solid #ffffff",
-            borderRadius: 10,
+            border: `${sizes.sticker.h >= 32 ? 3 : 2}px solid #ffffff`,
+            borderRadius: Math.round(sizes.sticker.h * 0.28),
             boxShadow: "0 0 0 1px rgba(29,37,80,0.18), 0 3px 6px rgba(29,37,80,0.18)",
             fontFamily: "Bagel",
-            fontSize: 18,
+            fontSize: stickerFont,
             color: INK,
             transform: `rotate(${ROTATION[MBTI_TYPES.indexOf(sticker.type)] ?? 0}deg)`,
           }}
@@ -145,65 +176,102 @@ function Chart({
   );
 }
 
-function render(chart: ChartData) {
-  const lang = chart.questionLanguage;
+// Vertical space in the one-axis layout, in pixels.
+const Q_MARK = 38;
+const AXIS_LABELS = 18;
+const SUMMARY_LINE = 33;
+const FOOTER = 40;
+const BREATHING_ROOM = 10;
+
+function render(chart: ChartData, lang: Locale) {
   const t = MESSAGES[lang];
+  const question = questionIn(chart, lang);
+  // Satori breaks Hangul anywhere by default; keep words whole, as the page does.
+  const words = lang === "ko" ? ({ wordBreak: "keep-all" } as const) : {};
   const review = chart.review && isReviewComplete(chart.review) ? chart.review : null;
+  const kept = review ? gradeOf(review) : null;
+  const summary = review?.summary ? `${t.overall} · ${review.summary[lang]}` : "";
   const points = pointsFor(chart.plot, review);
   const jev = pointsFor(chart.plot, null);
   const order = correctedTypes(chart.plot, review);
-  const sizes = DESKTOP_SIZES;
   const [x, y] = chart.plot.axes;
   if (!x) throw new Error("Chart has no axes");
+
+  // Translations and long questions wrap, so text is sized first and the chart gets the rest.
+  const questionWidth = y ? 520 : kept !== null ? 880 : CONTENT_WIDTH;
+  const fitted = y
+    ? fitText(question, questionWidth, [40, 36, 32, 28, 24], [3, 4, 5])
+    : fitText(question, questionWidth, [44, 40, 36, 32, 28, 24], [2, 3, 4]);
+  const questionSize = fitted.size;
+  let questionLines = fitted.lines;
+  const questionHeight = () => Q_MARK + questionLines * questionSize * 1.18;
+
   let chartNode: React.ReactNode;
-  let chartWidth: number;
+  let summaryLines = 0;
   if (!y) {
-    chartWidth = 1104;
-    const layout = layoutHorizontal(
-      {
-        points: Object.fromEntries(MBTI_TYPES.map((type) => [type, points[type].x])) as Record<
-          MbtiType,
-          number
-        >,
-        spots: Object.fromEntries(order.map((type) => [type, jev[type].x])),
-        order,
-      },
-      chartWidth,
-      sizes,
-      { topPad: 16 },
-    );
-    const axisNode = (
-      <g>
-        <line
-          x1={18}
-          y1={layout.axisY}
-          x2={chartWidth - 18}
-          y2={layout.axisY}
-          stroke={INK}
-          strokeWidth={2.6}
-        />
-        <path
-          d={`M30 ${layout.axisY - 9} L18 ${layout.axisY} L30 ${layout.axisY + 9}`}
-          fill="none"
-          stroke={INK}
-          strokeWidth={2.4}
-        />
-        <path
-          d={`M${chartWidth - 30} ${layout.axisY - 9} L${chartWidth - 18} ${layout.axisY} L${chartWidth - 30} ${layout.axisY + 9}`}
-          fill="none"
-          stroke={INK}
-          strokeWidth={2.4}
-        />
-      </g>
-    );
+    summaryLines = summary ? Math.min(2, lineCount(summary, 30, CONTENT_WIDTH, 1)) : 0;
+    const budget = () =>
+      CONTENT_HEIGHT -
+      Math.max(questionHeight(), kept !== null ? 100 : 0) -
+      8 -
+      AXIS_LABELS -
+      (summaryLines ? 6 + summaryLines * SUMMARY_LINE : 0) -
+      FOOTER -
+      BREATHING_ROOM;
+    const input = {
+      points: Object.fromEntries(MBTI_TYPES.map((type) => [type, points[type].x])) as Record<
+        MbtiType,
+        number
+      >,
+      spots: Object.fromEntries(order.map((type) => [type, jev[type].x])),
+      order,
+    };
+    // The largest stickers whose stacks fit; crowded charts drop to smaller ones.
+    let sizes = DESKTOP_SIZES;
+    let layout = layoutHorizontal(input, CONTENT_WIDTH, sizes, { topPad: 12 });
+    for (const candidate of [MOBILE_SIZES, COMPACT_SIZES]) {
+      if (layout.height - 30 <= budget()) break;
+      sizes = candidate;
+      layout = layoutHorizontal(input, CONTENT_WIDTH, sizes, { topPad: 12 });
+    }
+    // Still too tall: the summary gives up a line, then the question, so nothing overlaps.
+    while (layout.height - 30 > budget()) {
+      if (summaryLines > 1) summaryLines -= 1;
+      else if (questionLines > 2) questionLines -= 1;
+      else break;
+    }
+    const axisY = layout.axisY;
     chartNode = (
       <div style={{ display: "flex", flexDirection: "column" }}>
         <Chart
           layout={layout}
           sizes={sizes}
-          width={chartWidth}
+          width={CONTENT_WIDTH}
           height={layout.height - 30}
-          axis={axisNode}
+          axis={
+            <g>
+              <line
+                x1={18}
+                y1={axisY}
+                x2={CONTENT_WIDTH - 18}
+                y2={axisY}
+                stroke={INK}
+                strokeWidth={2.6}
+              />
+              <path
+                d={`M30 ${axisY - 9} L18 ${axisY} L30 ${axisY + 9}`}
+                fill="none"
+                stroke={INK}
+                strokeWidth={2.4}
+              />
+              <path
+                d={`M${CONTENT_WIDTH - 30} ${axisY - 9} L${CONTENT_WIDTH - 18} ${axisY} L${CONTENT_WIDTH - 30} ${axisY + 9}`}
+                fill="none"
+                stroke={INK}
+                strokeWidth={2.4}
+              />
+            </g>
+          }
         />
         <div
           style={{
@@ -222,8 +290,9 @@ function render(chart: ChartData) {
       </div>
     );
   } else {
-    chartWidth = 560;
+    const chartWidth = 560;
     const height = 400;
+    const sizes = DESKTOP_SIZES;
     const layout = layoutPlane(
       {
         points: Object.fromEntries(
@@ -240,6 +309,12 @@ function render(chart: ChartData) {
       48,
       sizes,
     );
+    // The left column holds the question, grade, and summary; the footer runs full width below.
+    const left =
+      CONTENT_HEIGHT - FOOTER - questionHeight() - (kept !== null ? 62 : 0) - 12 - BREATHING_ROOM;
+    summaryLines = summary
+      ? Math.max(1, Math.min(lineCount(summary, 30, 520, 1), Math.floor(left / SUMMARY_LINE)))
+      : 0;
     chartNode = (
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
         <span style={{ fontFamily: "Noto", fontSize: 15, color: INK }}>↑ {y.high[lang]}</span>
@@ -286,8 +361,39 @@ function render(chart: ChartData) {
       </div>
     );
   }
-  const kept = review ? gradeOf(review) : null;
-  const summary = review?.summary ? `${t.overall} · ${review.summary[lang]}` : "";
+
+  const questionNode = (
+    <span
+      style={{
+        ...words,
+        display: "block",
+        lineClamp: questionLines,
+        fontFamily: "Noto",
+        fontSize: questionSize,
+        fontWeight: 800,
+        color: INK,
+        lineHeight: 1.18,
+      }}
+    >
+      {question}
+    </span>
+  );
+  const summaryNode = summary ? (
+    <span
+      style={{
+        ...words,
+        display: "block",
+        lineClamp: summaryLines,
+        fontFamily: "Pen",
+        fontSize: 30,
+        color: RED,
+        marginTop: y ? 12 : 6,
+        lineHeight: 1.1,
+      }}
+    >
+      {summary}
+    </span>
+  ) : null;
   const header = (
     <div
       style={{
@@ -297,19 +403,9 @@ function render(chart: ChartData) {
         gap: 24,
       }}
     >
-      <div style={{ display: "flex", flexDirection: "column", maxWidth: y ? 520 : 880 }}>
-        <span style={{ fontFamily: "Pen", fontSize: 34, color: "#4a5274" }}>Q.</span>
-        <span
-          style={{
-            fontFamily: "Noto",
-            fontSize: y ? 40 : 44,
-            fontWeight: 800,
-            color: INK,
-            lineHeight: 1.18,
-          }}
-        >
-          {chart.question}
-        </span>
+      <div style={{ display: "flex", flexDirection: "column", width: questionWidth }}>
+        <span style={{ fontFamily: "Pen", fontSize: 34, color: "#4a5274", lineHeight: 1 }}>Q.</span>
+        {questionNode}
       </div>
       {kept !== null && !y ? (
         <div
@@ -335,6 +431,8 @@ function render(chart: ChartData) {
     <div style={{ display: "flex", alignItems: "center", gap: 14, marginTop: "auto" }}>
       <span
         style={{
+          flexShrink: 0,
+          whiteSpace: "nowrap",
           fontFamily: "Bagel",
           fontSize: 18,
           color: INK,
@@ -347,7 +445,7 @@ function render(chart: ChartData) {
       >
         Jev MBTI
       </span>
-      <span style={{ fontFamily: "Noto", fontSize: 16, color: "#4a5274" }}>
+      <span style={{ ...words, fontFamily: "Noto", fontSize: 16, color: "#4a5274" }}>
         {t.footerPlaced(chart.reviewModel ?? "LLM")}
       </span>
     </div>
@@ -361,55 +459,42 @@ function render(chart: ChartData) {
         height: HEIGHT,
         display: "flex",
         flexDirection: "column",
-        padding: "36px 48px 28px",
+        padding: `${PADDING.top}px ${PADDING.side}px ${PADDING.bottom}px`,
+        ...words,
         backgroundColor: "#fafbfe",
         backgroundImage: grid,
         backgroundSize: "100px 100px, 100px 100px, 20px 20px, 20px 20px",
       }}
     >
       {y ? (
-        <div style={{ display: "flex", gap: 32, flex: 1 }}>
-          <div style={{ display: "flex", flexDirection: "column", width: 520 }}>
-            {header}
-            {kept !== null ? (
-              <span style={{ fontFamily: "Pen", fontSize: 44, color: RED, marginTop: 18 }}>
-                {kept}/16 {t.gradeLabel}
-              </span>
-            ) : null}
-            {summary ? (
-              <span
-                style={{
-                  fontFamily: "Pen",
-                  fontSize: 30,
-                  color: RED,
-                  marginTop: 12,
-                  lineHeight: 1.1,
-                }}
-              >
-                {summary}
-              </span>
-            ) : null}
-            {footer}
+        <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
+          <div style={{ display: "flex", gap: 32 }}>
+            <div style={{ display: "flex", flexDirection: "column", width: 520 }}>
+              {header}
+              {kept !== null ? (
+                <span style={{ fontFamily: "Pen", fontSize: 44, color: RED, marginTop: 18 }}>
+                  {kept}/16 {t.gradeLabel}
+                </span>
+              ) : null}
+              {summaryNode}
+            </div>
+            {chartNode}
           </div>
-          {chartNode}
+          {footer}
         </div>
       ) : (
         // Satori lays fragments out as rows, so the column is explicit.
         <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
           {header}
           <div style={{ display: "flex", marginTop: 8 }}>{chartNode}</div>
-          {summary ? (
-            <span style={{ fontFamily: "Pen", fontSize: 30, color: RED, marginTop: 6 }}>
-              {summary}
-            </span>
-          ) : null}
+          {summaryNode}
           {footer}
         </div>
       )}
     </div>
   );
   const text = [
-    chart.question,
+    question,
     summary,
     t.gradeLabel,
     t.footerPlaced(chart.reviewModel ?? "LLM"),
@@ -417,7 +502,7 @@ function render(chart: ChartData) {
     x.high[lang],
     y?.low[lang] ?? "",
     y?.high[lang] ?? "",
-    "Q.0123456789/ ←→↑↓·",
+    "Q.0123456789/ ←→↑↓·…",
     MBTI_TYPES.join(""),
     "Jev MBTI",
   ].join("");
@@ -428,7 +513,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   const { id } = await params;
   const chart = await charts.load(id);
   if (!chart) return new Response("Not found", { status: 404 });
-  const { page, text } = render(chart);
+  // Link previews use the question's language; Save image passes the viewer's.
+  const requested = new URL(request.url).searchParams.get("lang");
+  const { page, text } = render(chart, isLocale(requested) ? requested : chart.questionLanguage);
   const [noto, pen, bagel] = await Promise.all([
     font("Noto Sans KR:wght@800", text),
     font("Nanum Pen Script", text),

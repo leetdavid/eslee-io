@@ -100,6 +100,14 @@ export const chartDataSchema = z.object({
   reviewModel: z.string().nullable(),
 });
 
+/** The question as a viewer reads it: the original wording in its own language, the stored translation otherwise. */
+export function questionIn(
+  chart: Pick<ChartData, "question" | "questionLanguage" | "plot">,
+  locale: Locale,
+): string {
+  return chart.questionLanguage === locale ? chart.question : chart.plot.questionText[locale];
+}
+
 export type Point = { x: number; y?: number };
 
 export function jevPoint(plot: Plot, type: MbtiType): Point {

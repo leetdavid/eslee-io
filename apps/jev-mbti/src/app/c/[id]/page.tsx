@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 import { ChartView } from "@/components/chart/chart-view";
 import { Notebook } from "@/components/notebook";
+import { questionIn } from "@/lib/chart";
+import { MESSAGES } from "@/lib/i18n";
 import { getLocale } from "@/server/locale";
 import { LLM_LABEL } from "@/server/models";
 import { charts } from "@/server/service";
@@ -16,15 +18,18 @@ export async function generateMetadata({
 }: {
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
-  const { id } = await params;
+  const [{ id }, locale] = await Promise.all([params, getLocale()]);
   const chart = await loadChart(id);
   if (!chart) return { title: "Jev MBTI" };
   const image = `/c/${chart.id}/image`;
+  // A link preview can't know who will see it, so it matches the default share
+  // image: the question's own language. The browser tab follows the viewer.
+  const preview = { title: chart.question, description: MESSAGES[chart.questionLanguage].homeLead };
   return {
-    title: chart.question,
-    description: chart.plot.questionText[chart.questionLanguage === "ko" ? "en" : "ko"],
-    openGraph: { title: chart.question, images: [{ url: image, width: 1200, height: 630 }] },
-    twitter: { card: "summary_large_image", title: chart.question, images: [image] },
+    title: questionIn(chart, locale),
+    description: MESSAGES[locale].homeLead,
+    openGraph: { ...preview, images: [{ url: image, width: 1200, height: 630 }] },
+    twitter: { card: "summary_large_image", ...preview, images: [image] },
   };
 }
 

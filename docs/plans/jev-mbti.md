@@ -54,7 +54,7 @@ These apply unless the user objects.
 
 - A saved chart is fixed once it exists, so there are no re-rolls. The only later change is its review arriving. If a review fails, any viewer can retry it. Once a review succeeds, it is final.
 - Generated chart text, such as axis labels, explanations, and the summary, is stored in both languages so a chart reads correctly in either interface language.
-- The share image uses the question's language.
+- The chart page shows everything in the viewer's language, including the question, with the original wording beneath a translated one. Link previews use the question's language; Save image uses the viewer's.
 
 ### Interface
 

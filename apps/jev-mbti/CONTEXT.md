@@ -17,11 +17,11 @@ The saved answer to a question: its axes, the placements of all 16 types, and it
 _Avoid_: result, graph, plot
 
 **Chart link**:
-The short, permanent address of a chart. It opens in the viewer's interface language, whichever language the question used.
+The short, permanent address of a chart. It opens in the viewer's interface language, whichever language the question used. The question itself is shown in the viewer's language too, with the original wording beneath it when the languages differ.
 _Avoid_: URL, permalink, share link
 
 **Share image**:
-A picture of a chart for posting elsewhere. It serves as both the link preview and the downloadable image.
+A picture of a chart for posting elsewhere. As a link preview it uses the question's language, since nobody knows who will see the link. Saved from the chart page, it uses the viewer's interface language.
 _Avoid_: screenshot, thumbnail, OG image
 
 **Example chart**:

@@ -7,6 +7,7 @@ import {
   normalizeCorrection,
   plotSchema,
   pointsFor,
+  questionIn,
   type Review,
   ranksOf,
   reviewedCount,
@@ -69,6 +70,17 @@ describe("chart model", () => {
     expect(normalizeCorrection(cryPlot, "ISFJ", { x: 1.4, note })).toEqual({ x: 1, note });
     // One-axis charts ignore vertical moves.
     expect(normalizeCorrection(cryPlot, "ISFJ", { y: 0.9, note })).toBeUndefined();
+  });
+
+  it("shows the question in the viewer's language, keeping the original wording in its own", () => {
+    const chart = {
+      question: "영화 보다가  제일 먼저 우는 MBTI는?",
+      questionLanguage: "ko" as const,
+      plot: cryPlot,
+    };
+    // The visitor's exact wording, spacing included, beats the stored copy.
+    expect(questionIn(chart, "ko")).toBe("영화 보다가  제일 먼저 우는 MBTI는?");
+    expect(questionIn(chart, "en")).toBe("Which type cries first at a movie?");
   });
 
   it("knows when a streamed review is complete", () => {

@@ -25,6 +25,7 @@ import {
   isReviewComplete,
   nearestLevel,
   pointsFor,
+  questionIn,
   ranksOf,
   reviewedCount,
   STALE_REVIEW_MS,
@@ -311,10 +312,12 @@ export function ChartView({
       : t.tapForDetail
     : t.confidenceNote;
 
-  const changeAxes = new URLSearchParams({ q: chart.question, mode: oneAxis ? "one" : "two" });
+  // Everything the viewer reads or edits is in their language; the original wording stays visible below.
+  const question = questionIn(chart, locale);
+  const changeAxes = new URLSearchParams({ q: question, mode: oneAxis ? "one" : "two" });
   plot.axes.forEach((axis, index) => {
-    changeAxes.set(index === 0 ? "xl" : "yl", axis.low[chart.questionLanguage]);
-    changeAxes.set(index === 0 ? "xh" : "yh", axis.high[chart.questionLanguage]);
+    changeAxes.set(index === 0 ? "xl" : "yl", axis.low[locale]);
+    changeAxes.set(index === 0 ? "xh" : "yh", axis.high[locale]);
   });
 
   return (
@@ -324,12 +327,10 @@ export function ChartView({
           Q.
         </span>
         <div>
-          <h1 className="question" lang={chart.questionLanguage}>
-            {chart.question}
-          </h1>
+          <h1 className="question">{question}</h1>
           {chart.questionLanguage !== locale ? (
-            <p className="translation">
-              {t.translation}: {plot.questionText[locale]}
+            <p className="original-question">
+              {t.originalQuestion}: <span lang={chart.questionLanguage}>{chart.question}</span>
             </p>
           ) : null}
         </div>
@@ -386,7 +387,7 @@ export function ChartView({
           describe={describe}
           onSelect={(type) => setSelected((current) => (current === type ? null : type))}
           animateIn={animateIn}
-          label={t.chartAria(chart.question)}
+          label={t.chartAria(question)}
         />
         <aside className="margin" aria-label={t.redPenNotes}>
           {margin}
@@ -440,7 +441,11 @@ export function ChartView({
       <section className="share" aria-label={t.copyLink}>
         <InputCopy value={origin ? `${origin}/c/${chart.id}` : `/c/${chart.id}`} variant="button" />
         <div className="share-actions">
-          <a className="link-button" href={`/c/${chart.id}/image?download=1`} download>
+          <a
+            className="link-button"
+            href={`/c/${chart.id}/image?download=1&lang=${locale}`}
+            download
+          >
             <Download size={16} aria-hidden="true" />
             {t.saveImage}
           </a>

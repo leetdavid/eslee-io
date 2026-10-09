@@ -577,7 +577,7 @@ body {
   letter-spacing: -0.02em;
   text-wrap: balance;
 }
-.translation {
+.original-question {
   margin-top: 6px;
   font-size: 14px;
   color: var(--ink-soft);
