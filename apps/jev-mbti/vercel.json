@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "buildCommand": "pnpm --dir ../.. exec turbo run build --filter=@eslee/jev-mbti",
+  "installCommand": "pnpm --dir ../.. install --frozen-lockfile",
+  "regions": ["sin1"]
+}

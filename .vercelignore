@@ -5,6 +5,7 @@
 **/.turbo/
 **/dist/
 **/node_modules/
+**/.pglite/
 **/tsconfig.tsbuildinfo
 infra/.terraform/
 .env

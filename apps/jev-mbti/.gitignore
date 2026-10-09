@@ -1,0 +1,10 @@
+node_modules/
+.next/
+.next-dev/
+.turbo/
+.vercel/
+.pglite/
+.env*
+!.env.example
+*.tsbuildinfo
+.vercel
