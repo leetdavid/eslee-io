@@ -240,6 +240,8 @@ function render(chart: ChartData, lang: Locale) {
       else if (questionLines > 2) questionLines -= 1;
       else break;
     }
+    // One tall stack can overflow even so. Then the summary goes, unless the breathing room covers it.
+    if (layout.height - 30 > budget() + BREATHING_ROOM) summaryLines = 0;
     const axisY = layout.axisY;
     chartNode = (
       <div style={{ display: "flex", flexDirection: "column" }}>
@@ -378,22 +380,23 @@ function render(chart: ChartData, lang: Locale) {
       {question}
     </span>
   );
-  const summaryNode = summary ? (
-    <span
-      style={{
-        ...words,
-        display: "block",
-        lineClamp: summaryLines,
-        fontFamily: "Pen",
-        fontSize: 30,
-        color: RED,
-        marginTop: y ? 12 : 6,
-        lineHeight: 1.1,
-      }}
-    >
-      {summary}
-    </span>
-  ) : null;
+  const summaryNode =
+    summary && summaryLines ? (
+      <span
+        style={{
+          ...words,
+          display: "block",
+          lineClamp: summaryLines,
+          fontFamily: "Pen",
+          fontSize: 30,
+          color: RED,
+          marginTop: y ? 12 : 6,
+          lineHeight: 1.1,
+        }}
+      >
+        {summary}
+      </span>
+    ) : null;
   const header = (
     <div
       style={{

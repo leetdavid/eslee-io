@@ -17,6 +17,7 @@ import {
   type Sizes,
 } from "@/lib/layout";
 import { groupOf, MBTI_TYPES, type MbtiType } from "@/lib/mbti";
+import { cn } from "@/lib/utils";
 
 const ROTATION = [-3, 2, -1.5, 3, -2.5, 1.5, 2.5, -1, 1, -2, 3, -3, 2, -1.5, 1.5, -2.5];
 const rotationOf = (type: MbtiType) => ROTATION[MBTI_TYPES.indexOf(type)] ?? 0;
@@ -152,7 +153,7 @@ function Pieces({ layout, sizes, props }: { layout: ChartLayout; sizes: Sizes; p
         <button
           key={sticker.type}
           type="button"
-          className={`sticker ${groupOf(sticker.type)}${props.animateIn ? "dropping" : ""}`}
+          className={cn("sticker", groupOf(sticker.type), props.animateIn && "dropping")}
           aria-pressed={props.selected === sticker.type}
           aria-label={props.describe(sticker.type)}
           onClick={() => props.onSelect(sticker.type)}
