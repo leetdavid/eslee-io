@@ -9,6 +9,7 @@
     "start": "pnpm with-env next start -p 3011",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "check:responsive": "tsx scripts/check-responsive.ts",
     "evaluate:model": "NODE_OPTIONS=--conditions=react-server pnpm with-env tsx scripts/evaluate-model.ts",
     "db:generate": "pnpm with-env drizzle-kit generate",
     "db:migrate": "pnpm with-env tsx scripts/migrate.ts",

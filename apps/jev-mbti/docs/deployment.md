@@ -94,6 +94,17 @@ VERCEL_ORG_ID=team_tPjktSIurawh0LBAXsKia7HA \
 vercel deploy --prod --yes --scope eslee
 ```
 
+For layout changes, use the installed `agent-browser` CLI to check the home page and both chart kinds in Korean and English at widths from 320 to 1280 pixels:
+
+```sh
+pnpm --filter @eslee/jev-mbti check:responsive \
+  https://jev-mbti.vercel.app/ \
+  https://jev-mbti.vercel.app/c/8ytb8vhm \
+  https://jev-mbti.vercel.app/c/udachzpe
+```
+
+Pass local URLs and saved chart IDs to check a local build before deploying. The check fails if the page scrolls horizontally or the copy-link row extends past its share section.
+
 After a deployment reaches Ready, ask one new question in each language and confirm that the review completes, a repeated question reuses its chart, and `/c/<id>/image` renders. A passing build alone is not a completed release.
 
 ## Verified release

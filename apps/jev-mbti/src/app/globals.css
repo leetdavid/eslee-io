@@ -1092,6 +1092,8 @@ figure.plot {
 /* Share */
 .share {
   display: grid;
+  /* Let the copy-link row shrink so its URL truncates instead of widening the page. */
+  grid-template-columns: minmax(0, 1fr);
   gap: 8px;
   margin-top: 22px;
 }
