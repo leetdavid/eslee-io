@@ -15,6 +15,8 @@ function browser(...args: string[]) {
   });
 }
 
+type LayoutReport = { viewport: number; page: number; copy: number; bindingGap: number };
+
 let failures = 0;
 try {
   for (const locale of ["ko", "en"]) {
@@ -27,33 +29,39 @@ try {
 
       for (const width of widths) {
         browser("set", "viewport", String(width), "844");
-        const report: { data: { result: { viewport: number; page: number; copy: number } } } =
-          JSON.parse(
-            browser(
-              "--json",
-              "eval",
-              `(async () => {
+        const report: { data: { result: LayoutReport } } = JSON.parse(
+          browser(
+            "--json",
+            "eval",
+            `(async () => {
                 await document.fonts.ready;
                 await new Promise(requestAnimationFrame);
                 await new Promise(requestAnimationFrame);
                 const root = document.documentElement;
                 const share = document.querySelector('.share');
                 const copy = share?.firstElementChild;
+                const binding = document.querySelector('.spiral').getBoundingClientRect();
+                const rings = [...document.querySelectorAll('.spiral span')]
+                  .map(ring => ring.getBoundingClientRect())
+                  .filter(ring => ring.bottom <= binding.bottom + 1
+                    && ring.right <= binding.right + 1);
+                const gaps = rings.slice(1).map((ring, i) => ring.left - rings[i].right);
                 return {
                   viewport: root.clientWidth,
                   page: root.scrollWidth,
                   copy: copy && share
                     ? copy.getBoundingClientRect().width - share.getBoundingClientRect().width
                     : 0,
+                  bindingGap: gaps.length ? Math.min(...gaps) : 0,
                 };
               })()`,
-            ),
-          );
-        const { viewport, page, copy } = report.data.result;
-        if (page > viewport + 1 || copy > 1) {
+          ),
+        );
+        const { viewport, page, copy, bindingGap } = report.data.result;
+        if (page > viewport + 1 || copy > 1 || bindingGap < 16) {
           failures += 1;
           console.error(
-            `FAIL ${locale} ${width}px ${url}: page ${page}px, copy overflow ${copy}px`,
+            `FAIL ${locale} ${width}px ${url}: page ${page}px, copy overflow ${copy}px, binding gap ${bindingGap.toFixed(1)}px`,
           );
         }
       }
@@ -65,4 +73,4 @@ try {
 }
 
 if (failures) throw new Error(`${failures} responsive checks failed`);
-console.log("No horizontal overflow.");
+console.log("No horizontal overflow or crowded notebook rings.");

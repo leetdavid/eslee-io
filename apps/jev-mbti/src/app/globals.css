@@ -416,7 +416,11 @@ body {
   top: -12px;
   height: 32px;
   display: flex;
+  /* Show only the first row, letting the viewport determine how many rings fit. */
+  flex-wrap: wrap;
+  align-content: flex-start;
   justify-content: space-between;
+  column-gap: 18px;
   overflow: hidden;
   pointer-events: none;
 }
