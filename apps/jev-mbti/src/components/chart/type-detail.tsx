@@ -2,7 +2,7 @@
 
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { type ChartData, LEVEL_COUNT, nearestLevel } from "@/lib/chart";
+import { axesOf, type ChartData, LEVEL_COUNT, nearestLevel } from "@/lib/chart";
 import { type Locale, MESSAGES } from "@/lib/i18n";
 import { groupOf, type MbtiType } from "@/lib/mbti";
 import { TOPIC_INFO } from "@/lore/schema";
@@ -30,9 +30,10 @@ export function TypeDetail({
 }) {
   const t = MESSAGES[locale];
   const { plot } = chart;
+  const axes = axesOf(plot, chart.review);
   const typeReview = chart.review?.types[type];
   const correction = showReview ? typeReview?.correction : undefined;
-  const oneAxis = plot.axes.length === 1;
+  const oneAxis = axes.length === 1;
   const title = correction ? t.movedNote : showReview && typeReview ? t.keptNote : type;
 
   return (
@@ -78,14 +79,14 @@ export function TypeDetail({
           ) : null}
         </p>
       ) : null}
-      {plot.axes.map((axis, index) => {
+      {axes.map((axis, index) => {
         const key = AXIS_KEYS[index] ?? "x";
         const judgment = plot.placements[type][key];
         if (!judgment) return null;
         const moved = correction?.[key];
         return (
           <p key={key} style={{ margin: "6px 0 0", fontSize: 14, lineHeight: 1.45 }}>
-            {plot.axes.length === 2 ? (
+            {!oneAxis ? (
               <span style={{ color: "var(--ink-soft)" }}>{axis.name[locale]} · </span>
             ) : null}
             {t.axisJev(axis.levels[nearestLevel(judgment.position)]?.label[locale] ?? "")}
@@ -100,7 +101,7 @@ export function TypeDetail({
       })}
 
       <p className="detail-label">{t.howSure}</p>
-      {plot.axes.map((axis, index) => {
+      {axes.map((axis, index) => {
         const key = AXIS_KEYS[index] ?? "x";
         const judgment = plot.placements[type][key];
         if (!judgment) return null;
@@ -113,7 +114,7 @@ export function TypeDetail({
               </span>
               <span style={{ fontSize: 13, color: "var(--ink-soft)" }}>
                 {t.confidenceWord}
-                {plot.axes.length === 2 ? ` · ${axis.name[locale]}` : ""}
+                {!oneAxis ? ` · ${axis.name[locale]}` : ""}
               </span>
             </div>
             <div

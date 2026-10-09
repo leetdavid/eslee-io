@@ -4,12 +4,13 @@ Status: Live at https://jev-mbti.vercel.app on an isolated Railway database, ver
 
 ## Implementation decisions
 
-- The pipeline has three stages. Gemini chooses axes, refuses unsafe questions, and selects lore topics; that draft is signed so the next step can't be forged. Jev places all 16 types with one Score request per type, in parallel, at about 0.5 seconds. Gemini then streams the review, which any viewer's browser starts and which polling shows to everyone.
-- Each axis has seven Score levels written by the LLM. Each level is a concrete situation on one fixed scenario, calibrated so that only the one or two most extreme stereotypes reach either end.
+- Jev goes first, at the user's request on October 9, because waiting 8 to 14 seconds for LLM-designed axes made the page slow to appear. Jev reads each question in one request of about 0.3 seconds: five yes/no hazard checks decide refusal, a Choice tells a ranking question from a style question, and a Choice over the lore topics picks the topics. A ranking question or the visitor's own ends need no LLM before placement, so the chart page appears about a second after asking. A style question or a two-axis chart still waits for Gemini to design its axes, now in about 6 seconds without thinking. The chosen axes are signed as a draft so the next step can't be forged. Jev places all 16 types with one Score request per type, in parallel, at about 0.4 seconds. Gemini then streams the review, which any viewer's browser starts and which polling shows to everyone.
+- A ranking question uses a fit axis: seven fixed levels from "the opposite of the answer" to "the textbook answer that people name first", judged from the community's point of view. Custom ends use seven fixed levels that name both ends. Neither needs an LLM, so both show placeholder labels until the review writes the chart's wording first: the translated question, axis names, ends, and level labels. Live checks found the fit axis as spread out as LLM-designed axes on the production examples, and one Choice-picked topic placed types as well as the LLM's two or three.
+- A suggested axis, designed by the LLM, has seven Score levels. Each level is a concrete situation on one fixed scenario, calibrated so that only the one or two most extreme stereotypes reach either end.
 - The lore library covers 16 types across 17 topics plus 8 letters, in both languages, with sources in `apps/jev-mbti/src/lore/SOURCES.md`. Four delegated research attempts produced no files, so the library was written directly from the cited Korean sources and broad community consensus.
-- The team's AI Gateway is on the free tier, which blocks every Gemini 3.x model. Offered gateway credit or the existing OpenRouter balance for Gemini 3.8 Flash, the user chose to stay on `google/gemini-2.5-flash`, which is now the default. Axes take 7 to 14 seconds with a small thinking budget and reviews about 7 seconds. `JEV_MBTI_LLM_MODEL` switches models, and an `openrouter:` prefix routes through OpenRouter.
+- The team's AI Gateway is on the free tier, which blocks every Gemini 3.x model. Offered gateway credit or the existing OpenRouter balance for Gemini 3.8 Flash, the user chose to stay on `google/gemini-2.5-flash`, which is now the default. Suggested axes take about 6 seconds without thinking, and reviews 7 to 9 seconds. `JEV_MBTI_LLM_MODEL` switches models, and an `openrouter:` prefix routes through OpenRouter.
 - At the user's request, free OpenRouter models were evaluated as an option. None was usable: the `openrouter/free` router took 37 seconds or more per axis request and often timed out, Nemotron 3 Super refused every question, and Gemma 4 31B was rate-limited upstream. The full comparison is in the deployment runbook.
-- A live evaluation (`pnpm evaluate:model`) checks direction (F above T for crying, J above P for trip planning), custom ends, forced two-axis charts, refusal of a question about a named coworker, and review streaming. It passed on Gemini 2.5 Flash.
+- A live evaluation (`pnpm evaluate:model`) checks that ranking questions and custom ends skip the LLM, direction (F above T for crying, J above P for trip planning and for zombie survival on custom ends), two suggested axes for style questions and forced two-axis charts, refusal of a question about a named coworker and of one personality can't answer, and a review that words a Jev-first chart before explaining it. It passed on Gemini 2.5 Flash.
 
 ## Confirmed direction
 
@@ -43,8 +44,8 @@ These apply unless the user objects.
 
 ### Judgments
 
-- Jev decides placements and the LLM writes the axes, because Jev cannot generate text. For each question the LLM chooses one axis or two.
-- Each placement is a Jev Score per type per axis, with that type's lore in Jev's state. Text sent to Jev is English-normalized because Jev is most accurate in English. An evaluation set will confirm this choice.
+- Jev reads the question and decides placements; the LLM writes every piece of text, because Jev cannot generate it. Fit and custom axes carry fixed placeholder labels in code until the review words them.
+- Each placement is a Jev Score per type per axis, with that type's lore in Jev's state. When the LLM designed the axes, Jev reads its English wording of the question; a Jev-first chart sends the visitor's original question, which placed Korean questions as well in live checks.
 - Only the 16 four-letter types are used. The -A and -T variants are ignored.
 - The lore library paraphrases and summarizes rather than copying posts verbatim. It keeps the playful tone of Korean MBTI culture but leaves out demeaning content about real groups of people.
 - If the review fails, Jev's chart stays usable and the review can be retried. A failed review never removes or hides placements.
@@ -61,7 +62,7 @@ These apply unless the user objects.
 - UI components come from Fluid Functionalism, as in What Beats Jev, re-themed to the notebook direction. Every typeface must include Hangul.
 - The interface follows the browser's language, falls back to English, and has a visible language toggle.
 - Asking: a single question box with an Auto, one-axis, or two-axis control, and optional custom axis ends behind "Set axes yourself". Questions can be up to 120 visible characters. Because a saved chart is fixed, changing the axes on a chart creates a new chart.
-- A chart moves through these states: suggesting axes, Jev placing, review writing (the red pen arrives), and complete. Separate states cover a failed review with Retry, a refused question, a rate limit, and a missing chart.
+- A chart moves through these states: choosing axes (Jev reads the question, and the LLM designs axes for style questions), Jev placing, review writing (the red pen names a Jev-first chart, then arrives), and complete. Separate states cover a failed review with Retry, a refused question, a rate limit, and a missing chart.
 - Corrected types get red-pen margin notes on the chart itself. Every type's explanation also appears when its sticker is selected and in a list below the chart.
 - Jev's confidence appears in each type's detail rather than on the chart, so the page stays readable.
 - After the review, the reviewed chart is shown by default, and the toggle shows Jev's placements alone.
@@ -100,6 +101,6 @@ Sources: [Score](https://docs.typesafe.ai/primitives/score), [Models](https://do
 
 ## Current readiness
 
-9/10. The site is live, tested (29 tests, typecheck, Biome, production build), and verified end to end in production with real Jev and LLM output. The home page features the six example questions from the approved design. One decision remains with the user: the public name and a custom domain.
+9/10. The site is live, tested (39 tests, typecheck, Biome, production build), and verified end to end in production with real Jev and LLM output. The home page features the six example questions from the approved design. One decision remains with the user: the public name and a custom domain.
 
 A rough cost per chart is about $0.03, almost all of it LLM output. It assumes about 2k tokens of lore per Jev Score and a review that writes about 4k tokens of explanations in both languages. Jev's share is about $0.001.

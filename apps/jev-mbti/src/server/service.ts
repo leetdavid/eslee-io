@@ -1,6 +1,6 @@
 import "server-only";
 
-import { suggestAxes } from "@/server/axes";
+import { chooseAxes } from "@/server/axes";
 import { chartService } from "@/server/charts";
 import { getDatabase } from "@/server/database";
 import { placeTypes } from "@/server/jev";
@@ -9,7 +9,7 @@ import { writeReview } from "@/server/review";
 
 export const charts = chartService({
   db: getDatabase,
-  suggestAxes,
+  chooseAxes,
   placeTypes,
   writeReview,
   reviewModel: LLM_LABEL,

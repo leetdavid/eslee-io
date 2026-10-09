@@ -58,8 +58,10 @@ export const LLM_TIMEOUT_MS =
     : { axes: 30_000, review: 90_000 };
 
 /**
- * Per-call provider settings. Axis design benefits from a little reasoning;
- * the streamed review mostly needs to start fast.
+ * Per-call provider settings. Gemini 2.5 Flash designed axes twice as fast
+ * without thinking and spread the types as well (October 9 evaluation), so
+ * Gemini 2.x never thinks; newer models keep a little reasoning for axes. The
+ * streamed review mostly needs to start fast.
  */
 export function llmOptions(task: "axes" | "review"): Record<string, Record<string, JSONValue>> {
   if (LLM_PROVIDER === "openrouter") {
@@ -69,14 +71,8 @@ export function llmOptions(task: "axes" | "review"): Record<string, Record<strin
   }
   const gateway = { tags: [`feature:jev-mbti-${task}`] };
   if (!LLM_MODEL.startsWith("google/")) return { gateway };
-  const legacy = /gemini-2\./.test(LLM_MODEL);
-  const thinkingConfig =
-    task === "axes"
-      ? legacy
-        ? { thinkingBudget: 1_024 }
-        : { thinkingLevel: "low" }
-      : legacy
-        ? { thinkingBudget: 0 }
-        : { thinkingLevel: "minimal" };
+  const thinkingConfig = /gemini-2\./.test(LLM_MODEL)
+    ? { thinkingBudget: 0 }
+    : { thinkingLevel: task === "axes" ? "low" : "minimal" };
   return { gateway, google: { thinkingConfig } };
 }

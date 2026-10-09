@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import type { Review } from "@/lib/chart";
 import { MBTI_TYPES } from "@/lib/mbti";
-import { cryAxis, cryPlot } from "@/lib/test-fixtures";
+import { cryAxis, cryPlot, fitCryPlot, fitCryWording } from "@/lib/test-fixtures";
 import { RateLimitedError } from "@/server/budget";
 import { type ChartDeps, chartService, DraftError } from "@/server/charts";
 import { type Database, openPglite } from "@/server/database";
@@ -32,7 +32,7 @@ let clock = Date.UTC(2026, 9, 9, 3);
 function service(overrides: Partial<ChartDeps> = {}) {
   return chartService({
     db: async () => db,
-    suggestAxes: vi.fn(async () => ({
+    chooseAxes: vi.fn(async () => ({
       questionText: cryPlot.questionText,
       axes: [cryAxis],
       loreTopics: cryPlot.loreTopics,
@@ -76,6 +76,38 @@ describe("chart service", () => {
       "other",
     );
     expect(again).toEqual({ kind: "existing", id });
+  });
+
+  it("places a Jev-first chart from the original question and waits for the review's wording", async () => {
+    const placeTypes = vi.fn<ChartDeps["placeTypes"]>(async () => ({
+      placements: fitCryPlot.placements,
+      model: "jev-1.13.0",
+      ms: 400,
+    }));
+    let worded = false;
+    const charts = service({
+      chooseAxes: vi.fn(async () => ({ axes: fitCryPlot.axes, loreTopics: fitCryPlot.loreTopics })),
+      placeTypes,
+      writeReview: async () => ({
+        review: { ...completeReview(), ...(worded ? { wording: fitCryWording } : {}) },
+        model: "Routed Model",
+      }),
+    });
+    const question = "영화 보다가 제일 먼저 우는 MBTI는?";
+    const { id } = await createChart(charts, question);
+    expect(placeTypes.mock.calls[0]?.[0]).toBe(question);
+    const chart = await charts.load(id);
+    expect(chart?.plot.questionText).toBeUndefined();
+    expect(chart?.plot.axes[0]?.kind).toBe("fit");
+    await expect(charts.review(id, "a")).rejects.toThrow("unworded");
+    worded = true;
+    expect(await charts.review(id, "b")).toBe("complete");
+    await db.update(JevMbtiChart).set({ isExample: true }).where(eq(JevMbtiChart.id, id));
+    const example = (await charts.examples()).find((entry) => entry.id === id);
+    expect(example?.questionText).toEqual({
+      ko: question,
+      en: "Which type cries first at a movie?",
+    });
   });
 
   it("rejects tampered and expired drafts", async () => {

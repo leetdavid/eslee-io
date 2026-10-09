@@ -13,7 +13,17 @@ export const STALE_REVIEW_MS = 150_000;
 export const bilingualSchema = z.object({ ko: z.string().min(1), en: z.string().min(1) });
 export type Bilingual = z.infer<typeof bilingualSchema>;
 
+/**
+ * Where an axis came from. The LLM designs a suggested axis before Jev places
+ * anything. A fit axis and a custom axis need no LLM first: Jev places the
+ * types right away, and the review names the axis afterward.
+ */
+export const AXIS_KINDS = ["suggested", "fit", "custom"] as const;
+export type AxisKind = (typeof AXIS_KINDS)[number];
+
 export const axisSchema = z.object({
+  /** Charts saved before Jev went first only have suggested axes. */
+  kind: z.enum(AXIS_KINDS).default("suggested"),
   name: bilingualSchema,
   low: bilingualSchema,
   high: bilingualSchema,
@@ -37,8 +47,12 @@ export type Placement = z.infer<typeof placementSchema>;
 export const plotSchema = z
   .object({
     version: z.literal(1),
-    /** The question in both languages; the original wording is stored separately. */
-    questionText: bilingualSchema,
+    /**
+     * The question in both languages, when the LLM wrote it before placement.
+     * A chart Jev placed first gets its translation from the review's wording.
+     * The original wording is stored separately.
+     */
+    questionText: bilingualSchema.optional(),
     axes: z.array(axisSchema).min(1).max(2),
     loreTopics: z.array(z.enum(LORE_TOPICS)).min(1).max(3),
     placements: z.record(z.enum(MBTI_TYPES), placementSchema),
@@ -67,7 +81,24 @@ export const typeReviewSchema = z.object({
 });
 export type TypeReview = z.infer<typeof typeReviewSchema>;
 
+/** The review's names for a fit or custom axis, which replace its placeholders. */
+export const axisWordingSchema = z.object({
+  name: bilingualSchema,
+  low: bilingualSchema,
+  high: bilingualSchema,
+  /** One label per level, from the low end to the high end. */
+  levels: z.array(bilingualSchema).length(LEVEL_COUNT),
+});
+
+/** What the review writes first for a chart Jev placed first: the translated question and axis names. */
+export const wordingSchema = z.object({
+  question: bilingualSchema,
+  axes: z.array(axisWordingSchema).min(1).max(2),
+});
+export type Wording = z.infer<typeof wordingSchema>;
+
 export const reviewSchema = z.object({
+  wording: wordingSchema.optional(),
   types: z.partialRecord(z.enum(MBTI_TYPES), typeReviewSchema),
   summary: bilingualSchema.optional(),
 });
@@ -100,12 +131,43 @@ export const chartDataSchema = z.object({
   reviewModel: z.string().nullable(),
 });
 
-/** The question as a viewer reads it: the original wording in its own language, the stored translation otherwise. */
+/** A chart Jev placed first shows placeholder axis names and no translation until its review words it. */
+export function needsWording(plot: Plot): boolean {
+  return plot.axes.some((axis) => axis.kind !== "suggested");
+}
+
+/**
+ * The question as a viewer reads it: the original wording in its own language,
+ * its translation otherwise. Until a chart Jev placed first is worded, every
+ * viewer reads the original.
+ */
 export function questionIn(
-  chart: Pick<ChartData, "question" | "questionLanguage" | "plot">,
+  chart: Pick<ChartData, "question" | "questionLanguage" | "plot" | "review">,
   locale: Locale,
 ): string {
-  return chart.questionLanguage === locale ? chart.question : chart.plot.questionText[locale];
+  if (chart.questionLanguage === locale) return chart.question;
+  const translated = chart.review?.wording?.question ?? chart.plot.questionText;
+  return translated?.[locale] ?? chart.question;
+}
+
+/**
+ * The axes as shown. The review's wording is naming rather than correcting,
+ * so it applies in the Jev-only view too.
+ */
+export function axesOf(plot: Plot, review: Review | null): Axis[] {
+  const wording = review?.wording;
+  if (!wording) return plot.axes;
+  return plot.axes.map((axis, index) => {
+    const worded = wording.axes[index];
+    if (!worded) return axis;
+    return {
+      ...axis,
+      name: worded.name,
+      low: worded.low,
+      high: worded.high,
+      levels: axis.levels.map((level, i) => ({ ...level, label: worded.levels[i] ?? level.label })),
+    };
+  });
 }
 
 export type Point = { x: number; y?: number };

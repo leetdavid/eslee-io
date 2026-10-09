@@ -4,7 +4,7 @@ Status: The user chose the direction (notebook with red-pen 첨삭). Fourteen re
 
 ## 1. Feature summary
 
-A public, anonymous, bilingual site. A visitor asks a question in Korean or English. An LLM suggests one or two axes, and Jev places all 16 MBTI types on them within seconds, drawing on a curated library of Korean social media lore. An LLM review then explains every placement and corrects the ones it disagrees with, while Jev's original placements stay visible. Every chart is saved under a chart link with a share image.
+A public, anonymous, bilingual site. A visitor asks a question in Korean or English. Jev reads it and places all 16 MBTI types within seconds, drawing on a curated library of Korean social media lore; only a question about each type's style waits for an LLM to suggest two axes first. An LLM review then names the chart, explains every placement, and corrects the ones it disagrees with, while Jev's original placements stay visible. Every chart is saved under a chart link with a share image.
 
 ## 2. Primary user action
 

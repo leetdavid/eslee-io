@@ -19,6 +19,7 @@ import { InputCopy } from "@/components/ui/input-copy";
 import { TabItem, Tabs, TabsList } from "@/components/ui/tabs";
 import { api, failureOf } from "@/lib/api";
 import {
+  axesOf,
   type ChartData,
   correctedTypes,
   gradeOf,
@@ -122,6 +123,7 @@ export function ChartView({
 
   const { plot } = chart;
   const review = chart.review;
+  const axes = axesOf(plot, review);
   const failed = chart.reviewStatus === "failed";
   const hasReview = Boolean(review && reviewedCount(review) > 0) && !failed;
   const showReview = view === "review" && hasReview;
@@ -137,7 +139,7 @@ export function ChartView({
   const reviewedBy = chart.reviewModel ?? reviewer;
 
   const levelLabel = (axisIndex: number, position: number) =>
-    plot.axes[axisIndex]?.levels[nearestLevel(position)]?.label[locale] ?? "";
+    axes[axisIndex]?.levels[nearestLevel(position)]?.label[locale] ?? "";
   const describe = (type: MbtiType) =>
     oneAxis
       ? t.stickerAria(type, `${t.ordinal(finalRanks[type])} · ${levelLabel(0, points[type].x)}`)
@@ -180,9 +182,7 @@ export function ChartView({
     {
       key: "axes",
       label: t.stepAxesDone,
-      description: plot.axes
-        .map((axis) => t.axisArrow(axis.low[locale], axis.high[locale]))
-        .join(" · "),
+      description: axes.map((axis) => t.axisArrow(axis.low[locale], axis.high[locale])).join(" · "),
       status: "complete",
     },
     {
@@ -315,7 +315,7 @@ export function ChartView({
   // Everything the viewer reads or edits is in their language; the original wording stays visible below.
   const question = questionIn(chart, locale);
   const changeAxes = new URLSearchParams({ q: question, mode: oneAxis ? "one" : "two" });
-  plot.axes.forEach((axis, index) => {
+  axes.forEach((axis, index) => {
     changeAxes.set(index === 0 ? "xl" : "yl", axis.low[locale]);
     changeAxes.set(index === 0 ? "xh" : "yh", axis.high[locale]);
   });
@@ -328,7 +328,7 @@ export function ChartView({
         </span>
         <div>
           <h1 className="question">{question}</h1>
-          {chart.questionLanguage !== locale ? (
+          {question !== chart.question ? (
             <p className="original-question">
               {t.originalQuestion}: <span lang={chart.questionLanguage}>{chart.question}</span>
             </p>
@@ -378,7 +378,7 @@ export function ChartView({
 
       <section className="chartwrap">
         <Plot
-          axes={plot.axes}
+          axes={axes}
           locale={locale}
           points={points}
           spots={spots}

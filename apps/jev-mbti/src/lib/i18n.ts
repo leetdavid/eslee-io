@@ -49,13 +49,14 @@ const en = {
   submit: "Place them",
   enterHint: "Press Enter to place them. Shift+Enter adds a line.",
   howTitle: "How it works",
-  howAxes: "Choose axes",
-  howAxesBody: "An LLM picks one axis or two for your question.",
+  howAxes: "Read the question",
+  howAxesBody:
+    "Jev sets up the axis right away. Questions about each type's style get two axes from an LLM.",
   howJev: "Jev places",
   howJevBody: "Jev reads Korean social media lore and places all 16 types in about a second.",
   howReview: "Red pen review",
   howReviewBody:
-    "An LLM explains each type and fixes spots it disagrees with. Jev's originals stay visible.",
+    "An LLM labels the chart, explains each type, and fixes spots it disagrees with. Jev's originals stay visible.",
   examplesTitle: "Example charts",
   oneAxis: "One axis",
   twoAxes: "Two axes",
@@ -64,7 +65,8 @@ const en = {
   axisEndMissing: "Fill in both ends of each axis, or close Set axes yourself.",
   axisEndTooLong: (max: number) => `Keep each axis end within ${max} characters.`,
   refused: "We can't chart that question. Try another one.",
-  refusedDetail: "Questions that target real people or groups aren't charted.",
+  refusedDetail:
+    "We chart questions that compare the types. Questions about real people or groups aren't charted.",
   rateLimited: (minutes: number) =>
     `You've made a lot of new charts. Try again in ${minutes} minute${minutes === 1 ? "" : "s"}.`,
   rateLimitedDetail: "Saved charts and examples still open normally.",
@@ -169,12 +171,14 @@ const ko: Messages = {
   submit: "배치하기",
   enterHint: "Enter로 배치하고, Shift+Enter로 줄을 바꿔요.",
   howTitle: "이렇게 작동해요",
-  howAxes: "축 고르기",
-  howAxesBody: "LLM이 질문에 맞는 한 축이나 두 축을 정해요.",
+  howAxes: "질문 읽기",
+  howAxesBody:
+    "Jev가 질문을 읽고 바로 축을 정해요. 유형별 스타일을 묻는 질문은 LLM이 두 축을 그려요.",
   howJev: "Jev 배치",
   howJevBody: "Jev가 한국 SNS 밈을 읽고 16개 유형을 1초 만에 붙여요.",
   howReview: "빨간 펜 첨삭",
-  howReviewBody: "LLM이 유형마다 이유를 쓰고, 틀린 자리는 고쳐요. Jev 원래 자리는 그대로 남아요.",
+  howReviewBody:
+    "LLM이 차트에 이름을 붙이고, 유형마다 이유를 쓰고, 틀린 자리는 고쳐요. Jev 원래 자리는 그대로 남아요.",
   examplesTitle: "이런 질문은 어때요?",
   oneAxis: "한 축",
   twoAxes: "두 축",
@@ -183,7 +187,8 @@ const ko: Messages = {
   axisEndMissing: "축 양쪽 끝을 모두 적거나, 축 직접 정하기를 닫아 주세요.",
   axisEndTooLong: (max) => `축 끝은 ${max}자 안으로 적어 주세요.`,
   refused: "이 질문은 차트로 만들 수 없어요. 다른 질문을 해 주세요.",
-  refusedDetail: "실제 사람이나 집단을 겨냥한 질문은 배치하지 않아요.",
+  refusedDetail:
+    "MBTI 유형끼리 비교하는 질문만 배치해요. 실제 사람이나 집단을 겨냥한 질문은 안 돼요.",
   rateLimited: (minutes) => `새 차트를 많이 만들었어요. ${minutes}분 뒤에 다시 시도해 주세요.`,
   rateLimitedDetail: "이미 저장된 차트와 예시 차트는 지금도 열 수 있어요.",
   failedToCreate: "차트를 만들지 못했어요. 질문은 그대로 있어요. 다시 시도해 주세요.",

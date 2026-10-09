@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
+  axesOf,
   correctedTypes,
   finalPoint,
   gradeOf,
   isReviewComplete,
+  needsWording,
   normalizeCorrection,
   plotSchema,
   pointsFor,
@@ -13,7 +15,7 @@ import {
   reviewedCount,
 } from "@/lib/chart";
 import { MBTI_TYPES } from "@/lib/mbti";
-import { cryPlot } from "@/lib/test-fixtures";
+import { cryAxis, cryPlot, fitCryPlot, fitCryWording } from "@/lib/test-fixtures";
 
 const note = { ko: "메모", en: "Note" };
 const explanation = { ko: "이유", en: "Reason" };
@@ -77,10 +79,40 @@ describe("chart model", () => {
       question: "영화 보다가  제일 먼저 우는 MBTI는?",
       questionLanguage: "ko" as const,
       plot: cryPlot,
+      review: null,
     };
     // The visitor's exact wording, spacing included, beats the stored copy.
     expect(questionIn(chart, "ko")).toBe("영화 보다가  제일 먼저 우는 MBTI는?");
     expect(questionIn(chart, "en")).toBe("Which type cries first at a movie?");
+  });
+
+  it("shows a Jev-first chart's original question until the review translates it", () => {
+    const chart = {
+      question: "영화 보다가 제일 먼저 우는 MBTI는?",
+      questionLanguage: "ko" as const,
+      plot: fitCryPlot,
+      review: { types: {} },
+    };
+    expect(questionIn(chart, "en")).toBe("영화 보다가 제일 먼저 우는 MBTI는?");
+    const worded = { ...chart, review: { wording: fitCryWording, types: {} } };
+    expect(questionIn(worded, "en")).toBe("Which type cries first at a movie?");
+  });
+
+  it("names a Jev-first axis with the review's wording, keeping Jev's criteria", () => {
+    expect(needsWording(fitCryPlot)).toBe(true);
+    expect(needsWording(cryPlot)).toBe(false);
+    expect(axesOf(fitCryPlot, null)).toBe(fitCryPlot.axes);
+    const [axis] = axesOf(fitCryPlot, { wording: fitCryWording, types: {} });
+    expect(axis?.kind).toBe("fit");
+    expect(axis?.high).toEqual({ ko: "시작부터 오열", en: "Cries first" });
+    expect(axis?.levels[6]?.label.en).toBe("Sobbing ten minutes in");
+    expect(axis?.levels[6]?.criterion).toBe(fitCryPlot.axes[0]?.levels[6]?.criterion);
+  });
+
+  it("reads axes saved before Jev went first as suggested axes", () => {
+    const { kind: _, ...older } = cryAxis;
+    const parsed = plotSchema.parse({ ...cryPlot, axes: [older] });
+    expect(parsed.axes[0]?.kind).toBe("suggested");
   });
 
   it("knows when a streamed review is complete", () => {

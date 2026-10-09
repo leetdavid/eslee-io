@@ -36,12 +36,20 @@ _Avoid_: personality, character, MBTI (as a name for a single type)
 A named dimension with a labeled low end and high end, along which every type receives a position.
 _Avoid_: scale, spectrum, dimension
 
+**Ranking question**:
+A question about which types are most or least something, such as who cries first at a movie. Jev decides whether a question ranks the types or asks about each type's style, such as each type's texting style.
+_Avoid_: one-axis question, simple question
+
+**Fit axis**:
+The axis of a ranking question: how strongly Korean MBTI communities would name each type as the answer. Its levels are fixed, so Jev places the types without waiting for the LLM.
+_Avoid_: generic axis, default axis, likelihood scale
+
 **Suggested axis**:
-An axis proposed automatically from the question. Most charts are expected to use only suggested axes.
+An axis the LLM designs for a question about each type's style, or for a two-axis chart, before Jev places anything.
 _Avoid_: default axis, generated axis
 
 **Custom axis**:
-An axis whose ends the visitor labeled instead of accepting a suggested axis.
+An axis whose ends the visitor labeled instead of accepting a fit or suggested axis. Jev places types between the visitor's ends right away.
 _Avoid_: manual axis, user axis
 
 **One-axis chart**:
@@ -61,6 +69,10 @@ _Avoid_: score, rank, rating
 **Review**:
 The LLM's automatic pass over every completed chart. It gives each type an explanation and may correct placements it disagrees with.
 _Avoid_: second opinion, validation, audit
+
+**Wording**:
+What the review writes first for a chart with a fit or custom axis: the question in both languages and the axis's name, ends, and level labels. Until it arrives, the chart shows the visitor's original question and plain placeholder labels. It names the chart rather than correcting it, so it also appears in the Jev-only view.
+_Avoid_: labels, copy, translation step
 
 **Explanation**:
 The review's short account, in both languages, of why a type sits where it does.
@@ -93,15 +105,15 @@ The curated, bilingual collection of type lore and letter lore, written in this 
 _Avoid_: dataset, corpus, scrape, live search
 
 **Lore topic**:
-A subject in the lore library, such as texting, dating, or conflict. A chart draws only on the topics relevant to its question.
+A subject in the lore library, such as texting, dating, or conflict. A chart draws only on the topics Jev judges relevant to its question.
 _Avoid_: category, tag, facet
 
 ## Models
 
 **Jev**:
-TypeSafe AI's System One model, which judges every placement. Jev returns structured judgments rather than generated text, so it cannot write axis labels or explanations.
+TypeSafe AI's System One model. It reads each question first, deciding whether to refuse it, whether it is a ranking question, and which lore topics matter, and then judges every placement. Jev returns structured judgments rather than generated text, so it cannot write axis labels or explanations.
 _Avoid_: LLM, chatbot
 
 **LLM**:
-The generative language model that suggests axes and performs the review. Unlike Jev, it writes text.
+The generative language model that designs suggested axes and performs the review, including its wording. Unlike Jev, it writes text.
 _Avoid_: AI, assistant, Jev

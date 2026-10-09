@@ -12,9 +12,11 @@ import {
   type ChartData,
   gradeOf,
   isReviewComplete,
+  needsWording,
   type Plot,
   plotSchema,
   pointsFor,
+  questionIn,
   type Review,
   type ReviewStatus,
   reviewSchema,
@@ -50,9 +52,10 @@ export class DraftError extends Error {
 
 export type ChartDeps = {
   db: () => Promise<Database>;
-  suggestAxes: (ask: CleanAsk) => Promise<AxisPlan>;
+  /** Jev reads the question; the LLM designs axes only for style questions and two-axis charts. */
+  chooseAxes: (ask: CleanAsk) => Promise<AxisPlan>;
   placeTypes: (
-    question: Bilingual,
+    question: string,
     axes: Axis[],
     topics: LoreTopic[],
   ) => Promise<{ placements: Plot["placements"]; model: string; ms: number }>;
@@ -80,7 +83,7 @@ const draftSchema = z.object({
     axes: z.array(z.object({ low: z.string(), high: z.string() })).optional(),
   }),
   plan: z.object({
-    questionText: bilingualSchema,
+    questionText: bilingualSchema.optional(),
     axes: z.array(axisSchema).min(1).max(2),
     loreTopics: z.array(z.enum(LORE_TOPICS)).min(1).max(3),
   }),
@@ -121,7 +124,7 @@ export function chartService(deps: ChartDeps) {
     return row?.id ?? null;
   }
 
-  /** Step one: reuse a saved chart, or have the LLM choose axes and return them as a signed draft. */
+  /** Step one: reuse a saved chart, or choose axes for the question and return them as a signed draft. */
   async function suggest(input: AskInput, ip: string): Promise<SuggestResult> {
     const checked = checkAsk(input);
     if (!checked.ok) throw new InvalidQuestionError(checked);
@@ -130,7 +133,7 @@ export function chartService(deps: ChartDeps) {
     const existing = await existingId(db, reuseKey(ask));
     if (existing) return { kind: "existing", id: existing };
     await reserveBudget(db, "ask", ip, deps.now());
-    const plan = await deps.suggestAxes(ask);
+    const plan = await deps.chooseAxes(ask);
     const payload = Buffer.from(
       JSON.stringify({ v: 1, ask, plan, expires: deps.now() + DRAFT_TTL_MS }),
     ).toString("base64url");
@@ -163,7 +166,12 @@ export function chartService(deps: ChartDeps) {
     const key = reuseKey(ask);
     const existing = await existingId(db, key);
     if (existing) return { id: existing };
-    const jev = await deps.placeTypes(plan.questionText, plan.axes, plan.loreTopics);
+    // Jev reads English best, so it gets the LLM's English wording when there is one.
+    const jev = await deps.placeTypes(
+      plan.questionText?.en ?? ask.question,
+      plan.axes,
+      plan.loreTopics,
+    );
     const plot: Plot = plotSchema.parse({
       version: 1,
       questionText: plan.questionText,
@@ -263,6 +271,8 @@ export function chartService(deps: ChartDeps) {
         },
       );
       if (!isReviewComplete(review)) throw new Error("The review is incomplete");
+      if (needsWording(chart.plot) && !review.wording)
+        throw new Error("The review left the chart unworded");
       await db
         .update(JevMbtiChart)
         .set({
@@ -291,11 +301,17 @@ export function chartService(deps: ChartDeps) {
       const plot = plotSchema.safeParse(row.plot);
       const parsed = reviewSchema.safeParse(row.review);
       if (!plot.success || !parsed.success) return [];
+      const chart = {
+        question: row.question,
+        questionLanguage: row.questionLanguage as Locale,
+        plot: plot.data,
+        review: parsed.data,
+      };
       return [
         {
           id: row.id,
           question: row.question,
-          questionText: plot.data.questionText,
+          questionText: { ko: questionIn(chart, "ko"), en: questionIn(chart, "en") },
           axisCount: plot.data.axes.length,
           grade: isReviewComplete(parsed.data) ? gradeOf(parsed.data) : null,
           points: pointsFor(plot.data, parsed.data),

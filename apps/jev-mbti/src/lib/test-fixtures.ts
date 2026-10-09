@@ -1,9 +1,10 @@
-import type { Axis, Judgment, Plot } from "@/lib/chart";
+import type { Axis, Judgment, Plot, Wording } from "@/lib/chart";
 import { MBTI_TYPES, type MbtiType } from "@/lib/mbti";
 
 const level = (en: string, ko: string, criterion: string) => ({ criterion, label: { en, ko } });
 
 export const cryAxis: Axis = {
+  kind: "suggested",
   name: { ko: "눈물", en: "Tears" },
   low: { ko: "눈물 한 방울 없음", en: "Stays dry-eyed" },
   high: { ko: "시작 10분 만에 오열", en: "Sobbing ten minutes in" },
@@ -65,4 +66,24 @@ export const cryPlot: Plot = {
     MBTI_TYPES.map((type) => [type, { x: judgment(cryPositions[type]) }]),
   ) as Plot["placements"],
   jevMs: 1200,
+};
+
+/** The same placements on a fit axis, as Jev places a ranking question before any LLM runs. */
+export const fitCryPlot: Plot = {
+  ...cryPlot,
+  questionText: undefined,
+  axes: [{ ...cryAxis, kind: "fit" }],
+};
+
+/** What the review writes first for `fitCryPlot`. */
+export const fitCryWording: Wording = {
+  question: { ko: "영화 보다가 제일 먼저 우는 MBTI는?", en: "Which type cries first at a movie?" },
+  axes: [
+    {
+      name: { ko: "눈물", en: "Tears" },
+      low: { ko: "눈물 한 방울 없음", en: "Stays dry-eyed" },
+      high: { ko: "시작부터 오열", en: "Cries first" },
+      levels: cryAxis.levels.map((level) => level.label),
+    },
+  ],
 };

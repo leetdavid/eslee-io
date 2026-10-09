@@ -32,7 +32,7 @@ Vercel production and preview have these server-only variables:
 | `TYPESAFE_API_KEY` | sensitive | Jev placements |
 | `JEV_MBTI_DATABASE_URL` | sensitive | Railway PostgreSQL through the TCP proxy |
 | `RATE_LIMIT_SECRET` | sensitive | Hashes visitor IPs for request budgets and signs axis drafts |
-| `JEV_MBTI_LLM_MODEL` | encrypted | The model for axes and the review, currently `google/gemini-2.5-flash` |
+| `JEV_MBTI_LLM_MODEL` | encrypted | The model for suggested axes and the review, currently `google/gemini-2.5-flash` |
 
 Deployed functions authenticate to AI Gateway with the project's OIDC token, so no gateway key is stored. Never prefix these variables with `NEXT_PUBLIC_`, print their values, or commit env files. The root `.vercelignore` keeps every `.env*` file and the local `.pglite/` database out of CLI uploads.
 
@@ -55,6 +55,17 @@ The October 9 run of `pnpm evaluate:model` compared the options on six cases:
 | Gemma 4 31B, free | 0 of 6 | Rate-limited upstream on every call |
 
 Free OpenRouter models aren't usable for this site today.
+
+Later on October 9, Jev started going first, and Gemini 2.5 Flash stopped thinking while designing axes. The evaluation then passed 9 of 9 cases:
+
+| Path | Time before placement | Notes |
+| --- | --- | --- |
+| Ranking question (fit axis) | 0.3 to 0.6 seconds | Jev's question checks only; placement adds about 0.35 seconds |
+| Custom ends | about 0.3 seconds | No LLM before placement |
+| Style question or two axes (suggested) | 5.6 to 6.7 seconds | Was 10.7 to 13.4 seconds with a thinking budget, with no loss of spread |
+| Refusal | about 0.3 seconds | Jev refuses before any LLM call |
+
+The review writes a Jev-first chart's wording about 3 seconds in and finishes in 7 to 9 seconds.
 
 ## Schema changes
 

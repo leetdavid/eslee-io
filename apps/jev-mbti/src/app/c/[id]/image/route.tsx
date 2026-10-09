@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import {
+  axesOf,
   type ChartData,
   correctedTypes,
   gradeOf,
@@ -194,7 +195,8 @@ function render(chart: ChartData, lang: Locale) {
   const points = pointsFor(chart.plot, review);
   const jev = pointsFor(chart.plot, null);
   const order = correctedTypes(chart.plot, review);
-  const [x, y] = chart.plot.axes;
+  // Wording names the axes as soon as it is written, even before the review finishes.
+  const [x, y] = axesOf(chart.plot, chart.review);
   if (!x) throw new Error("Chart has no axes");
 
   // Translations and long questions wrap, so text is sized first and the chart gets the rest.
