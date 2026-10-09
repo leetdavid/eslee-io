@@ -41,9 +41,11 @@ export type PlotProps = {
   axes: Axis[];
   locale: Locale;
   points: Record<MbtiType, { x: number; y?: number }>;
-  /** Jev's original points for corrected types; empty in clean and Jev-only views. */
+  /** Original points reserved in the collision layout for direct comparison between corrected views. */
   spots: Partial<Record<MbtiType, { x: number; y?: number }>>;
   order: MbtiType[];
+  /** Hide annotations without moving or resizing the stickers. */
+  showCorrections: boolean;
   selected: MbtiType | null;
   describe: (type: MbtiType) => string;
   onSelect: (type: MbtiType) => void;
@@ -133,22 +135,23 @@ function Pieces({ layout, sizes, props }: { layout: ChartLayout; sizes: Sizes; p
   const fontSize = FONT[sizes.sticker.w] ?? 16;
   return (
     <>
-      {layout.spots.map((spot) => (
-        <div
-          key={`s-${spot.type}`}
-          className="spot"
-          aria-hidden="true"
-          style={{
-            left: spot.cx - sizes.spot.w / 2,
-            top: spot.cy - sizes.spot.h / 2,
-            width: sizes.spot.w,
-            height: sizes.spot.h,
-            fontSize: Math.max(10.5, fontSize - 6),
-          }}
-        >
-          {spot.type}
-        </div>
-      ))}
+      {props.showCorrections &&
+        layout.spots.map((spot) => (
+          <div
+            key={`s-${spot.type}`}
+            className="spot"
+            aria-hidden="true"
+            style={{
+              left: spot.cx - sizes.spot.w / 2,
+              top: spot.cy - sizes.spot.h / 2,
+              width: sizes.spot.w,
+              height: sizes.spot.h,
+              fontSize: Math.max(10.5, fontSize - 6),
+            }}
+          >
+            {spot.type}
+          </div>
+        ))}
       {layout.stickers.map((sticker, index) => (
         <button
           key={sticker.type}
@@ -172,22 +175,23 @@ function Pieces({ layout, sizes, props }: { layout: ChartLayout; sizes: Sizes; p
           {sticker.type}
         </button>
       ))}
-      {layout.marks.map((mark) => (
-        <div
-          key={`m-${mark.type}`}
-          className="mark"
-          aria-hidden="true"
-          style={{
-            left: mark.x,
-            top: mark.y,
-            width: sizes.mark,
-            height: sizes.mark,
-            fontSize: sizes.mark - 3,
-          }}
-        >
-          {mark.n}
-        </div>
-      ))}
+      {props.showCorrections &&
+        layout.marks.map((mark) => (
+          <div
+            key={`m-${mark.type}`}
+            className="mark"
+            aria-hidden="true"
+            style={{
+              left: mark.x,
+              top: mark.y,
+              width: sizes.mark,
+              height: sizes.mark,
+              fontSize: sizes.mark - 3,
+            }}
+          >
+            {mark.n}
+          </div>
+        ))}
     </>
   );
 }
@@ -292,7 +296,7 @@ export function Plot(incoming: PlotProps) {
                 strokeWidth="2"
               />
             ))}
-            <Ink layout={layout} />
+            {props.showCorrections ? <Ink layout={layout} /> : null}
           </svg>
           <Pieces layout={layout} sizes={sizes} props={props} />
           <span className="axis-label" style={{ left: 16, top: layout.axisY + 12, fontSize: 15 }}>
@@ -335,7 +339,7 @@ export function Plot(incoming: PlotProps) {
                 strokeWidth="2"
               />
             ))}
-            <Ink layout={layout} />
+            {props.showCorrections ? <Ink layout={layout} /> : null}
           </svg>
           <Pieces layout={layout} sizes={sizes} props={props} />
           <span
@@ -448,7 +452,7 @@ export function Plot(incoming: PlotProps) {
             markerStart="url(#axis-head)"
             markerEnd="url(#axis-head)"
           />
-          <Ink layout={layout} />
+          {props.showCorrections ? <Ink layout={layout} /> : null}
         </svg>
         <Pieces layout={layout} sizes={sizes} props={props} />
         {labels.map((item) => {
@@ -472,7 +476,7 @@ export function Plot(incoming: PlotProps) {
   return (
     <figure ref={ref} className="plot gridbg" aria-label={props.label} style={{ height }}>
       {body}
-      {hasSpots && width > 0 ? <Legend locale={locale} /> : null}
+      {props.showCorrections && hasSpots && width > 0 ? <Legend locale={locale} /> : null}
     </figure>
   );
 }

@@ -77,7 +77,7 @@ Stickers never overlap. On one axis they stack in lanes, and on two axes they ar
 | Jev placing | Stickers landing quickly in staggered order, with the axes drawn |
 | Review writing | Jev's chart complete and red notes arriving one at a time ("첨삭 중 9/16") |
 | Complete (reviewed) | Grade, circles, arrows, margin notes, 총평, ranked list, and share actions |
-| Clean chart | Corrected stickers without red ink or old spots, a full-width chart, and explanations without before-and-after comparisons |
+| Clean chart | Corrected stickers without red ink or old spots, the same plotting area and reserved side column as With review, and explanations without before-and-after comparisons |
 | Jev only | Same chart with stickers at Jev's placements and no red ink |
 | Type detail | Type code and group, rank or position under Jev and under review, Jev's confidence meter, explanation, and lore topics used |
 | No corrections | No arrows, and a red "참 잘했어요" stamp beside a 16/16 grade |

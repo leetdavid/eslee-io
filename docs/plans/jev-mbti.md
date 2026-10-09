@@ -65,7 +65,7 @@ These apply unless the user objects.
 - A chart moves through these states: choosing axes (Jev reads the question, and the LLM designs axes for style questions), Jev placing, review writing (the red pen names a Jev-first chart, then arrives), and complete. Separate states cover a failed review with Retry, a refused question, a rate limit, and a missing chart.
 - Corrected types get red-pen margin notes on the chart itself. Every type's explanation also appears when its sticker is selected and in a list below the chart.
 - Jev's confidence appears in each type's detail rather than on the chart, so the page stays readable.
-- After the review, With review is shown by default. At the user's request, Clean chart keeps the corrected positions without red marks, old spots, notes, grading, or before-and-after comparisons, and fills the empty margin with the chart. Jev only shows the original placements. Save image follows the selected view; link previews keep the annotated review.
+- After the review, With review is shown by default. At the user's request, Clean chart keeps the corrected positions without red marks, old spots, notes, grading, or before-and-after comparisons. It reserves the same side column and exact sticker layout as With review for direct comparison instead of filling the empty margin with the chart. Jev only shows the original placements. Save image follows the selected view; link previews keep the annotated review.
 - Mobile and desktop both get first-class layouts, with WCAG AA as the accessibility baseline.
 - Excluded from the first version: highlighting the visitor's own type, quadrant names on two-axis charts, accounts, a public feed, re-rolls, dark mode, and live search.
 

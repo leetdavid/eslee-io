@@ -25,6 +25,7 @@ type LayoutReport = {
   annotations: number;
   stickerCount: number;
   descriptions: string;
+  plotGeometry: string;
   imageView: string | null;
 };
 
@@ -40,6 +41,7 @@ try {
       if (isChart) browser("wait", ".plot > svg");
       const views: (ChartViewMode | null)[] = isChart ? [...CHART_VIEWS] : [null];
       let reviewedDescriptions = "";
+      const reviewedGeometry = new Map<number, string>();
 
       for (const view of views) {
         if (view) {
@@ -68,6 +70,7 @@ try {
                     && ring.right <= binding.right + 1);
                 const gaps = rings.slice(1).map((ring, i) => ring.left - rings[i].right);
                 const stickers = [...document.querySelectorAll('.plot .sticker')];
+                const plot = document.querySelector('.plot')?.getBoundingClientRect();
                 const image = document.querySelector('.share a[download]');
                 return {
                   viewport: root.clientWidth,
@@ -83,20 +86,32 @@ try {
                   descriptions: JSON.stringify(stickers
                     .map(sticker => [sticker.textContent, sticker.getAttribute('aria-label')])
                     .sort((a, b) => a[0].localeCompare(b[0]))),
+                  plotGeometry: JSON.stringify({
+                    bounds: plot ? [plot.left, plot.width, plot.height] : null,
+                    stickers: stickers.map(sticker => [sticker.textContent,
+                      sticker.style.left, sticker.style.top, sticker.style.width, sticker.style.height])
+                      .sort((a, b) => a[0].localeCompare(b[0])),
+                  }),
                   imageView: image ? new URL(image.href).searchParams.get('view') : null,
                 };
               })()`,
             ),
           );
           const { viewport, page, copy, bindingGap } = report.data.result;
-          const { annotations, stickerCount, descriptions, imageView } = report.data.result;
-          if (view === "review") reviewedDescriptions = descriptions;
+          const { annotations, stickerCount, descriptions, imageView, plotGeometry } =
+            report.data.result;
+          if (view === "review") {
+            reviewedDescriptions = descriptions;
+            reviewedGeometry.set(width, plotGeometry);
+          }
           const wrongView =
             view !== null &&
             (stickerCount !== 16 ||
               imageView !== view ||
               (view !== "review" && annotations > 0) ||
-              (view === "clean" && descriptions !== reviewedDescriptions));
+              (view === "clean" &&
+                (descriptions !== reviewedDescriptions ||
+                  plotGeometry !== reviewedGeometry.get(width))));
           if (page > viewport + 1 || copy > 1 || bindingGap < 16 || wrongView) {
             failures += 1;
             console.error(

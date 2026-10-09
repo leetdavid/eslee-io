@@ -35,7 +35,6 @@ import {
 } from "@/lib/chart";
 import { type Locale, MESSAGES } from "@/lib/i18n";
 import { groupOf, MBTI_TYPES, type MbtiType, TYPE_GROUPS } from "@/lib/mbti";
-import { cn } from "@/lib/utils";
 import type { FailureReason } from "@/server/router";
 
 function useMediaQuery(query: string) {
@@ -133,7 +132,12 @@ export function ChartView({
   const shownView = !hasReview ? "jev" : view === "clean" && !complete ? "review" : view;
   const showReview = shownView !== "jev";
   const showCorrections = shownView === "review";
-  const { points, order, spots } = chartPresentation(plot, hasReview ? review : null, shownView);
+  // Both corrected views use the same layout. Plot hides annotations in clean view.
+  const { points, order, spots } = chartPresentation(
+    plot,
+    hasReview ? review : null,
+    showReview ? "review" : "jev",
+  );
   const jevPoints = pointsFor(plot, null);
   const finalRanks = ranksOf(points);
   const jevRanks = ranksOf(jevPoints);
@@ -383,27 +387,27 @@ export function ChartView({
         </div>
       ) : null}
 
-      <section className={cn("chartwrap", !margin && "chartwrap-full")}>
+      <section className="chartwrap">
         <Plot
           axes={axes}
           locale={locale}
           points={points}
           spots={spots}
           order={order}
+          showCorrections={showCorrections}
           selected={selected}
           describe={describe}
           onSelect={(type) => setSelected((current) => (current === type ? null : type))}
           animateIn={animateIn}
           label={t.chartAria(question)}
         />
-        {margin ? (
-          <aside
-            className="margin"
-            aria-label={shownView === "clean" ? t.placement : t.redPenNotes}
-          >
-            {margin}
-          </aside>
-        ) : null}
+        <aside
+          className="margin"
+          aria-hidden={margin ? undefined : true}
+          aria-label={margin ? (shownView === "clean" ? t.placement : t.redPenNotes) : undefined}
+        >
+          {margin}
+        </aside>
       </section>
 
       {showCorrections && complete && review?.summary ? (

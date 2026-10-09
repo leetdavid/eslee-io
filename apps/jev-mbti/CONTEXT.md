@@ -65,7 +65,7 @@ A type's position on a chart, with one value per axis, as judged by Jev.
 _Avoid_: score, rank, rating
 
 **Chart view**:
-How a chart is displayed, without changing its stored placements or review. With review shows corrected positions and the red-pen history. Clean chart (최종 배치) shows the same corrected positions and explanations without old spots, marks, margin notes, grading, or before-and-after comparisons; it becomes available once the review finishes. Jev only shows the original placements. Save image follows the selected view.
+How a chart is displayed, without changing its stored placements or review. With review shows corrected positions and the red-pen history. Clean chart (최종 배치) shows the same corrected positions and explanations without old spots, marks, margin notes, grading, or before-and-after comparisons; it becomes available once the review finishes. Clean chart reserves the same side column and uses the same sticker layout as With review, so switching between them never moves or resizes the chart. Jev only shows the original placements. Save image follows the selected view.
 _Avoid_: chart mode, correction toggle
 
 ## Review

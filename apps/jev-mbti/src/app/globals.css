@@ -632,14 +632,17 @@ body {
   gap: 22px;
   margin-top: 16px;
 }
+.margin:empty {
+  display: none;
+}
 @media (min-width: 1024px) {
   .chartwrap {
     grid-template-columns: minmax(0, 1fr) 264px;
     gap: 36px;
     margin-top: 26px;
   }
-  .chartwrap-full {
-    grid-template-columns: minmax(0, 1fr);
+  .margin:empty {
+    display: block;
   }
   .margin {
     border-left: 3px double var(--grid-strong);

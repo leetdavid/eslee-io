@@ -103,7 +103,7 @@ pnpm --filter @eslee/jev-mbti check:responsive \
   https://jev-mbti.vercel.app/c/udachzpe
 ```
 
-Pass local URLs and completed chart IDs to check a local build before deploying. The check fails if the page scrolls horizontally, the copy-link row extends past its share section, or the notebook rings become crowded. It also checks that Clean chart keeps the reviewed placements without annotations and that each view's Save image link selects the matching image view.
+Pass local URLs and completed chart IDs to check a local build before deploying. The check fails if the page scrolls horizontally, the copy-link row extends past its share section, or the notebook rings become crowded. It also checks that Clean chart keeps the reviewed placements, chart dimensions, and exact sticker layout without annotations, and that each view's Save image link selects the matching image view.
 
 After a deployment reaches Ready, ask one new question in each language and confirm that the review completes, a repeated question reuses its chart, and `/c/<id>/image` renders. A passing build alone is not a completed release.
 
