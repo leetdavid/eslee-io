@@ -105,6 +105,12 @@ Production deployment `dpl_7TDB4Ym3x9M25DkbZPa5iUKYtJyH` reached Ready with func
 - Asking it again with different spacing and case reused the saved chart in 0.7 seconds.
 - The share image returned a 1200 by 630 PNG. Function logs showed no errors.
 
+The Jev-first release, deployment `dpl_7ejitPcjGTh6YxhrSiPJpTZLiig7`, was verified the same way on October 9:
+
+- A new Korean ranking question showed its chart page 2.3 seconds after asking on the first request after deployment, and a new English one 1.4 seconds after. Both pages showed Jev's placements with placeholder ends, gained the review's ends about 5 seconds later, and finished the review at 11 to 13 seconds with the 16/16 stamp.
+- Reasking the Korean question with different spacing and case reused its chart in 0.3 seconds.
+- The new chart, two older examples, and their share images returned 200, and the home page still lists all six examples.
+
 ## Example charts
 
 The home page features the six questions from the approved design, created on production on October 9:
