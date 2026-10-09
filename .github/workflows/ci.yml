@@ -116,6 +116,33 @@ jobs:
       - name: Test game rules and transactional matchup reuse
         run: pnpm --filter @eslee/what-beats-jev test
 
+  jev-mbti-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: ghcr.io/railwayapp-templates/postgres-ssl:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: jev_mbti_ci
+          PGDATA: /var/lib/postgresql/data/pgdata
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres -d jev_mbti_ci"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      JEV_MBTI_DATABASE_URL: postgres://postgres:postgres@localhost:5432/jev_mbti_ci?sslmode=require
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./tooling/github/setup
+      - name: Apply chart migrations and verify reruns
+        run: |
+          pnpm --filter @eslee/jev-mbti db:migrate
+          pnpm --filter @eslee/jev-mbti db:migrate
+      - name: Test chart rules, layouts, lore, and the chart service
+        run: pnpm --filter @eslee/jev-mbti test
+
   railway-infrastructure:
     needs: [lint, format, typecheck, sushiro-tests]
     if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')

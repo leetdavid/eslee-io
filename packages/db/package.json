@@ -19,6 +19,10 @@
     "./what-beats-jev": {
       "types": "./dist/schema/what-beats-jev.d.ts",
       "default": "./src/schema/what-beats-jev.ts"
+    },
+    "./jev-mbti": {
+      "types": "./dist/schema/jev-mbti.d.ts",
+      "default": "./src/schema/jev-mbti.ts"
     }
   },
   "license": "MIT",
