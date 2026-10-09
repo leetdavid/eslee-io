@@ -21,7 +21,7 @@ The short, permanent address of a chart. It opens in the viewer's interface lang
 _Avoid_: URL, permalink, share link
 
 **Share image**:
-A picture of a chart for posting elsewhere. As a link preview it uses the question's language, since nobody knows who will see the link. Saved from the chart page, it uses the viewer's interface language.
+A picture of a chart for posting elsewhere. As a link preview it uses the question's language and the annotated review, since nobody knows who will see the link. Saved from the chart page, it uses the viewer's interface language and selected chart view.
 _Avoid_: screenshot, thumbnail, OG image
 
 **Example chart**:
@@ -64,6 +64,10 @@ _Avoid_: 2D chart, scatter plot, quadrant chart
 A type's position on a chart, with one value per axis, as judged by Jev.
 _Avoid_: score, rank, rating
 
+**Chart view**:
+How a chart is displayed, without changing its stored placements or review. With review shows corrected positions and the red-pen history. Clean chart (최종 배치) shows the same corrected positions and explanations without old spots, marks, margin notes, grading, or before-and-after comparisons; it becomes available once the review finishes. Jev only shows the original placements. Save image follows the selected view.
+_Avoid_: chart mode, correction toggle
+
 ## Review
 
 **Review**:
@@ -79,7 +83,7 @@ The review's short account, in both languages, of why a type sits where it does.
 _Avoid_: reason, rationale, comment
 
 **Correction**:
-A review's decision to move a type away from its placement. The original placement remains visible next to the corrected position.
+A review's decision to move a type away from its placement. In With review, the original placement remains visible next to the corrected position. Clean chart hides that history without undoing the correction.
 _Avoid_: override, fix, adjustment
 
 **Summary**:

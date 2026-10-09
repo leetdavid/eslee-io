@@ -107,6 +107,13 @@ export type Review = z.infer<typeof reviewSchema>;
 export const REVIEW_STATUSES = ["pending", "running", "complete", "failed"] as const;
 export type ReviewStatus = (typeof REVIEW_STATUSES)[number];
 
+export const CHART_VIEWS = ["review", "clean", "jev"] as const;
+export type ChartViewMode = (typeof CHART_VIEWS)[number];
+
+export function isChartViewMode(value: unknown): value is ChartViewMode {
+  return CHART_VIEWS.some((view) => view === value);
+}
+
 export type ChartData = {
   id: string;
   question: string;
@@ -215,6 +222,16 @@ export function correctedTypes(plot: Plot, review: Review | null): MbtiType[] {
   if (plot.axes.length === 2) return corrected;
   const ranks = ranksOf(pointsFor(plot, review));
   return corrected.sort((a, b) => ranks[a] - ranks[b]);
+}
+
+/** Shared by the page and share image: clean view keeps final positions but none of the correction history. */
+export function chartPresentation(plot: Plot, review: Review | null, view: ChartViewMode) {
+  const points = pointsFor(plot, view === "jev" ? null : review);
+  const order = view === "review" ? correctedTypes(plot, review) : [];
+  const spots = Object.fromEntries(order.map((type) => [type, jevPoint(plot, type)])) as Partial<
+    Record<MbtiType, Point>
+  >;
+  return { points, order, spots };
 }
 
 export function reviewedCount(review: Review | null): number {

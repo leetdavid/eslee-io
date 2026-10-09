@@ -21,8 +21,10 @@ import { api, failureOf } from "@/lib/api";
 import {
   axesOf,
   type ChartData,
-  correctedTypes,
+  type ChartViewMode,
+  chartPresentation,
   gradeOf,
+  isChartViewMode,
   isReviewComplete,
   nearestLevel,
   pointsFor,
@@ -33,6 +35,7 @@ import {
 } from "@/lib/chart";
 import { type Locale, MESSAGES } from "@/lib/i18n";
 import { groupOf, MBTI_TYPES, type MbtiType, TYPE_GROUPS } from "@/lib/mbti";
+import { cn } from "@/lib/utils";
 import type { FailureReason } from "@/server/router";
 
 function useMediaQuery(query: string) {
@@ -60,7 +63,7 @@ export function ChartView({
 }) {
   const t = MESSAGES[locale];
   const [chart, setChart] = useState(initial);
-  const [view, setView] = useState<"review" | "jev">("review");
+  const [view, setView] = useState<ChartViewMode>("review");
   const [selected, setSelected] = useState<MbtiType | null>(null);
   const [reviewFailure, setReviewFailure] = useState<FailureReason | null>(null);
   const [origin, setOrigin] = useState("");
@@ -126,13 +129,12 @@ export function ChartView({
   const axes = axesOf(plot, review);
   const failed = chart.reviewStatus === "failed";
   const hasReview = Boolean(review && reviewedCount(review) > 0) && !failed;
-  const showReview = view === "review" && hasReview;
-  const shownReview = showReview ? review : null;
   const complete = chart.reviewStatus === "complete" && review !== null && isReviewComplete(review);
-  const points = pointsFor(plot, shownReview);
+  const shownView = !hasReview ? "jev" : view === "clean" && !complete ? "review" : view;
+  const showReview = shownView !== "jev";
+  const showCorrections = shownView === "review";
+  const { points, order, spots } = chartPresentation(plot, hasReview ? review : null, shownView);
   const jevPoints = pointsFor(plot, null);
-  const order = correctedTypes(plot, shownReview);
-  const spots = Object.fromEntries(order.map((type) => [type, jevPoints[type]]));
   const finalRanks = ranksOf(points);
   const jevRanks = ranksOf(jevPoints);
   const oneAxis = plot.axes.length === 1;
@@ -152,7 +154,7 @@ export function ChartView({
     <TypeDetail
       chart={chart}
       type={selected}
-      showReview={showReview}
+      view={shownView}
       jevRank={jevRanks[selected]}
       finalRank={finalRanks[selected]}
       locale={locale}
@@ -205,7 +207,7 @@ export function ChartView({
     margin = (
       <>
         <ProgressSteps title={reviewedBy} steps={steps} />
-        {showReview ? notes : null}
+        {showCorrections ? notes : null}
         <p className="pencil" style={{ fontSize: 22, marginTop: 16 }}>
           {t.noScoreYet}
         </p>
@@ -227,7 +229,7 @@ export function ChartView({
     );
   } else if (complete && review) {
     const kept = gradeOf(review);
-    margin = showReview ? (
+    margin = showCorrections ? (
       <>
         {kept === 16 ? (
           <div className="stamp" role="img" aria-label={t.stampAria}>
@@ -241,11 +243,11 @@ export function ChartView({
         )}
         {notes}
       </>
-    ) : (
+    ) : shownView === "jev" ? (
       <p className="pencil" style={{ fontSize: 24, margin: 0 }}>
         {t.beforeRedPen}
       </p>
-    );
+    ) : null;
   }
 
   const rowContent = (type: MbtiType) => {
@@ -255,7 +257,7 @@ export function ChartView({
       return (
         <span className="e">
           {explanation[locale]}
-          {moved ? (
+          {showCorrections && moved ? (
             <span className="fx num">
               {oneAxis ? t.rankMoveFull(jevRanks[type], finalRanks[type]) : moved.note[locale]}
             </span>
@@ -309,7 +311,9 @@ export function ChartView({
   const listNote = showReview
     ? active
       ? t.explanationsPending
-      : t.tapForDetail
+      : shownView === "clean"
+        ? t.cleanDetailHint
+        : t.tapForDetail
     : t.confidenceNote;
 
   // Everything the viewer reads or edits is in their language; the original wording stays visible below.
@@ -345,12 +349,15 @@ export function ChartView({
           ) : null}
         </div>
         <Tabs
-          value={showReview ? "review" : "jev"}
-          onValueChange={(value) => setView(value as "review" | "jev")}
+          value={shownView}
+          onValueChange={(value) => {
+            if (isChartViewMode(value)) setView(value);
+          }}
           size="compact"
         >
           <TabsList aria-label={t.viewLabel}>
             <TabItem value="review" label={t.withReview} disabled={!hasReview} />
+            <TabItem value="clean" label={t.cleanChart} disabled={!complete} />
             <TabItem value="jev" label={t.jevOnly} />
           </TabsList>
         </Tabs>
@@ -376,7 +383,7 @@ export function ChartView({
         </div>
       ) : null}
 
-      <section className="chartwrap">
+      <section className={cn("chartwrap", !margin && "chartwrap-full")}>
         <Plot
           axes={axes}
           locale={locale}
@@ -389,17 +396,22 @@ export function ChartView({
           animateIn={animateIn}
           label={t.chartAria(question)}
         />
-        <aside className="margin" aria-label={t.redPenNotes}>
-          {margin}
-        </aside>
+        {margin ? (
+          <aside
+            className="margin"
+            aria-label={shownView === "clean" ? t.placement : t.redPenNotes}
+          >
+            {margin}
+          </aside>
+        ) : null}
       </section>
 
-      {showReview && complete && review?.summary ? (
+      {showCorrections && complete && review?.summary ? (
         <section className="summary hand" aria-label={t.overall}>
           <span className="k">{t.overall}</span>
           <p>{review.summary[locale]}</p>
         </section>
-      ) : showReview && active ? (
+      ) : showCorrections && active ? (
         <section className="summary pencil" aria-label={t.overall}>
           <span className="k">{t.overall}</span>
           <p>{t.summaryPending}</p>
@@ -443,7 +455,7 @@ export function ChartView({
         <div className="share-actions">
           <a
             className="link-button"
-            href={`/c/${chart.id}/image?download=1&lang=${locale}`}
+            href={`/c/${chart.id}/image?download=1&lang=${locale}&view=${shownView}`}
             download
           >
             <Download size={16} aria-hidden="true" />

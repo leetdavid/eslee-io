@@ -50,7 +50,7 @@ The hero is the notebook page itself: a grid-paper sheet with spiral binding acr
 Components come from Fluid Functionalism, re-themed:
 
 - InputMessage-style composer for the question
-- Tabs for Auto / one axis / two axes and for With review / Jev only
+- Tabs for Auto / one axis / two axes and for With review / Clean chart / Jev only
 - Accordion for "Set axes yourself"
 - Buttons, Badges, and Tooltip
 - ThinkingSteps for progress
@@ -77,6 +77,7 @@ Stickers never overlap. On one axis they stack in lanes, and on two axes they ar
 | Jev placing | Stickers landing quickly in staggered order, with the axes drawn |
 | Review writing | Jev's chart complete and red notes arriving one at a time ("첨삭 중 9/16") |
 | Complete (reviewed) | Grade, circles, arrows, margin notes, 총평, ranked list, and share actions |
+| Clean chart | Corrected stickers without red ink or old spots, a full-width chart, and explanations without before-and-after comparisons |
 | Jev only | Same chart with stickers at Jev's placements and no red ink |
 | Type detail | Type code and group, rank or position under Jev and under review, Jev's confidence meter, explanation, and lore topics used |
 | No corrections | No arrows, and a red "참 잘했어요" stamp beside a 16/16 grade |
@@ -89,7 +90,7 @@ Stickers never overlap. On one axis they stack in lanes, and on two axes they ar
 
 - Enter submits the question and Shift+Enter adds a line. IME composition never triggers a submit.
 - Changing axes on a saved chart creates a new chart with its own link. A saved chart never changes, except that its review arrives once.
-- The review toggle defaults to With review once the review exists. It is unavailable until the review starts.
+- Chart views default to With review once explanations start arriving. Clean chart becomes available once the review finishes and hides all correction history while keeping corrected positions. Jev only remains available throughout. Save image follows the selected view.
 - Selecting a sticker opens its type detail, from either the chart or the list. Stickers are buttons and are reachable with the keyboard in ranked order.
 - Motion: stickers drop in with a short spring and stagger, red ink draws its strokes along the path, and the grade circles itself last. Under reduced motion, everything appears at its final state.
 - Screen readers get the chart as the ranked list. Corrections are announced in words, such as "ISFJ: Jev 7th, reviewed 3rd," never by color alone.
@@ -111,7 +112,7 @@ Copy is short and written by hand. Jev never "explains" anything; explanations b
 | Jev placing | Jev가 16개 유형을 붙이는 중 | Jev is placing all 16 types |
 | Review writing | 빨간 펜이 첨삭하는 중 · 9/16 | The red pen is reviewing · 9/16 |
 | Grade label | Jev 점수 | Jev's score |
-| Review toggle | 첨삭 반영 · Jev만 | With review · Jev only |
+| Chart views | 첨삭 반영 · 최종 배치 · Jev만 | With review · Clean chart · Jev only |
 | Summary label | 총평 | Overall |
 | Review failed | 첨삭을 끝내지 못했어요. Jev 배치는 그대로예요. | Couldn't finish the review. Jev's placements are safe. |
 | Retry | 다시 첨삭하기 | Retry review |

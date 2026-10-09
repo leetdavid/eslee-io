@@ -2,10 +2,11 @@ import { ImageResponse } from "next/og";
 import {
   axesOf,
   type ChartData,
-  correctedTypes,
+  type ChartViewMode,
+  chartPresentation,
   gradeOf,
+  isChartViewMode,
   isReviewComplete,
-  pointsFor,
   questionIn,
 } from "@/lib/chart";
 import { isLocale, type Locale, MESSAGES } from "@/lib/i18n";
@@ -184,17 +185,16 @@ const SUMMARY_LINE = 33;
 const FOOTER = 40;
 const BREATHING_ROOM = 10;
 
-function render(chart: ChartData, lang: Locale) {
+function render(chart: ChartData, lang: Locale, view: ChartViewMode) {
   const t = MESSAGES[lang];
   const question = questionIn(chart, lang);
   // Satori breaks Hangul anywhere by default; keep words whole, as the page does.
   const words = lang === "ko" ? ({ wordBreak: "keep-all" } as const) : {};
   const review = chart.review && isReviewComplete(chart.review) ? chart.review : null;
-  const kept = review ? gradeOf(review) : null;
-  const summary = review?.summary ? `${t.overall} · ${review.summary[lang]}` : "";
-  const points = pointsFor(chart.plot, review);
-  const jev = pointsFor(chart.plot, null);
-  const order = correctedTypes(chart.plot, review);
+  const annotations = view === "review";
+  const kept = annotations && review ? gradeOf(review) : null;
+  const summary = annotations && review?.summary ? `${t.overall} · ${review.summary[lang]}` : "";
+  const { points, order, spots } = chartPresentation(chart.plot, review, view);
   // Wording names the axes as soon as it is written, even before the review finishes.
   const [x, y] = axesOf(chart.plot, chart.review);
   if (!x) throw new Error("Chart has no axes");
@@ -225,7 +225,7 @@ function render(chart: ChartData, lang: Locale) {
         MbtiType,
         number
       >,
-      spots: Object.fromEntries(order.map((type) => [type, jev[type].x])),
+      spots: Object.fromEntries(Object.entries(spots).map(([type, point]) => [type, point.x])),
       order,
     };
     // The largest stickers whose stacks fit; crowded charts drop to smaller ones.
@@ -303,7 +303,7 @@ function render(chart: ChartData, lang: Locale) {
           MBTI_TYPES.map((type) => [type, { x: points[type].x, y: points[type].y ?? 0.5 }]),
         ) as Record<MbtiType, { x: number; y: number }>,
         spots: Object.fromEntries(
-          order.map((type) => [type, { x: jev[type].x, y: jev[type].y ?? 0.5 }]),
+          Object.entries(spots).map(([type, point]) => [type, { x: point.x, y: point.y ?? 0.5 }]),
         ),
         order,
         obstacles: [],
@@ -518,9 +518,16 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   const { id } = await params;
   const chart = await charts.load(id);
   if (!chart) return new Response("Not found", { status: 404 });
-  // Link previews use the question's language; Save image passes the viewer's.
-  const requested = new URL(request.url).searchParams.get("lang");
-  const { page, text } = render(chart, isLocale(requested) ? requested : chart.questionLanguage);
+  // Link previews keep the annotated view in the question's language.
+  // Save image passes the viewer's language and chosen view.
+  const query = new URL(request.url).searchParams;
+  const requested = query.get("lang");
+  const view = query.get("view");
+  const { page, text } = render(
+    chart,
+    isLocale(requested) ? requested : chart.questionLanguage,
+    isChartViewMode(view) ? view : "review",
+  );
   const [noto, pen, bagel] = await Promise.all([
     font("Noto Sans KR:wght@800", text),
     font("Nanum Pen Script", text),

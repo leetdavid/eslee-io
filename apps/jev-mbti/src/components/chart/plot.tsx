@@ -41,7 +41,7 @@ export type PlotProps = {
   axes: Axis[];
   locale: Locale;
   points: Record<MbtiType, { x: number; y?: number }>;
-  /** Jev's original points for corrected types; empty in Jev-only view. */
+  /** Jev's original points for corrected types; empty in clean and Jev-only views. */
   spots: Partial<Record<MbtiType, { x: number; y?: number }>>;
   order: MbtiType[];
   selected: MbtiType | null;
@@ -365,6 +365,7 @@ export function Plot(incoming: PlotProps) {
     const ax = width / 2;
     const ay = height / 2;
     const label = (text: string) => estimateTextWidth(text, font) + font + 14;
+    const verticalLabelX = (text: string) => Math.min(ax + 8, Math.max(8, width - 8 - label(text)));
     const labels: (Rect & { text: string; icon: "left" | "right" | "up" | "down" })[] = [
       {
         text: x.low[locale],
@@ -385,7 +386,7 @@ export function Plot(incoming: PlotProps) {
       {
         text: y.high[locale],
         icon: "up",
-        x: ax + 8,
+        x: verticalLabelX(y.high[locale]),
         y: 8,
         w: label(y.high[locale]),
         h: font * 1.5,
@@ -393,7 +394,7 @@ export function Plot(incoming: PlotProps) {
       {
         text: y.low[locale],
         icon: "down",
-        x: ax + 8,
+        x: verticalLabelX(y.low[locale]),
         y: height - 8 - font * 1.5,
         w: label(y.low[locale]),
         h: font * 1.5,

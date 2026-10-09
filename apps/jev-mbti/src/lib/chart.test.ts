@@ -1,12 +1,15 @@
 import { describe, expect, it } from "vitest";
 import {
   axesOf,
+  chartPresentation,
   correctedTypes,
   finalPoint,
   gradeOf,
+  isChartViewMode,
   isReviewComplete,
   needsWording,
   normalizeCorrection,
+  type Plot,
   plotSchema,
   pointsFor,
   questionIn,
@@ -15,7 +18,7 @@ import {
   reviewedCount,
 } from "@/lib/chart";
 import { MBTI_TYPES } from "@/lib/mbti";
-import { cryAxis, cryPlot, fitCryPlot, fitCryWording } from "@/lib/test-fixtures";
+import { cryAxis, cryPlot, fitCryPlot, fitCryWording, judgment } from "@/lib/test-fixtures";
 
 const note = { ko: "메모", en: "Note" };
 const explanation = { ko: "이유", en: "Reason" };
@@ -51,6 +54,58 @@ describe("chart model", () => {
     expect(finalPoint(cryPlot, review, "ISFJ")).toEqual({ x: 0.82 });
     expect(finalPoint(cryPlot, review, "INFP")).toEqual({ x: 0.93 });
     expect(finalPoint(cryPlot, null, "ISFJ")).toEqual({ x: 0.6 });
+  });
+
+  it("keeps corrected placements and ranks in clean view without any original spots or marks", () => {
+    const review = fullReview({ ISFJ: 0.82 });
+    const annotated = chartPresentation(cryPlot, review, "review");
+    const clean = chartPresentation(cryPlot, review, "clean");
+    expect(clean.points).toEqual(annotated.points);
+    expect(ranksOf(clean.points).ISFJ).toBe(3);
+    expect(clean.order).toEqual([]);
+    expect(clean.spots).toEqual({});
+    expect(annotated.order).toEqual(["ISFJ"]);
+    expect(annotated.spots).toEqual({ ISFJ: { x: 0.6 } });
+  });
+
+  it("shows Jev's originals in Jev-only view even when corrections exist", () => {
+    const original = chartPresentation(cryPlot, fullReview({ ISFJ: 0.82 }), "jev");
+    expect(original.points.ISFJ).toEqual({ x: 0.6 });
+    expect(original.order).toEqual([]);
+    expect(original.spots).toEqual({});
+  });
+
+  it("keeps both corrected coordinates in a clean two-axis chart", () => {
+    const plot: Plot = {
+      ...cryPlot,
+      axes: [cryAxis, cryAxis],
+      placements: Object.fromEntries(
+        MBTI_TYPES.map((type) => [type, { ...cryPlot.placements[type], y: judgment(0.4) }]),
+      ) as Plot["placements"],
+    };
+    const review = fullReview({ ISFJ: 0.82 });
+    review.types.ISFJ = { explanation, correction: { x: 0.82, y: 0.9, note } };
+    const clean = chartPresentation(plot, review, "clean");
+    expect(clean.points.ISFJ).toEqual({ x: 0.82, y: 0.9 });
+    expect(clean.points.INFP).toEqual({ x: 0.93, y: 0.4 });
+    expect(clean.spots).toEqual({});
+  });
+
+  it("shows the original placements without annotations when no review exists", () => {
+    for (const view of ["review", "clean", "jev"] as const) {
+      const shown = chartPresentation(cryPlot, null, view);
+      expect(shown.points).toEqual(pointsFor(cryPlot, null));
+      expect(shown.order).toEqual([]);
+      expect(shown.spots).toEqual({});
+    }
+  });
+
+  it("accepts only the three supported chart views", () => {
+    expect(isChartViewMode("clean")).toBe(true);
+    expect(isChartViewMode("review")).toBe(true);
+    expect(isChartViewMode("jev")).toBe(true);
+    expect(isChartViewMode("other")).toBe(false);
+    expect(isChartViewMode(null)).toBe(false);
   });
 
   it("ranks highest first and orders corrections by final rank", () => {

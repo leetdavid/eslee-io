@@ -2,7 +2,14 @@
 
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { axesOf, type ChartData, LEVEL_COUNT, nearestLevel } from "@/lib/chart";
+import {
+  axesOf,
+  type ChartData,
+  type ChartViewMode,
+  finalPoint,
+  LEVEL_COUNT,
+  nearestLevel,
+} from "@/lib/chart";
 import { type Locale, MESSAGES } from "@/lib/i18n";
 import { groupOf, type MbtiType } from "@/lib/mbti";
 import { TOPIC_INFO } from "@/lore/schema";
@@ -12,7 +19,7 @@ const AXIS_KEYS = ["x", "y"] as const;
 export function TypeDetail({
   chart,
   type,
-  showReview,
+  view,
   jevRank,
   finalRank,
   locale,
@@ -21,7 +28,7 @@ export function TypeDetail({
 }: {
   chart: ChartData;
   type: MbtiType;
-  showReview: boolean;
+  view: ChartViewMode;
   jevRank: number;
   finalRank: number;
   locale: Locale;
@@ -32,9 +39,11 @@ export function TypeDetail({
   const { plot } = chart;
   const axes = axesOf(plot, chart.review);
   const typeReview = chart.review?.types[type];
-  const correction = showReview ? typeReview?.correction : undefined;
+  const clean = view === "clean";
+  const correction = view === "review" ? typeReview?.correction : undefined;
+  const final = finalPoint(plot, chart.review, type);
   const oneAxis = axes.length === 1;
-  const title = correction ? t.movedNote : showReview && typeReview ? t.keptNote : type;
+  const title = correction ? t.movedNote : view === "review" && typeReview ? t.keptNote : type;
 
   return (
     <div>
@@ -67,7 +76,7 @@ export function TypeDetail({
       <p className="detail-label">{t.placement}</p>
       {oneAxis ? (
         <p style={{ margin: "6px 0 0", fontSize: 14 }}>
-          <b className="num">{t.jevRank(jevRank)}</b>{" "}
+          <b className="num">{clean ? t.ordinal(finalRank) : t.jevRank(jevRank)}</b>{" "}
           <span style={{ color: "var(--ink-soft)" }}>{t.ofSixteen}</span>
           {correction ? (
             <>
@@ -89,7 +98,9 @@ export function TypeDetail({
             {!oneAxis ? (
               <span style={{ color: "var(--ink-soft)" }}>{axis.name[locale]} · </span>
             ) : null}
-            {t.axisJev(axis.levels[nearestLevel(judgment.position)]?.label[locale] ?? "")}
+            {clean
+              ? axis.levels[nearestLevel(final[key] ?? judgment.position)]?.label[locale]
+              : t.axisJev(axis.levels[nearestLevel(judgment.position)]?.label[locale] ?? "")}
             {moved !== undefined ? (
               <b style={{ color: "var(--red-pen)" }}>
                 {" "}
@@ -100,45 +111,49 @@ export function TypeDetail({
         );
       })}
 
-      <p className="detail-label">{t.howSure}</p>
-      {axes.map((axis, index) => {
-        const key = AXIS_KEYS[index] ?? "x";
-        const judgment = plot.placements[type][key];
-        if (!judgment) return null;
-        const percents = judgment.probabilities.map((p) => Math.round(p * 100));
-        return (
-          <div key={key} style={{ marginTop: 8 }}>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-              <span className="num" style={{ fontSize: 26, fontWeight: 800 }}>
-                {Math.round(judgment.confidence * 100)}%
-              </span>
-              <span style={{ fontSize: 13, color: "var(--ink-soft)" }}>
-                {t.confidenceWord}
-                {!oneAxis ? ` · ${axis.name[locale]}` : ""}
-              </span>
-            </div>
-            <div
-              className="dist"
-              style={{ ["--levels" as string]: LEVEL_COUNT }}
-              role="img"
-              aria-label={axis.levels
-                .map((level, i) => `${level.label[locale]} ${percents[i] ?? 0}%`)
-                .join(", ")}
-            >
-              {percents.map((percent, i) => (
-                // biome-ignore lint/suspicious/noArrayIndexKey: levels are positional
-                <i key={i} style={{ height: Math.max(2, percent * 0.7) }}>
-                  {percent >= 5 ? <b className="num">{percent}%</b> : null}
-                </i>
-              ))}
-            </div>
-            <div className="dist-ends">
-              <span>{axis.low[locale]}</span>
-              <span style={{ textAlign: "right" }}>{axis.high[locale]}</span>
-            </div>
-          </div>
-        );
-      })}
+      {!clean ? (
+        <>
+          <p className="detail-label">{t.howSure}</p>
+          {axes.map((axis, index) => {
+            const key = AXIS_KEYS[index] ?? "x";
+            const judgment = plot.placements[type][key];
+            if (!judgment) return null;
+            const percents = judgment.probabilities.map((p) => Math.round(p * 100));
+            return (
+              <div key={key} style={{ marginTop: 8 }}>
+                <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+                  <span className="num" style={{ fontSize: 26, fontWeight: 800 }}>
+                    {Math.round(judgment.confidence * 100)}%
+                  </span>
+                  <span style={{ fontSize: 13, color: "var(--ink-soft)" }}>
+                    {t.confidenceWord}
+                    {!oneAxis ? ` · ${axis.name[locale]}` : ""}
+                  </span>
+                </div>
+                <div
+                  className="dist"
+                  style={{ ["--levels" as string]: LEVEL_COUNT }}
+                  role="img"
+                  aria-label={axis.levels
+                    .map((level, i) => `${level.label[locale]} ${percents[i] ?? 0}%`)
+                    .join(", ")}
+                >
+                  {percents.map((percent, i) => (
+                    // biome-ignore lint/suspicious/noArrayIndexKey: levels are positional
+                    <i key={i} style={{ height: Math.max(2, percent * 0.7) }}>
+                      {percent >= 5 ? <b className="num">{percent}%</b> : null}
+                    </i>
+                  ))}
+                </div>
+                <div className="dist-ends">
+                  <span>{axis.low[locale]}</span>
+                  <span style={{ textAlign: "right" }}>{axis.high[locale]}</span>
+                </div>
+              </div>
+            );
+          })}
+        </>
+      ) : null}
 
       {typeReview ? (
         <>

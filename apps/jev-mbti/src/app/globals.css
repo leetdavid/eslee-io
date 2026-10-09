@@ -638,6 +638,9 @@ body {
     gap: 36px;
     margin-top: 26px;
   }
+  .chartwrap-full {
+    grid-template-columns: minmax(0, 1fr);
+  }
   .margin {
     border-left: 3px double var(--grid-strong);
     padding-left: 22px;
