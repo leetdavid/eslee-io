@@ -5,11 +5,11 @@ import Image from "next/image";
 import { useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import { useLanguage } from "@/components/language-provider";
+import { LoadError } from "@/components/load-error";
 import { MapViewport } from "@/components/map-viewport";
 import { QueueChart } from "@/components/queue-chart";
 import { QueueLegend } from "@/components/queue-legend";
 import { StoreSheet } from "@/components/store-sheet";
-import { Button } from "@/components/ui/button";
 import { projectMapLocation } from "@/lib/map-projection";
 import {
   copy,
@@ -77,6 +77,7 @@ export function QueueMap() {
       language={language}
       onLanguageChange={setLanguage}
       onRefresh={feed.refresh}
+      staleSince={feed.error && feed.data ? feed.loadedAt : null}
       updatedAt={feed.loadedAt}
     >
       {status === "ready" && snapshot ? (
@@ -201,12 +202,9 @@ export function QueueMap() {
       ) : null}
 
       {status === "error" ? (
-        <section className="map-status" role="alert">
-          <p>{text.unavailable}</p>
-          <Button onClick={feed.refresh} variant="secondary">
-            {text.retry}
-          </Button>
-        </section>
+        <div className="map-status">
+          <LoadError language={language} onRetry={feed.refresh} />
+        </div>
       ) : null}
 
       {/* Keeps the sheet mounted while it animates out. */}

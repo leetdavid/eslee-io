@@ -1,10 +1,11 @@
 "use client";
 
-import { Minus, Plus } from "lucide-react";
+import { Minus, Plus, Star } from "lucide-react";
 import { useEffect, useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import { BranchPicker } from "@/components/branch-picker";
 import { useLanguage } from "@/components/language-provider";
+import { LoadError } from "@/components/load-error";
 import { PlanBranch } from "@/components/plan-branch";
 import { PlanRuler } from "@/components/plan-ruler";
 import { QueueLegend } from "@/components/queue-legend";
@@ -161,6 +162,7 @@ export function PlanView({ initialMinute, initialWeekday }: PlanViewProps) {
       language={language}
       onLanguageChange={setLanguage}
       onRefresh={refresh}
+      staleSince={feed.error && feed.data ? feed.loadedAt : null}
       updatedAt={feed.loadedAt}
     >
       <div className="plan">
@@ -200,14 +202,7 @@ export function PlanView({ initialMinute, initialWeekday }: PlanViewProps) {
           </p>
         ) : null}
 
-        {status === "error" ? (
-          <section className="stats-status" role="alert">
-            <p>{text.unavailable}</p>
-            <Button onClick={refresh} variant="secondary">
-              {text.retry}
-            </Button>
-          </section>
-        ) : null}
+        {status === "error" ? <LoadError language={language} onRetry={refresh} /> : null}
 
         {status === "ready" ? (
           <>
@@ -230,7 +225,9 @@ export function PlanView({ initialMinute, initialWeekday }: PlanViewProps) {
                       {fill(plan.keyUsual, { day: dayName })}
                     </span>
                   </p>
-                  <div className="plan-add-wide">{addBranch("compact")}</div>
+                  {mine.length > 0 ? (
+                    <div className="plan-add-wide">{addBranch("compact")}</div>
+                  ) : null}
                 </div>
               </div>
               {mine.length > 0 ? (
@@ -260,10 +257,16 @@ export function PlanView({ initialMinute, initialWeekday }: PlanViewProps) {
                   </ul>
                 </>
               ) : (
-                <p className="caption plan-empty">{plan.emptyMine}</p>
+                <div className="plan-empty-card">
+                  <Star aria-hidden="true" size={20} />
+                  <p>{plan.emptyMine}</p>
+                  {addBranch("default")}
+                </div>
               )}
               {/* On phones the button sits under the cards, full width. */}
-              <div className="plan-add-narrow">{addBranch("default")}</div>
+              {mine.length > 0 ? (
+                <div className="plan-add-narrow">{addBranch("default")}</div>
+              ) : null}
             </section>
 
             <section aria-labelledby="plan-all" className="plan-card">

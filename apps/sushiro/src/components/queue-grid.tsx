@@ -1,9 +1,12 @@
 "use client";
 
 import { AnimatePresence } from "framer-motion";
+import { CalendarClock } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import { useLanguage } from "@/components/language-provider";
+import { LoadError } from "@/components/load-error";
 import { MyBranchRows } from "@/components/my-branch-rows";
 import { QueueAreaChart } from "@/components/queue-area-chart";
 import { QueueLegend } from "@/components/queue-legend";
@@ -109,6 +112,7 @@ export function QueueGrid() {
       language={language}
       onLanguageChange={setLanguage}
       onRefresh={feed.refresh}
+      staleSince={feed.error && feed.data ? feed.loadedAt : null}
       updatedAt={feed.loadedAt}
     >
       <div className="home">
@@ -116,19 +120,39 @@ export function QueueGrid() {
           <>
             <div>
               <div className="home-summary">
-                <div className="home-total">
-                  <strong className="figure-l">{total.groups}</strong>
-                  <span>{text.groupsWaiting}</span>
-                </div>
-                <p className="caption home-meta">
-                  {fill(text.branchesIssuing, { count: total.activeStores })}
-                  {updatedTime ? (
-                    <span className="home-updated">
-                      {" · "}
-                      {fill(text.updated, { time: updatedTime })}
-                    </span>
-                  ) : null}
-                </p>
+                {total.activeStores === 0 ? (
+                  <div className="home-closed">
+                    <h2>{text.allClosed}</h2>
+                    <p className="caption home-meta">
+                      {text.allClosedNote}
+                      {updatedTime ? (
+                        <span className="home-updated">
+                          {" · "}
+                          {fill(text.updated, { time: updatedTime })}
+                        </span>
+                      ) : null}
+                    </p>
+                    <Button asChild leadingIcon={CalendarClock} variant="secondary">
+                      <Link href="/plan">{text.planTomorrow}</Link>
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <div className="home-total">
+                      <strong className="figure-l">{total.groups}</strong>
+                      <span>{text.groupsWaiting}</span>
+                    </div>
+                    <p className="caption home-meta">
+                      {fill(text.branchesIssuing, { count: total.activeStores })}
+                      {updatedTime ? (
+                        <span className="home-updated">
+                          {" · "}
+                          {fill(text.updated, { time: updatedTime })}
+                        </span>
+                      ) : null}
+                    </p>
+                  </>
+                )}
               </div>
               {savedStores.length > 0 ? (
                 <MyBranchRows
@@ -244,82 +268,96 @@ export function QueueGrid() {
                 </section>
               ) : null}
 
-              <section aria-labelledby="queueing-heading">
-                <div className="list-heading">
-                  <h2 id="queueing-heading">{text.queueing}</h2>
-                  <span className="caption">
-                    {fill(text.branchCount, { count: queueing.length })}
-                  </span>
-                </div>
-                <ul className="branch-rows">
-                  {visibleQueueing.map((store) => {
-                    const points = historyByStoreId.get(store.id) ?? [];
+              {queueing.length > 0 ? (
+                <section aria-labelledby="queueing-heading">
+                  <div className="list-heading">
+                    <h2 id="queueing-heading">{text.queueing}</h2>
+                    <span className="caption">
+                      {fill(text.branchCount, { count: queueing.length })}
+                    </span>
+                  </div>
+                  <ul className="branch-rows">
+                    {visibleQueueing.map((store) => {
+                      const points = historyByStoreId.get(store.id) ?? [];
 
-                    return (
-                      <li key={store.id}>
-                        <button
-                          aria-label={describe(store)}
-                          className="branch-row"
-                          data-band={queueBand(store)}
-                          onClick={() => openStore(store)}
-                          type="button"
-                        >
-                          <i className="band-dot" />
-                          <span className="branch-row-main">
-                            <span className="branch-row-name">
-                              {shortStoreName(store, language)}
+                      return (
+                        <li key={store.id}>
+                          <button
+                            aria-label={describe(store)}
+                            className="branch-row"
+                            data-band={queueBand(store)}
+                            onClick={() => openStore(store)}
+                            type="button"
+                          >
+                            <i className="band-dot" />
+                            <span className="branch-row-main">
+                              <span className="branch-row-name">
+                                {shortStoreName(store, language)}
+                              </span>
+                              <span className="caption">
+                                {store.area} · {waitingGroups(store)} {text.groups}
+                              </span>
                             </span>
-                            <span className="caption">
-                              {store.area} · {waitingGroups(store)} {text.groups}
+                            {/* Each row scales to its own peak, with a 30-minute floor so a quiet
+                                branch does not look dramatic. */}
+                            <QueueAreaChart
+                              end={historyWindow.end}
+                              maximumWait={Math.max(30, ...points.map((point) => point.wait))}
+                              points={points}
+                              start={historyWindow.start}
+                            />
+                            <span className="branch-row-figure">
+                              <strong className="figure-m">{store.wait}</strong>
+                              <span className="caption">{text.minutes}</span>
                             </span>
-                          </span>
-                          {/* Each row scales to its own peak, with a 30-minute floor so a quiet
-                              branch does not look dramatic. */}
-                          <QueueAreaChart
-                            end={historyWindow.end}
-                            maximumWait={Math.max(30, ...points.map((point) => point.wait))}
-                            points={points}
-                            start={historyWindow.start}
-                          />
-                          <span className="branch-row-figure">
-                            <strong className="figure-m">{store.wait}</strong>
-                            <span className="caption">{text.minutes}</span>
-                          </span>
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-                {queueing.length > queueingPreview ? (
-                  <Button
-                    className="w-full"
-                    onClick={() => setShowAllQueueing((showAll) => !showAll)}
-                    variant="secondary"
-                  >
-                    {showAllQueueing
-                      ? text.showFewer
-                      : fill(text.showAll, { count: queueing.length })}
-                  </Button>
-                ) : null}
-              </section>
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                  {queueing.length > queueingPreview ? (
+                    <Button
+                      className="w-full"
+                      onClick={() => setShowAllQueueing((showAll) => !showAll)}
+                      variant="secondary"
+                    >
+                      {showAllQueueing
+                        ? text.showFewer
+                        : fill(text.showAll, { count: queueing.length })}
+                    </Button>
+                  ) : null}
+                </section>
+              ) : null}
             </div>
           </>
         ) : null}
 
+        {/* While the first load runs the grid keeps its shape, so nothing jumps when it lands. */}
         {status === "loading" ? (
-          <div aria-live="polite" className="home-status">
-            {text.loading}
+          <div aria-busy="true" aria-live="polite" className="home-skeleton">
+            <div className="home-total">
+              <i className="skeleton-bar skeleton-figure" />
+              <i className="skeleton-bar skeleton-line" />
+            </div>
+            {storeGridBands.map(({ band, cells }) => (
+              <div key={band}>
+                <p className="band-label">{text.territory[band]}</p>
+                <div aria-hidden="true" className="tile-grid">
+                  {cells.map(({ key, name }) =>
+                    name ? (
+                      <span className="tile" data-band="muted" key={key} />
+                    ) : (
+                      <span className="tile-placeholder" key={key} />
+                    ),
+                  )}
+                </div>
+              </div>
+            ))}
+            <p className="caption home-meta">{text.loadingQueues}</p>
           </div>
         ) : null}
 
-        {status === "error" ? (
-          <section className="home-status" role="alert">
-            <p>{text.unavailable}</p>
-            <Button onClick={feed.refresh} variant="secondary">
-              {text.retry}
-            </Button>
-          </section>
-        ) : null}
+        {status === "error" ? <LoadError language={language} onRetry={feed.refresh} /> : null}
       </div>
 
       {/* Keeps the sheet mounted while it animates out. */}

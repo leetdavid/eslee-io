@@ -6,6 +6,7 @@ import { AppShell } from "@/components/app-shell";
 import { BranchPicker } from "@/components/branch-picker";
 import { DatePicker } from "@/components/date-picker";
 import { useLanguage } from "@/components/language-provider";
+import { LoadError } from "@/components/load-error";
 import { QueueAreaChart } from "@/components/queue-area-chart";
 import { StatsBranchDay } from "@/components/stats-branch-day";
 import { StatsChart } from "@/components/stats-chart";
@@ -220,18 +221,13 @@ export function StatsView({ initialBranch, initialDate, initialView }: StatsView
         ) : null}
 
         {status === "error" ? (
-          <section className="stats-status" role="alert">
-            <p>{text.unavailable}</p>
-            <Button
-              onClick={() => {
-                resource.refresh();
-                branchResource.refresh();
-              }}
-              variant="secondary"
-            >
-              {text.retry}
-            </Button>
-          </section>
+          <LoadError
+            language={language}
+            onRetry={() => {
+              resource.refresh();
+              branchResource.refresh();
+            }}
+          />
         ) : null}
 
         {status === "ready" && view === "daily" && date && branchId !== null ? (
