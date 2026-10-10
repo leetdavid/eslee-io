@@ -122,3 +122,11 @@ If working on Payload CMS functionality, you must follow these rules defined in 
 2. **API:** Expose data via tRPC routers in `@eslee/api` or Payload custom endpoints.
 3. **UI:** Consume the API in Next.js apps using tRPC hooks or Server Components.
 4. **Safety Verification:** Before finalizing, ensure `pnpm typecheck` passes and write/run a targeted Vitest test for the new logic.
+
+## 6. Design Work (Doop)
+
+Design frames for every site in this monorepo live on one Doop canvas: `_kQrdcpH9P`.
+
+- **One page per site and version:** Give each site, and each design version of that site, its own page on the canvas, named for both (e.g., `sushiro v2`). Never put two sites, or two versions of one site, on the same page.
+- **New version, new page:** Start a redesign on a new page and leave the earlier version's page as it is.
+- **Sushiro v1 has no page:** It was never drawn on Doop, by the owner's decision. Sushiro's pages start at `sushiro v2`; do not backfill v1.
