@@ -1,10 +1,14 @@
-import { X } from "lucide-react";
+"use client";
+
+import { ChartColumn, Star, X } from "lucide-react";
 import Link from "next/link";
 import { QueueChart } from "@/components/queue-chart";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useMyBranches } from "@/lib/my-branches";
 import {
   copy,
+  fill,
   type Language,
   queueBand,
   queueBandLabel,
@@ -12,7 +16,10 @@ import {
   waitingGroups,
 } from "@/lib/queue-presentation";
 import { isTicketing, type QueueHistoryPoint, type QueueStore } from "@/lib/queues";
+import { useSharedJson } from "@/lib/shared-json";
+import { statsCopy } from "@/lib/stats-copy";
 import { ticketCopy } from "@/lib/ticket-copy";
+import { hongKongClock, type UsualResponse, usualAt, usualRange } from "@/lib/usual";
 
 type StoreSheetProps = {
   language: Language;
@@ -30,6 +37,16 @@ export function StoreSheet({ language, onClose, points = [], store }: StoreSheet
   const name = storeName(store, language);
   const band = queueBand(store);
   const bandLabel = queueBandLabel(store, language);
+  const { ids: savedIds, toggle: toggleSaved } = useMyBranches();
+  const isSaved = savedIds.includes(store.id);
+  const now = hongKongClock(new Date());
+  const usual = useSharedJson<UsualResponse>(
+    `/api/queues/usual?weekday=${now.weekday}&storeIds=${store.id}`,
+    { maxAgeMs: 10 * 60_000 },
+  );
+  const usualSlot = usualAt(usual.data?.stores[0]?.slots ?? [], now.minute);
+  const usualNow = usualSlot ? usualRange(usualSlot) : null;
+  const weekday = statsCopy[language].weekdaysLong[now.weekday] ?? "";
 
   return (
     <>
@@ -47,9 +64,21 @@ export function StoreSheet({ language, onClose, points = [], store }: StoreSheet
             <p className="caption">{store.area}</p>
             <h1>{name}</h1>
           </div>
-          <Button aria-label={text.close} onClick={onClose} size="icon" variant="ghost">
-            <X size={16} />
-          </Button>
+          <div className="sheet-heading-actions">
+            <Button
+              aria-label={isSaved ? text.removeBranch : text.saveBranch}
+              aria-pressed={isSaved}
+              className="star-button"
+              onClick={() => toggleSaved(store.id)}
+              size="icon"
+              variant="ghost"
+            >
+              <Star fill={isSaved ? "currentColor" : "none"} size={16} />
+            </Button>
+            <Button aria-label={text.close} onClick={onClose} size="icon" variant="ghost">
+              <X size={16} />
+            </Button>
+          </div>
         </div>
 
         <div className="sheet-badges">
@@ -72,6 +101,13 @@ export function StoreSheet({ language, onClose, points = [], store }: StoreSheet
               <span>{text.minutes}</span>
             </div>
             <p className="caption">{text.officialWait}</p>
+            {usualNow ? (
+              <p className="sheet-usual">
+                {usualNow.high === 0
+                  ? fill(text.usualSheetNone, { weekday })
+                  : fill(text.usualSheet, { ...usualNow, weekday })}
+              </p>
+            ) : null}
           </div>
           <div className="sheet-groups">
             <div>
@@ -113,6 +149,14 @@ export function StoreSheet({ language, onClose, points = [], store }: StoreSheet
 
         <Button asChild className="sheet-action h-11">
           <Link href={`/tickets?storeId=${store.id}`}>{ticketCopy[language].link}</Link>
+        </Button>
+        <Button
+          asChild
+          className="sheet-action sheet-action-secondary h-11"
+          leadingIcon={ChartColumn}
+          variant="secondary"
+        >
+          <Link href={`/stats?branch=${store.id}`}>{text.branchStats}</Link>
         </Button>
         <p className="caption sheet-footer">{text.dataSource}</p>
       </aside>

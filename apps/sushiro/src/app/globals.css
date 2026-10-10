@@ -1904,6 +1904,50 @@ button.chip:hover {
   }
 }
 
+/* My branches: starred branches lead Home, and their tiles carry a ring in the grid. */
+.tile[data-saved] {
+  box-shadow: inset 0 0 0 1.5px var(--foreground);
+}
+
+.my-branches-stacked {
+  display: none;
+  margin-bottom: 8px;
+}
+
+.sheet-heading-actions {
+  display: flex;
+  flex: none;
+}
+
+.star-button {
+  color: var(--muted-foreground);
+}
+
+.star-button[aria-pressed="true"] {
+  color: var(--foreground);
+}
+
+.sheet-usual {
+  font-size: var(--fs-caption);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--lh-caption);
+  margin: 2px 0 0;
+}
+
+.sheet-action.sheet-action-secondary {
+  margin-top: 8px;
+}
+
+@media (max-width: 1099px) {
+  .my-branches-stacked {
+    display: block;
+  }
+
+  .my-branches-side {
+    display: none;
+  }
+}
+
 /* Stats for one branch: the branch chip, selectable rows, and the day against its usual range. */
 .branch-chip {
   box-shadow:

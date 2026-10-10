@@ -1,6 +1,7 @@
 import { sushiroQueueSnapshot } from "@eslee/db/schema";
 import { and, asc, eq, gte, lt, sql } from "drizzle-orm";
 import { getGridChartHistory } from "@/lib/queue-cache";
+import { issuingTickets } from "@/lib/queue-sql";
 import {
   gridHistoryHours,
   historyRanges,
@@ -60,8 +61,7 @@ async function loadChartHistory({
 }: ChartHistoryWindow): Promise<QueueHistory> {
   const bucketInterval = sql.raw(`${minutes} * interval '1 minute'`);
   const bucketedAt = sql<string>`date_bin(${bucketInterval}, ${sushiroQueueSnapshot.collectedAt}, timestamptz '2000-01-01')`;
-  const issuing = sql`${sushiroQueueSnapshot.storeStatus} = 'OPEN' and (${sushiroQueueSnapshot.netTicketStatus} like '%MANUAL%' or ${sushiroQueueSnapshot.netTicketStatus} like '%ONLINE%')`;
-  const activeWait = sql<number>`round(avg(case when ${issuing} then ${sushiroQueueSnapshot.wait} else 0 end))::integer`;
+  const activeWait = sql<number>`round(avg(case when ${issuingTickets} then ${sushiroQueueSnapshot.wait} else 0 end))::integer`;
   const { db } = await import("@/lib/db");
   const snapshots = await db
     .select({
@@ -78,7 +78,7 @@ async function loadChartHistory({
         to ? lt(sushiroQueueSnapshot.collectedAt, to) : undefined,
         // Trend charts keep closed hours as a zero wait. Statistics leave those snapshots out, so
         // a branch that has stopped issuing tickets is not counted as having no queue.
-        issuingOnly ? issuing : undefined,
+        issuingOnly ? issuingTickets : undefined,
         storeId ? eq(sushiroQueueSnapshot.storeId, storeId) : undefined,
       ),
     )

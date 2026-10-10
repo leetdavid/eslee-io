@@ -3,10 +3,12 @@
 import { useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import { useLanguage } from "@/components/language-provider";
+import { MyBranchRows } from "@/components/my-branch-rows";
 import { QueueAreaChart } from "@/components/queue-area-chart";
 import { QueueLegend } from "@/components/queue-legend";
 import { StoreSheet } from "@/components/store-sheet";
 import { Button } from "@/components/ui/button";
+import { useMyBranches } from "@/lib/my-branches";
 import {
   copy,
   fill,
@@ -26,6 +28,7 @@ import {
 import { useSelectedStore } from "@/lib/selected-store";
 import { useSharedJson } from "@/lib/shared-json";
 import { storeGridBands, storeGridNames } from "@/lib/store-grid";
+import { hongKongClock, type UsualResponse } from "@/lib/usual";
 
 // Rows shown in the queueing list before "Show all".
 const queueingPreview = 8;
@@ -53,6 +56,18 @@ export function QueueGrid() {
     start: chart.loadedAt - gridHistoryHours * 60 * 60 * 1_000,
   };
   const updatedAt = feed.loadedAt ? new Date(feed.loadedAt) : null;
+  const { ids: savedIds } = useMyBranches();
+  // The clock moves on each time the feed refreshes.
+  const now = hongKongClock(new Date(feed.loadedAt || Date.now()));
+  const usual = useSharedJson<UsualResponse>(
+    savedIds.length > 0
+      ? `/api/queues/usual?weekday=${now.weekday}&storeIds=${[...savedIds].sort((left, right) => left - right).join(",")}`
+      : null,
+    { maxAgeMs: 10 * 60_000 },
+  );
+  const savedStores = stores
+    .filter(({ id }) => savedIds.includes(id))
+    .sort((left, right) => left.wait - right.wait || left.id - right.id);
 
   const text = copy[language];
   const storesByGridName = new Map(
@@ -108,6 +123,18 @@ export function QueueGrid() {
                   {updatedTime ? ` · ${fill(text.updated, { time: updatedTime })}` : null}
                 </p>
               </div>
+              {savedStores.length > 0 ? (
+                <MyBranchRows
+                  className="my-branches my-branches-stacked"
+                  historyByStoreId={historyByStoreId}
+                  historyWindow={historyWindow}
+                  language={language}
+                  now={now}
+                  onOpen={openStore}
+                  stores={savedStores}
+                  usual={usual.data?.stores ?? []}
+                />
+              ) : null}
 
               {storeGridBands.map(({ band, cells }) => (
                 <section aria-label={text.territory[band]} key={band}>
@@ -134,6 +161,7 @@ export function QueueGrid() {
                         <button
                           aria-label={describe(store)}
                           className="tile"
+                          data-saved={savedIds.includes(store.id) || undefined}
                           data-band={band}
                           key={store.id}
                           onClick={() => openStore(store)}
@@ -174,6 +202,18 @@ export function QueueGrid() {
             </div>
 
             <div className="home-lists">
+              {savedStores.length > 0 ? (
+                <MyBranchRows
+                  className="my-branches my-branches-side"
+                  historyByStoreId={historyByStoreId}
+                  historyWindow={historyWindow}
+                  language={language}
+                  now={now}
+                  onOpen={openStore}
+                  stores={savedStores}
+                  usual={usual.data?.stores ?? []}
+                />
+              ) : null}
               {noQueue.length > 0 ? (
                 <section aria-labelledby="no-queue-heading">
                   <div className="list-heading">

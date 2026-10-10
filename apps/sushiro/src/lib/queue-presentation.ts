@@ -1,4 +1,5 @@
 import { isActiveStore, type QueueStore } from "@/lib/queues";
+import { type UsualSlot, usualRange } from "@/lib/usual";
 
 export type Language = "en" | "zh-HK";
 
@@ -14,6 +15,15 @@ export const copy = {
     lightMode: "切換淺色模式",
     longestWaits: "輪候最耐嘅分店",
     mapCredit: "地圖來源 MapSVG，CC BY 4.0",
+    myBranches: "我的分店",
+    myBranchesNote: "平時係{weekday}呢個鐘嘅輪候",
+    removeBranch: "由我的分店移除",
+    saveBranch: "加入我的分店",
+    branchStats: "分店統計",
+    usualNone: "平時唔使等",
+    usualRange: "平時 {low} 至 {high} 分鐘",
+    usualSheet: "{weekday}呢個鐘通常 {low} 至 {high} 分鐘",
+    usualSheetNone: "{weekday}呢個鐘通常唔使等",
     legendNote: "數字係壽司郎估計輪候分鐘",
     minutes: "分鐘",
     noCalledTickets: "暫無叫號資料",
@@ -93,6 +103,15 @@ export const copy = {
     lightMode: "Switch to light mode",
     longestWaits: "Longest waits",
     mapCredit: "Map from MapSVG, CC BY 4.0",
+    myBranches: "My branches",
+    myBranchesNote: "Usual is for this time on {weekday}s",
+    removeBranch: "Remove from My branches",
+    saveBranch: "Add to My branches",
+    branchStats: "Branch stats",
+    usualNone: "usually no queue",
+    usualRange: "usual {low} to {high} min",
+    usualSheet: "Usually {low} to {high} min at this time on {weekday}s",
+    usualSheetNone: "Usually no queue at this time on {weekday}s",
     legendNote: "Numbers are Sushiro's estimated wait in minutes",
     minutes: "min",
     noCalledTickets: "No called numbers supplied",
@@ -214,6 +233,16 @@ export function homeLists(stores: QueueStore[], language: Language) {
           left.id - right.id,
       ),
   };
+}
+
+// The usual wait for a time of day as a short phrase, or null when nothing usual is known.
+export function usualText(slot: UsualSlot | null, language: Language) {
+  if (!slot) {
+    return null;
+  }
+
+  const { high, low } = usualRange(slot);
+  return high === 0 ? copy[language].usualNone : fill(copy[language].usualRange, { high, low });
 }
 
 // Bands are set from the official wait in minutes: 0, 5-10, 15-30, then 35 and over.
