@@ -54,3 +54,16 @@ resource "cloudflare_dns_record" "eslee_io_railway_cname_site_verifications" {
   content = each.value.content
   ttl     = 1
 }
+
+# The noai records were first defined in domain.tf and later here as well. Cloudflare refused the
+# second copy of each, so every apply ended in an error. These moves hand the existing records to
+# the definitions above without touching DNS.
+moved {
+  from = cloudflare_dns_record.eslee_io_vercel_cnames_map["noai"]
+  to   = cloudflare_dns_record.eslee_io_railway_cnames_map["noai"]
+}
+
+moved {
+  from = cloudflare_dns_record.noai_railway_verification
+  to   = cloudflare_dns_record.eslee_io_railway_cname_site_verifications["noai"]
+}

@@ -24,14 +24,6 @@ locals {
       name    = "blog.eslee.io"
       content = "869642ca4d27b8f0.vercel-dns-017.com."
     }
-    noai = {
-      name    = "noai.eslee.io"
-      content = "789jh5nz.up.railway.app"
-    }
-    noai_api = {
-      name    = "api.noai.eslee.io"
-      content = "nql8oew3.up.railway.app"
-    }
   }
 }
 
@@ -78,12 +70,4 @@ resource "cloudflare_dns_record" "eslee_io_google_site_verification" {
   content = "google-site-verification=LUi5KHoamAkZvHa2Uj9SP3s-odkJfMcnuUHsdXmMzJY"
   ttl     = 3600
   proxied = false
-}
-
-resource "cloudflare_dns_record" "noai_railway_verification" {
-  zone_id = var.cloudflare_zone_id
-  type    = "TXT"
-  name    = "_railway-verify.noai"
-  content = "railway-verify=db6d0a70d5684117cfc4a867864e6fbac46496232d1d55b7c46a8c92d50b4154"
-  ttl     = 1
 }
