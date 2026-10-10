@@ -1354,6 +1354,14 @@ button.chip:hover {
   color: #1a1a1a;
 }
 
+/* My branches carry a foreground ring, as their tiles do on Home, and sit above neighbours. */
+.store-marker[data-saved] {
+  box-shadow:
+    0 0 0 2px var(--foreground),
+    0 0 0 3.5px var(--background);
+  z-index: 3;
+}
+
 .store-marker:is(:hover, :focus-visible) {
   box-shadow:
     0 0 0 1.5px var(--background),
@@ -1362,11 +1370,25 @@ button.chip:hover {
   z-index: 3;
 }
 
+.store-marker[data-saved]:is(:hover, :focus-visible) {
+  box-shadow:
+    0 0 0 2px var(--foreground),
+    0 0 0 3.5px var(--background),
+    0 0 0 5px var(--muted-foreground);
+}
+
 .store-marker[data-selected="true"] {
   box-shadow:
     0 0 0 1.5px var(--background),
     0 0 0 3.5px var(--foreground);
   z-index: 4;
+}
+
+.store-marker[data-saved][data-selected="true"] {
+  box-shadow:
+    0 0 0 2px var(--foreground),
+    0 0 0 3.5px var(--background),
+    0 0 0 5.5px var(--foreground);
 }
 
 .map-stage[data-dragging="true"],

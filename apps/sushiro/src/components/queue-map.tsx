@@ -11,6 +11,7 @@ import { QueueChart } from "@/components/queue-chart";
 import { QueueLegend } from "@/components/queue-legend";
 import { StoreSheet } from "@/components/store-sheet";
 import { projectMapLocation } from "@/lib/map-projection";
+import { useMyBranches } from "@/lib/my-branches";
 import {
   copy,
   fill,
@@ -38,6 +39,7 @@ export function QueueMap() {
     pollMs: 5 * 60_000,
   });
   const snapshot = feed.data;
+  const { ids: savedIds } = useMyBranches();
   // A failed history load shows the empty state instead of loading forever.
   const history: QueueHistory | null =
     chart.data ?? (chart.error ? { global: [], stores: [] } : null);
@@ -94,12 +96,14 @@ export function QueueMap() {
             const { x, y } = projectMapLocation(store);
             const band = queueBand(store);
             const isSelected = selectedStore?.id === store.id;
+            const isSaved = savedIds.includes(store.id);
 
             return (
               <button
-                aria-label={`${storeName(store, language)}: ${store.wait} ${text.minutes}, ${waitingGroups(store)} ${text.groups}`}
+                aria-label={`${storeName(store, language)}: ${store.wait} ${text.minutes}, ${waitingGroups(store)} ${text.groups}${isSaved ? `, ${text.myBranches}` : ""}`}
                 className="store-marker"
                 data-band={band}
+                data-saved={isSaved || undefined}
                 data-selected={isSelected}
                 key={store.id}
                 onClick={() => openStore(store)}
