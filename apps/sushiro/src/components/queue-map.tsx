@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AppShell } from "@/components/app-shell";
+import { useLanguage } from "@/components/language-provider";
 import { MapViewport } from "@/components/map-viewport";
 import { QueueChart } from "@/components/queue-chart";
 import { QueueLegend } from "@/components/queue-legend";
@@ -12,7 +13,6 @@ import { projectMapLocation } from "@/lib/map-projection";
 import {
   copy,
   fill,
-  type Language,
   networkTotal,
   queueBand,
   storeName,
@@ -24,132 +24,28 @@ import {
   isActiveStore,
   type QueueHistory,
   type QueueSnapshot,
-  type QueueStore,
 } from "@/lib/queues";
+import { useSelectedStore } from "@/lib/selected-store";
+import { useSharedJson } from "@/lib/shared-json";
 
 export function QueueMap() {
-  const [language, setLanguage] = useState<Language>("zh-HK");
-  const [snapshot, setSnapshot] = useState<QueueSnapshot | null>(null);
-  const [status, setStatus] = useState<"error" | "loading" | "ready">("loading");
-  const [selectedStore, setSelectedStore] = useState<QueueStore | null>(null);
-  const [refreshVersion, setRefreshVersion] = useState(0);
-  const [isRefreshing, setIsRefreshing] = useState(true);
-  const [history, setHistory] = useState<QueueHistory | null>(null);
+  const { language, setLanguage } = useLanguage();
   const [historyRange, setHistoryRange] = useState<HistoryRange>(24);
-
-  useEffect(() => {
-    const storedLanguage = window.localStorage.getItem("sushiro-language");
-
-    if (storedLanguage === "en" || storedLanguage === "zh-HK") {
-      setLanguage(storedLanguage);
-    }
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadHistory() {
-      try {
-        const response = await fetch(`/api/queues/charts?hours=${historyRange}`, {
-          cache: "no-store",
-        });
-
-        if (!response.ok) {
-          throw new Error("Unable to load queue history");
-        }
-
-        const nextHistory = (await response.json()) as QueueHistory;
-
-        if (!cancelled) {
-          setHistory(nextHistory);
-        }
-      } catch {
-        if (!cancelled) {
-          setHistory({ global: [], stores: [] });
-        }
-      }
-    }
-
-    void loadHistory();
-    const interval = window.setInterval(() => void loadHistory(), 5 * 60_000);
-
-    return () => {
-      cancelled = true;
-      window.clearInterval(interval);
-    };
-  }, [historyRange]);
-
-  useEffect(() => {
-    document.documentElement.lang = language;
-  }, [language]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadQueues() {
-      setStatus((currentStatus) => (currentStatus === "ready" ? currentStatus : "loading"));
-      setIsRefreshing(true);
-
-      try {
-        const response = await fetch(`/api/queues?request=${refreshVersion}`, {
-          cache: "no-store",
-        });
-
-        if (!response.ok) {
-          throw new Error("Unable to load queues");
-        }
-
-        const nextSnapshot = (await response.json()) as QueueSnapshot;
-
-        if (!cancelled) {
-          setSnapshot(nextSnapshot);
-          setStatus("ready");
-          setSelectedStore((store) =>
-            store ? (nextSnapshot.stores.find(({ id }) => id === store.id) ?? null) : null,
-          );
-        }
-      } catch {
-        if (!cancelled) {
-          setStatus((currentStatus) => (currentStatus === "ready" ? currentStatus : "error"));
-        }
-      } finally {
-        if (!cancelled) {
-          setIsRefreshing(false);
-        }
-      }
-    }
-
-    void loadQueues();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [refreshVersion]);
-
-  useEffect(() => {
-    const interval = window.setInterval(() => {
-      setRefreshVersion((version) => version + 1);
-    }, 60_000);
-
-    return () => {
-      window.clearInterval(interval);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!selectedStore) {
-      return;
-    }
-
-    function closeOnEscape(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        setSelectedStore(null);
-      }
-    }
-
-    window.addEventListener("keydown", closeOnEscape);
-    return () => window.removeEventListener("keydown", closeOnEscape);
-  }, [selectedStore]);
+  const feed = useSharedJson<QueueSnapshot>("/api/queues", { maxAgeMs: 60_000, pollMs: 60_000 });
+  const chart = useSharedJson<QueueHistory>(`/api/queues/charts?hours=${historyRange}`, {
+    maxAgeMs: 5 * 60_000,
+    pollMs: 5 * 60_000,
+  });
+  const snapshot = feed.data;
+  // A failed history load shows the empty state instead of loading forever.
+  const history: QueueHistory | null =
+    chart.data ?? (chart.error ? { global: [], stores: [] } : null);
+  const {
+    close: closeStore,
+    open: openStore,
+    selectedStore,
+  } = useSelectedStore(snapshot?.stores ?? []);
+  const status = snapshot ? "ready" : feed.error ? "error" : "loading";
 
   const text = copy[language];
   const activeStores = snapshot?.stores.filter(isActiveStore) ?? [];
@@ -173,27 +69,13 @@ export function QueueMap() {
       })
     : [];
 
-  function changeLanguage(nextLanguage: Language) {
-    window.localStorage.setItem("sushiro-language", nextLanguage);
-    setLanguage(nextLanguage);
-  }
-
-  function refreshQueues() {
-    setRefreshVersion((version) => version + 1);
-  }
-
-  function changeHistoryRange(range: HistoryRange) {
-    setHistory(null);
-    setHistoryRange(range);
-  }
-
   return (
     <AppShell
       activePage="map"
-      isRefreshing={isRefreshing}
+      isRefreshing={feed.pending}
       language={language}
-      onLanguageChange={changeLanguage}
-      onRefresh={refreshQueues}
+      onLanguageChange={setLanguage}
+      onRefresh={feed.refresh}
     >
       {status === "ready" && snapshot ? (
         <MapViewport language={language}>
@@ -217,7 +99,7 @@ export function QueueMap() {
                 data-band={band}
                 data-selected={isSelected}
                 key={store.id}
-                onClick={() => setSelectedStore(store)}
+                onClick={() => openStore(store)}
                 style={{
                   left: `${x}%`,
                   top: `${y}%`,
@@ -258,7 +140,7 @@ export function QueueMap() {
               <button
                 aria-pressed={historyRange === range}
                 key={range}
-                onClick={() => changeHistoryRange(range)}
+                onClick={() => setHistoryRange(range)}
                 type="button"
               >
                 {text.historyRange[range]}
@@ -292,7 +174,7 @@ export function QueueMap() {
                     data-band={matchingStore ? queueBand(matchingStore) : "muted"}
                     disabled={!matchingStore}
                     key={store.storeId}
-                    onClick={() => matchingStore && setSelectedStore(matchingStore)}
+                    onClick={() => matchingStore && openStore(matchingStore)}
                     type="button"
                   >
                     <QueueChart
@@ -319,7 +201,7 @@ export function QueueMap() {
       {status === "error" ? (
         <section className="map-status" role="alert">
           <p>{text.unavailable}</p>
-          <Button onClick={refreshQueues} variant="secondary">
+          <Button onClick={feed.refresh} variant="secondary">
             {text.retry}
           </Button>
         </section>
@@ -328,7 +210,7 @@ export function QueueMap() {
       {selectedStore ? (
         <StoreSheet
           language={language}
-          onClose={() => setSelectedStore(null)}
+          onClose={() => closeStore()}
           points={history?.stores.find(({ storeId }) => storeId === selectedStore.id)?.points}
           store={selectedStore}
         />

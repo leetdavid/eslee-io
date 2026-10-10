@@ -3,12 +3,14 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { AppShell } from "@/components/app-shell";
+import { useLanguage } from "@/components/language-provider";
 import { QueueAreaChart } from "@/components/queue-area-chart";
 import { QueueLegend } from "@/components/queue-legend";
 import { StatsChart } from "@/components/stats-chart";
 import { Button } from "@/components/ui/button";
 import { copy, fill, type Language, waitBand } from "@/lib/queue-presentation";
 import type { QueueHistory } from "@/lib/queues";
+import { useSharedJson } from "@/lib/shared-json";
 import { dailyStats, hongKongDate, hongKongDayRange, patternStats, shiftDate } from "@/lib/stats";
 import { statsCopy } from "@/lib/stats-copy";
 
@@ -27,81 +29,33 @@ function branchName(branch: { name: string; nameEn: string }, language: Language
 }
 
 export function StatsView({ initialDate, initialView }: StatsViewProps) {
-  const [language, setLanguage] = useState<Language>("zh-HK");
+  const { language, setLanguage } = useLanguage();
   const [view, setView] = useState<StatsViewName>(initialView);
   const [date, setDate] = useState(initialDate);
-  const [history, setHistory] = useState<QueueHistory | null>(null);
-  const [status, setStatus] = useState<"error" | "loading" | "ready">("loading");
-  const [refreshVersion, setRefreshVersion] = useState(0);
   const [showAllBranches, setShowAllBranches] = useState(false);
   const today = hongKongDate(new Date());
+  // issuing=1 leaves out the hours a branch was not issuing tickets, so they do not read as
+  // a zero wait.
+  const query = `${view === "patterns" ? "hours=720" : `date=${date}`}&issuing=1`;
+  const resource = useSharedJson<QueueHistory>(date ? `/api/queues/charts?${query}` : null, {
+    maxAgeMs: 5 * 60_000,
+  });
+  const history = resource.data;
+  const status = history ? "ready" : resource.error ? "error" : "loading";
 
   useEffect(() => {
-    const storedLanguage = window.localStorage.getItem("sushiro-language");
-
-    if (storedLanguage === "en" || storedLanguage === "zh-HK") {
-      setLanguage(storedLanguage);
-    }
-
     // Without a date in the URL, open on yesterday: the latest complete day.
     setDate((current) => current ?? shiftDate(hongKongDate(new Date()), -1));
   }, []);
 
   useEffect(() => {
-    document.documentElement.lang = language;
-  }, [language]);
-
-  useEffect(() => {
     if (!date) {
       return;
     }
 
-    const query = view === "patterns" ? "view=patterns" : `date=${date}`;
-    window.history.replaceState(null, "", `/stats?${query}`);
+    const address = view === "patterns" ? "view=patterns" : `date=${date}`;
+    window.history.replaceState(null, "", `/stats?${address}`);
   }, [date, view]);
-
-  useEffect(() => {
-    if (!date) {
-      return;
-    }
-
-    let cancelled = false;
-    // issuing=1 leaves out the hours a branch was not issuing tickets, so they do not read as
-    // a zero wait.
-    const query = `${view === "patterns" ? "hours=720" : `date=${date}`}&issuing=1`;
-
-    async function loadHistory() {
-      setStatus("loading");
-      setHistory(null);
-
-      try {
-        const response = await fetch(`/api/queues/charts?${query}&request=${refreshVersion}`, {
-          cache: "no-store",
-        });
-
-        if (!response.ok) {
-          throw new Error("Unable to load queue history");
-        }
-
-        const nextHistory = (await response.json()) as QueueHistory;
-
-        if (!cancelled) {
-          setHistory(nextHistory);
-          setStatus("ready");
-        }
-      } catch {
-        if (!cancelled) {
-          setStatus("error");
-        }
-      }
-    }
-
-    void loadHistory();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [date, refreshVersion, view]);
 
   const text = copy[language];
   const stats = statsCopy[language];
@@ -133,18 +87,13 @@ export function StatsView({ initialDate, initialView }: StatsViewProps) {
       to: String(slot.hour + 2).padStart(2, "0"),
     });
 
-  function changeLanguage(nextLanguage: Language) {
-    window.localStorage.setItem("sushiro-language", nextLanguage);
-    setLanguage(nextLanguage);
-  }
-
   return (
     <AppShell
       activePage="stats"
-      isRefreshing={status === "loading"}
+      isRefreshing={resource.pending}
       language={language}
-      onLanguageChange={changeLanguage}
-      onRefresh={() => setRefreshVersion((version) => version + 1)}
+      onLanguageChange={setLanguage}
+      onRefresh={resource.refresh}
     >
       <div className="stats">
         <header>
@@ -208,7 +157,7 @@ export function StatsView({ initialDate, initialView }: StatsViewProps) {
         {status === "error" ? (
           <section className="stats-status" role="alert">
             <p>{text.unavailable}</p>
-            <Button onClick={() => setRefreshVersion((version) => version + 1)} variant="secondary">
+            <Button onClick={resource.refresh} variant="secondary">
               {text.retry}
             </Button>
           </section>

@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AppShell } from "@/components/app-shell";
+import { useLanguage } from "@/components/language-provider";
 import { QueueAreaChart } from "@/components/queue-area-chart";
 import { QueueLegend } from "@/components/queue-legend";
 import { StoreSheet } from "@/components/store-sheet";
@@ -10,7 +11,6 @@ import {
   copy,
   fill,
   homeLists,
-  type Language,
   networkTotal,
   queueBand,
   shortStoreName,
@@ -23,6 +23,8 @@ import {
   type QueueSnapshot,
   type QueueStore,
 } from "@/lib/queues";
+import { useSelectedStore } from "@/lib/selected-store";
+import { useSharedJson } from "@/lib/shared-json";
 import { storeGridBands, storeGridNames } from "@/lib/store-grid";
 
 // Rows shown in the queueing list before "Show all".
@@ -33,143 +35,26 @@ function normalizedStoreName(name: string) {
 }
 
 export function QueueGrid() {
-  const [language, setLanguage] = useState<Language>("zh-HK");
-  const [snapshot, setSnapshot] = useState<QueueSnapshot | null>(null);
-  const [history, setHistory] = useState<QueueHistory | null>(null);
-  const [historyWindow, setHistoryWindow] = useState(() => {
-    const end = Date.now();
-    return { end, start: end - gridHistoryHours * 60 * 60 * 1_000 };
+  const { language, setLanguage } = useLanguage();
+  const feed = useSharedJson<QueueSnapshot>("/api/queues", { maxAgeMs: 60_000, pollMs: 60_000 });
+  const chart = useSharedJson<QueueHistory>(`/api/queues/charts?hours=${gridHistoryHours}`, {
+    maxAgeMs: 5 * 60_000,
+    pollMs: 5 * 60_000,
   });
-  const [status, setStatus] = useState<"error" | "loading" | "ready">("loading");
-  const [selectedStore, setSelectedStore] = useState<QueueStore | null>(null);
-  const [refreshVersion, setRefreshVersion] = useState(0);
-  const [isRefreshing, setIsRefreshing] = useState(true);
-  const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
   const [showAllQueueing, setShowAllQueueing] = useState(false);
-
-  useEffect(() => {
-    const storedLanguage = window.localStorage.getItem("sushiro-language");
-
-    if (storedLanguage === "en" || storedLanguage === "zh-HK") {
-      setLanguage(storedLanguage);
-    }
-  }, []);
-
-  useEffect(() => {
-    document.documentElement.lang = language;
-  }, [language]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadQueues() {
-      setStatus((currentStatus) => (currentStatus === "ready" ? currentStatus : "loading"));
-      setIsRefreshing(true);
-
-      try {
-        const response = await fetch(`/api/queues?request=${refreshVersion}`, {
-          cache: "no-store",
-        });
-
-        if (!response.ok) {
-          throw new Error("Unable to load queues");
-        }
-
-        const nextSnapshot = (await response.json()) as QueueSnapshot;
-
-        if (!cancelled) {
-          setSnapshot(nextSnapshot);
-          setUpdatedAt(new Date());
-          setStatus("ready");
-          setSelectedStore((store) =>
-            store ? (nextSnapshot.stores.find(({ id }) => id === store.id) ?? null) : null,
-          );
-        }
-      } catch {
-        if (!cancelled) {
-          setStatus((currentStatus) => (currentStatus === "ready" ? currentStatus : "error"));
-        }
-      } finally {
-        if (!cancelled) {
-          setIsRefreshing(false);
-        }
-      }
-    }
-
-    void loadQueues();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [refreshVersion]);
-
-  useEffect(() => {
-    const interval = window.setInterval(() => setRefreshVersion((version) => version + 1), 60_000);
-    return () => window.clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadHistory() {
-      try {
-        const response = await fetch(`/api/queues/charts?hours=${gridHistoryHours}`, {
-          cache: "no-store",
-        });
-
-        if (!response.ok) {
-          throw new Error("Unable to load queue history");
-        }
-
-        const nextHistory = (await response.json()) as QueueHistory;
-        const end = Date.now();
-
-        if (!cancelled) {
-          setHistory(nextHistory);
-          setHistoryWindow({ end, start: end - gridHistoryHours * 60 * 60 * 1_000 });
-        }
-      } catch {
-        if (!cancelled) {
-          setHistory({ global: [], stores: [] });
-        }
-      }
-    }
-
-    void loadHistory();
-    const interval = window.setInterval(() => void loadHistory(), 5 * 60_000);
-
-    return () => {
-      cancelled = true;
-      window.clearInterval(interval);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!selectedStore) {
-      return;
-    }
-
-    function closeOnEscape(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        setSelectedStore(null);
-      }
-    }
-
-    window.addEventListener("keydown", closeOnEscape);
-    return () => window.removeEventListener("keydown", closeOnEscape);
-  }, [selectedStore]);
-
-  function changeLanguage(nextLanguage: Language) {
-    window.localStorage.setItem("sushiro-language", nextLanguage);
-    setLanguage(nextLanguage);
-  }
-
-  function refreshQueues() {
-    setRefreshVersion((version) => version + 1);
-  }
+  const snapshot = feed.data;
+  const history = chart.data;
+  const stores = snapshot?.stores ?? [];
+  const { close: closeStore, open: openStore, selectedStore } = useSelectedStore(stores);
+  const status = snapshot ? "ready" : feed.error ? "error" : "loading";
+  // Trends cover the hours up to the moment the history last loaded.
+  const historyWindow = {
+    end: chart.loadedAt,
+    start: chart.loadedAt - gridHistoryHours * 60 * 60 * 1_000,
+  };
+  const updatedAt = feed.loadedAt ? new Date(feed.loadedAt) : null;
 
   const text = copy[language];
-  const stores = snapshot?.stores ?? [];
   const storesByGridName = new Map(
     stores.map((store) => [normalizedStoreName(store.nameEn || store.name), store]),
   );
@@ -204,10 +89,10 @@ export function QueueGrid() {
   return (
     <AppShell
       activePage="grid"
-      isRefreshing={isRefreshing}
+      isRefreshing={feed.pending}
       language={language}
-      onLanguageChange={changeLanguage}
-      onRefresh={refreshQueues}
+      onLanguageChange={setLanguage}
+      onRefresh={feed.refresh}
     >
       <div className="home">
         {status === "ready" && snapshot ? (
@@ -251,7 +136,7 @@ export function QueueGrid() {
                           className="tile"
                           data-band={band}
                           key={store.id}
-                          onClick={() => setSelectedStore(store)}
+                          onClick={() => openStore(store)}
                           type="button"
                         >
                           <span className="tile-name">{shortStoreName(store, language)}</span>
@@ -277,7 +162,7 @@ export function QueueGrid() {
                       <button
                         className="chip"
                         key={store.id}
-                        onClick={() => setSelectedStore(store)}
+                        onClick={() => openStore(store)}
                         type="button"
                       >
                         {shortStoreName(store, language)}
@@ -302,7 +187,7 @@ export function QueueGrid() {
                       <button
                         className="chip"
                         key={store.id}
-                        onClick={() => setSelectedStore(store)}
+                        onClick={() => openStore(store)}
                         type="button"
                       >
                         {shortStoreName(store, language)}
@@ -329,7 +214,7 @@ export function QueueGrid() {
                           aria-label={describe(store)}
                           className="branch-row"
                           data-band={queueBand(store)}
-                          onClick={() => setSelectedStore(store)}
+                          onClick={() => openStore(store)}
                           type="button"
                         >
                           <i className="band-dot" />
@@ -383,7 +268,7 @@ export function QueueGrid() {
         {status === "error" ? (
           <section className="home-status" role="alert">
             <p>{text.unavailable}</p>
-            <Button onClick={refreshQueues} variant="secondary">
+            <Button onClick={feed.refresh} variant="secondary">
               {text.retry}
             </Button>
           </section>
@@ -393,7 +278,7 @@ export function QueueGrid() {
       {selectedStore ? (
         <StoreSheet
           language={language}
-          onClose={() => setSelectedStore(null)}
+          onClose={() => closeStore()}
           points={historyByStoreId.get(selectedStore.id) ?? []}
           store={selectedStore}
         />

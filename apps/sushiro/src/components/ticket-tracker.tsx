@@ -2,9 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AppShell } from "@/components/app-shell";
+import { useLanguage } from "@/components/language-provider";
 import { TicketReportCard } from "@/components/ticket-report-card";
 import { Button } from "@/components/ui/button";
-import type { Language } from "@/lib/queue-presentation";
 import type { QueueStore } from "@/lib/queues";
 import { ticketCopy } from "@/lib/ticket-copy";
 import {
@@ -17,7 +17,7 @@ import {
 type TicketData = { reports: TicketReport[]; stores: QueueStore[]; feedAvailable: boolean };
 
 export function TicketTracker({ initialStoreId }: { initialStoreId: string }) {
-  const [language, setLanguage] = useState<Language>("zh-HK");
+  const { language, setLanguage } = useLanguage();
   const [data, setData] = useState<TicketData | null>(null);
   const [refreshVersion, setRefreshVersion] = useState(0);
   const [refreshing, setRefreshing] = useState(true);
@@ -37,8 +37,6 @@ export function TicketTracker({ initialStoreId }: { initialStoreId: string }) {
   const hasReports = Boolean(data?.reports.length);
 
   useEffect(() => {
-    const stored = localStorage.getItem("sushiro-language");
-    if (stored === "en" || stored === "zh-HK") setLanguage(stored);
     setNow(Date.now());
     setTakenValue(hongKongInput(new Date()));
     const interval = setInterval(() => {
@@ -47,9 +45,6 @@ export function TicketTracker({ initialStoreId }: { initialStoreId: string }) {
     }, 60_000);
     return () => clearInterval(interval);
   }, []);
-  useEffect(() => {
-    document.documentElement.lang = language;
-  }, [language]);
   useEffect(() => {
     const controller = new AbortController();
     const startedAtVersion = mutationVersion.current;
@@ -133,10 +128,7 @@ export function TicketTracker({ initialStoreId }: { initialStoreId: string }) {
       activePage="tickets"
       language={language}
       isRefreshing={refreshing}
-      onLanguageChange={(value) => {
-        setLanguage(value);
-        localStorage.setItem("sushiro-language", value);
-      }}
+      onLanguageChange={setLanguage}
       onRefresh={() => setRefreshVersion((value) => value + 1)}
     >
       <div className="ticket-page">
