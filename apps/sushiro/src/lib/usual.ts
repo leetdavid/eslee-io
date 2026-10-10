@@ -1,3 +1,5 @@
+import { dayType } from "@/lib/holidays";
+
 // The usual wait at a time of day: what the same weekday recorded around that time over the
 // last weeks. It is the app's estimate for a ticket taken then.
 export const usualStepMinutes = 5;
@@ -23,11 +25,13 @@ function quantile(sorted: number[], share: number) {
   return low + (high - low) * (index - lower);
 }
 
-// Minutes since midnight and weekday (Monday is 0), both in Hong Kong time.
+// The Hong Kong time of day in minutes since midnight, the weekday with Monday as 0, and the
+// kind of day for usual waits, where a public holiday counts as a Sunday.
 export function hongKongClock(at: Date) {
   const local = new Date(at.valueOf() + hongKongOffset);
 
   return {
+    dayType: dayType(local.toISOString().slice(0, 10)),
     minute: local.getUTCHours() * 60 + local.getUTCMinutes(),
     weekday: (local.getUTCDay() + 6) % 7,
   };

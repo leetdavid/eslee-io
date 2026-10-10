@@ -6,7 +6,6 @@ import {
   hongKongDate,
   hongKongDayRange,
   hongKongParts,
-  patternStats,
   shiftDate,
 } from "@/lib/stats";
 
@@ -132,52 +131,6 @@ describe("dailyStats", () => {
     expect(empty.branches).toEqual([]);
     expect(empty.busiest).toBeNull();
     expect(empty.quietest).toBeNull();
-  });
-});
-
-describe("patternStats", () => {
-  const stats = patternStats(
-    history([
-      {
-        id: 1,
-        points: [
-          [at("2026-10-05", "14:00"), 4], // Monday afternoon
-          [at("2026-10-09", "18:00"), 100], // Friday dinner
-          [at("2026-10-10", "18:00"), 80], // Saturday dinner
-          [at("2026-10-10", "20:00"), 40],
-          [at("2026-10-10", "02:00"), 999], // outside service hours
-        ],
-      },
-      {
-        id: 2,
-        points: [
-          [at("2026-10-09", "18:00"), 120],
-          [at("2026-10-11", "19:00"), 20], // Sunday, inside the 18:00 slot
-        ],
-      },
-    ]),
-  );
-
-  it("averages each weekday and two-hour slot, with columns only for slots that have data", () => {
-    expect(stats.slots).toEqual([14, 18, 20]);
-    expect(stats.grid[4]?.[1]).toBe(110); // Friday 18:00
-    expect(stats.grid[0]?.[0]).toBe(4); // Monday 14:00
-    expect(stats.grid[1]?.[0]).toBeNull();
-  });
-
-  it("finds the busiest slot, the quietest meal-time slot and the calmest day", () => {
-    expect(stats.busiest).toEqual({ hour: 18, wait: 110, weekday: 4 });
-    expect(stats.quietest).toEqual({ hour: 14, wait: 4, weekday: 0 });
-    expect(stats.calmestDay).toEqual({ wait: 4, weekday: 0 });
-  });
-
-  it("ranks branches by weekend dinner wait and reports the recorded range", () => {
-    expect(stats.branches.map(({ storeId, wait }) => [storeId, wait])).toEqual([
-      [1, 60],
-      [2, 20],
-    ]);
-    expect(stats.from).toBe(at("2026-10-05", "14:00"));
-    expect(stats.to).toBe(at("2026-10-11", "19:00"));
   });
 });
 

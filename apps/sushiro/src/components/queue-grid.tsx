@@ -61,7 +61,7 @@ export function QueueGrid() {
   const now = hongKongClock(new Date(feed.loadedAt || Date.now()));
   const usual = useSharedJson<UsualResponse>(
     savedIds.length > 0
-      ? `/api/queues/usual?weekday=${now.weekday}&storeIds=${[...savedIds].sort((left, right) => left - right).join(",")}`
+      ? `/api/queues/usual?weekday=${now.dayType}&storeIds=${[...savedIds].sort((left, right) => left - right).join(",")}`
       : null,
     { maxAgeMs: 10 * 60_000 },
   );

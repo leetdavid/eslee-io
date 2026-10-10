@@ -7,14 +7,15 @@ import { BranchPicker } from "@/components/branch-picker";
 import { DatePicker } from "@/components/date-picker";
 import { useLanguage } from "@/components/language-provider";
 import { QueueAreaChart } from "@/components/queue-area-chart";
-import { QueueLegend } from "@/components/queue-legend";
 import { StatsBranchDay } from "@/components/stats-branch-day";
 import { StatsChart } from "@/components/stats-chart";
+import { StatsPatterns } from "@/components/stats-patterns";
 import { Button } from "@/components/ui/button";
+import type { PatternsResponse } from "@/lib/patterns";
 import { copy, fill, type Language, waitBand } from "@/lib/queue-presentation";
 import type { QueueHistory, QueueSnapshot } from "@/lib/queues";
 import { useSharedJson } from "@/lib/shared-json";
-import { dailyStats, hongKongDate, hongKongDayRange, patternStats, shiftDate } from "@/lib/stats";
+import { dailyStats, hongKongDate, hongKongDayRange, shiftDate } from "@/lib/stats";
 import { statsCopy } from "@/lib/stats-copy";
 
 type StatsViewName = "daily" | "patterns";
@@ -27,8 +28,6 @@ type StatsViewProps = {
 
 // Rows shown in the day's branch table before "Show all".
 const branchPreview = 8;
-// Bars shown when branches are compared.
-const comparePreview = 10;
 
 function branchName(branch: { name: string; nameEn: string }, language: Language) {
   return language === "en" ? branch.nameEn || branch.name : branch.name.replace(/店$/, "");
@@ -43,11 +42,16 @@ export function StatsView({ initialBranch, initialDate, initialView }: StatsView
   const today = hongKongDate(new Date());
   // issuing=1 leaves out the hours a branch was not issuing tickets, so they do not read as
   // a zero wait.
-  const query = `${view === "patterns" ? "hours=720" : `date=${date}`}&issuing=1`;
-  const resource = useSharedJson<QueueHistory>(date ? `/api/queues/charts?${query}` : null, {
-    maxAgeMs: 5 * 60_000,
-  });
-  const history = resource.data;
+  const dayResource = useSharedJson<QueueHistory>(
+    view === "daily" && date ? `/api/queues/charts?date=${date}&issuing=1` : null,
+    { maxAgeMs: 5 * 60_000 },
+  );
+  const patternResource = useSharedJson<PatternsResponse>(
+    view === "patterns" ? `/api/queues/patterns${branchId ? `?storeId=${branchId}` : ""}` : null,
+    { maxAgeMs: 10 * 60_000 },
+  );
+  const resource = view === "daily" ? dayResource : patternResource;
+  const history = dayResource.data;
   // The live feed supplies the branch list for the picker.
   const feed = useSharedJson<QueueSnapshot>("/api/queues", { maxAgeMs: 60_000 });
   // One branch's last 30 days at half-hour detail, for its own Daily history.
@@ -57,12 +61,11 @@ export function StatsView({ initialBranch, initialDate, initialView }: StatsView
   );
   const branchHistory = branchResource.data?.stores[0] ?? null;
   const waitingForBranch = branchId !== null && view === "daily" && !branchResource.data;
-  const status =
-    history && !waitingForBranch
-      ? "ready"
-      : resource.error || (waitingForBranch && branchResource.error)
-        ? "error"
-        : "loading";
+  const status = (view === "daily" ? history && !waitingForBranch : patternResource.data)
+    ? "ready"
+    : resource.error || (waitingForBranch && branchResource.error)
+      ? "error"
+      : "loading";
   const firstDate =
     useSharedJson<{ first: string | null }>("/api/queues/range", { maxAgeMs: 60 * 60_000 }).data
       ?.first ?? null;
@@ -103,38 +106,19 @@ export function StatsView({ initialBranch, initialDate, initialView }: StatsView
   const selectedBranch =
     branchId === null
       ? null
-      : (branchHistory ?? history?.stores.find(({ storeId }) => storeId === branchId) ?? null);
+      : (branchHistory ??
+        history?.stores.find(({ storeId }) => storeId === branchId) ??
+        patternResource.data?.dinner.find(({ storeId }) => storeId === branchId) ??
+        feed.data?.stores.find(({ id }) => id === branchId) ??
+        null);
   const selectedName = selectedBranch ? branchName(selectedBranch, language) : "";
   const daily = view === "daily" && history && branchId === null ? dailyStats(history) : null;
-  const allPatterns = view === "patterns" && history ? patternStats(history) : null;
-  // With a branch selected, the figures and the grid are that branch's alone. The comparison
-  // still ranks every branch.
-  const patterns =
-    allPatterns && history && branchId !== null
-      ? patternStats({
-          global: [],
-          stores: history.stores.filter(({ storeId }) => storeId === branchId),
-        })
-      : allPatterns;
-  const ranking = allPatterns?.branches ?? [];
-  const rank = ranking.findIndex(({ storeId }) => storeId === branchId) + 1;
-  // The selected branch always shows, even when it is outside the first rows.
-  const compared =
-    rank > comparePreview
-      ? [...ranking.slice(0, comparePreview - 1), ...ranking.slice(rank - 1, rank)]
-      : ranking.slice(0, comparePreview);
   const longest = daily?.branches[0];
   const branches = daily
     ? showAllBranches
       ? daily.branches
       : daily.branches.slice(0, branchPreview)
     : [];
-  const slotLabel = (slot: { hour: number; weekday: number }) =>
-    fill(stats.slot, {
-      day: stats.weekdays[slot.weekday] ?? "",
-      from: String(slot.hour).padStart(2, "0"),
-      to: String(slot.hour + 2).padStart(2, "0"),
-    });
 
   return (
     <AppShell
@@ -383,130 +367,14 @@ export function StatsView({ initialBranch, initialDate, initialView }: StatsView
           </>
         ) : null}
 
-        {patterns && !patterns.busiest ? <p className="stats-status">{stats.noPatterns}</p> : null}
-
-        {patterns?.busiest && patterns.quietest && patterns.calmestDay ? (
-          <>
-            <div className="stats-cards stats-cards-three">
-              <div className="stats-card">
-                <p className="caption">{stats.busiestSlot}</p>
-                <p className="stats-figure">
-                  <strong className="figure-l">{Math.round(patterns.busiest.wait)}</strong>{" "}
-                  {stats.minAverage}
-                </p>
-                <p className="caption">{slotLabel(patterns.busiest)}</p>
-              </div>
-              <div className="stats-card">
-                <p className="caption">{stats.quietestSlot}</p>
-                <p className="stats-figure">
-                  <strong className="figure-l">{Math.round(patterns.quietest.wait)}</strong>{" "}
-                  {stats.minAverage}
-                </p>
-                <p className="caption">{slotLabel(patterns.quietest)}</p>
-              </div>
-              <div className="stats-card">
-                <p className="caption">{stats.calmestDay}</p>
-                <p className="stats-figure">
-                  <strong className="figure-l">
-                    {stats.weekdays[patterns.calmestDay.weekday]}
-                  </strong>
-                </p>
-                <p className="caption">
-                  {fill(stats.dayAverage, { wait: Math.round(patterns.calmestDay.wait) })}
-                </p>
-              </div>
-            </div>
-
-            <div className="stats-split">
-              <section className="stats-card">
-                <h2>
-                  {selectedName
-                    ? fill(stats.branchHeat, { branch: selectedName })
-                    : stats.heatTitle}
-                </h2>
-                <p className="caption">
-                  {fill(selectedName ? stats.branchHeatNote : stats.heatNote, {
-                    from: patterns.from ? dayMonth.format(new Date(patterns.from)) : "",
-                    to: patterns.to ? dayMonth.format(new Date(patterns.to)) : "",
-                  })}
-                </p>
-                <div className="stats-table-scroll">
-                  <table className="heat">
-                    <thead>
-                      <tr>
-                        <td />
-                        {patterns.slots.map((slot) => (
-                          <th key={slot} scope="col">
-                            {String(slot).padStart(2, "0")}:00
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {patterns.grid.map((row, weekday) => (
-                        <tr key={stats.weekdays[weekday]}>
-                          <th scope="row">{stats.weekdays[weekday]}</th>
-                          {row.map((wait, index) =>
-                            wait === null ? (
-                              <td key={patterns.slots[index]} />
-                            ) : (
-                              <td
-                                data-band={waitBand(Math.round(wait))}
-                                key={patterns.slots[index]}
-                              >
-                                {Math.round(wait)}
-                              </td>
-                            ),
-                          )}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                <QueueLegend language={language} />
-              </section>
-
-              <section className="stats-card">
-                <h2>{selectedName ? stats.againstTitle : stats.compareTitle}</h2>
-                <p className="caption">
-                  {stats.compareNote}
-                  {selectedName && rank > 0
-                    ? ` ${fill(stats.againstRank, { branch: selectedName, count: ranking.length, rank })}`
-                    : null}
-                </p>
-                <ul className="stats-bars">
-                  {compared.map((branch) => (
-                    <li
-                      aria-current={branch.storeId === branchId ? "true" : undefined}
-                      className="stats-bar"
-                      data-band={waitBand(Math.round(branch.wait))}
-                      key={branch.storeId}
-                    >
-                      <span>
-                        <button
-                          className="row-link"
-                          onClick={() => setBranchId(branch.storeId)}
-                          type="button"
-                        >
-                          {branchName(branch, language)}
-                        </button>
-                      </span>
-                      <span>
-                        <i
-                          style={{
-                            width: `${(branch.wait / (ranking[0]?.wait || 1)) * 100}%`,
-                          }}
-                        />
-                      </span>
-                      <strong>
-                        {Math.round(branch.wait)} {text.minutes}
-                      </strong>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            </div>
-          </>
+        {status === "ready" && view === "patterns" && patternResource.data ? (
+          <StatsPatterns
+            branchId={branchId}
+            data={patternResource.data}
+            language={language}
+            onSelectBranch={setBranchId}
+            selectedName={selectedName}
+          />
         ) : null}
       </div>
     </AppShell>

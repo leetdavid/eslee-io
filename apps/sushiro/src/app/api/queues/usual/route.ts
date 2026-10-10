@@ -1,6 +1,6 @@
 import { sushiroQueueSnapshot } from "@eslee/db/schema";
 import { and, gte, inArray, lt, sql } from "drizzle-orm";
-import { issuingTickets } from "@/lib/queue-sql";
+import { dayTypeOfSnapshot, hongKongTime, issuingTickets, slotOfSnapshot } from "@/lib/queue-sql";
 import { hongKongDate, hongKongDayRange } from "@/lib/stats";
 import { type UsualResponse, type UsualRow, usualSlots } from "@/lib/usual";
 
@@ -27,7 +27,7 @@ function parseStoreIds(value: string | null) {
 }
 
 // ?weekday=0..6 (Monday is 0) returns each branch's usual wait for every five minutes of that
-// weekday. ?storeIds=1,2 limits it to those branches.
+// weekday. A public holiday counts as a Sunday. ?storeIds=1,2 limits it to those branches.
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const weekdayParameter = searchParams.get("weekday");
@@ -55,9 +55,8 @@ export async function GET(request: Request) {
 
   const startOfToday = hongKongDayRange(today)?.from ?? new Date();
   const from = new Date(startOfToday.valueOf() - historyDays * 24 * 60 * 60_000);
-  const local = sql`(${sushiroQueueSnapshot.collectedAt} at time zone 'Asia/Hong_Kong')`;
-  const day = sql<string>`${local}::date::text`;
-  const minute = sql<number>`((extract(hour from ${local}) * 60 + extract(minute from ${local}))::int / 5) * 5`;
+  const day = sql<string>`${hongKongTime}::date::text`;
+  const minute = slotOfSnapshot(5);
   const { db } = await import("@/lib/db");
   const rows = await db
     .select({
@@ -72,7 +71,7 @@ export async function GET(request: Request) {
         gte(sushiroQueueSnapshot.collectedAt, from),
         lt(sushiroQueueSnapshot.collectedAt, startOfToday),
         issuingTickets,
-        sql`extract(isodow from ${local}) = ${weekday + 1}`,
+        sql`${dayTypeOfSnapshot} = ${weekday + 1}`,
         storeIds ? inArray(sushiroQueueSnapshot.storeId, storeIds) : undefined,
       ),
     )

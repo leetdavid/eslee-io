@@ -1,3 +1,4 @@
+import { dayType } from "@/lib/holidays";
 import type { QueueHistory, QueueHistoryPoint } from "@/lib/queues";
 
 const hour = 60 * 60_000;
@@ -5,14 +6,12 @@ const hongKongOffset = 8 * hour;
 
 // Branches open in the late morning, so nothing earlier is counted.
 export const serviceStartHour = 10;
-export const patternSlots = [10, 12, 14, 16, 18, 20, 22];
 
 // A time counts toward the all-branch average only when at least this share of the day's
 // branches were issuing tickets. It keeps one late branch from standing in for Hong Kong.
 const minimumBranchShare = 0.25;
 
 export type TimedWait = { collectedAt: string; wait: number };
-export type SlotWait = { hour: number; wait: number; weekday: number };
 
 export function hongKongDate(at: Date) {
   return new Date(at.valueOf() + hongKongOffset).toISOString().slice(0, 10);
@@ -115,77 +114,6 @@ export function dailyStats(history: QueueHistory, bucketHours = 0.5) {
   };
 }
 
-// Weeks of two-hour buckets, summarised by weekday and time for the Patterns view.
-export function patternStats(history: QueueHistory) {
-  const waitsBySlot = new Map<string, number[]>();
-  const dinnerWaits = new Map<number, number[]>();
-  // Empty until the first point is seen.
-  let from = "";
-  let to = "";
-
-  for (const store of history.stores) {
-    for (const point of store.points) {
-      const { hour: pointHour, weekday } = hongKongParts(point.collectedAt);
-      const slot = Math.floor(pointHour / 2) * 2;
-
-      if (!patternSlots.includes(slot)) {
-        continue;
-      }
-
-      from = from === "" || point.collectedAt < from ? point.collectedAt : from;
-      to = point.collectedAt > to ? point.collectedAt : to;
-
-      const key = `${weekday}-${slot}`;
-      waitsBySlot.set(key, [...(waitsBySlot.get(key) ?? []), point.wait]);
-
-      // Weekend dinner: Saturday and Sunday, from 18:00 until tickets stop.
-      if (weekday >= 5 && (slot === 18 || slot === 20)) {
-        dinnerWaits.set(store.storeId, [...(dinnerWaits.get(store.storeId) ?? []), point.wait]);
-      }
-    }
-  }
-
-  // Only the slots in which some branch was issuing tickets become columns.
-  const slotsWithData = patternSlots.filter((slot) =>
-    Array.from({ length: 7 }, (_, weekday) => waitsBySlot.has(`${weekday}-${slot}`)).some(Boolean),
-  );
-  const grid = Array.from({ length: 7 }, (_, weekday) =>
-    slotsWithData.map((slot) => {
-      const waits = waitsBySlot.get(`${weekday}-${slot}`);
-      return waits ? mean(waits) : null;
-    }),
-  );
-  const slots: SlotWait[] = grid.flatMap((row, weekday) =>
-    row.flatMap((wait, index) =>
-      wait === null ? [] : [{ hour: slotsWithData[index] ?? 0, wait, weekday }],
-    ),
-  );
-  const days = grid.flatMap((row, weekday) => {
-    const waits = row.filter((wait): wait is number => wait !== null);
-    return waits.length > 0 ? [{ wait: mean(waits), weekday }] : [];
-  });
-
-  return {
-    // Every branch with weekend dinner data, longest wait first.
-    branches: history.stores
-      .flatMap((store) => {
-        const waits = dinnerWaits.get(store.storeId);
-        return waits
-          ? [{ name: store.name, nameEn: store.nameEn, storeId: store.storeId, wait: mean(waits) }]
-          : [];
-      })
-      .sort((left, right) => right.wait - left.wait || left.storeId - right.storeId),
-    busiest: highest(slots),
-    calmestDay: lowest(days),
-    from: from || null,
-    grid,
-    // Lunch through dinner only.
-    quietest: lowest(slots.filter((slot) => slot.hour >= 12 && slot.hour <= 20)),
-    slots: slotsWithData,
-    to: to || null,
-  };
-}
-
 // A day needs this many half-hour buckets before it counts toward a branch's usual range, so a
 // day the recorder mostly missed does not set the range.
 const minimumBucketsForUsual = 12;
@@ -205,12 +133,13 @@ export function branchDailyStats(points: QueueHistoryPoint[], date: string, buck
     .filter((day) => day.points.length > 0)
     .sort((left, right) => right.date.localeCompare(left.date));
   const range = hongKongDayRange(date);
-  const weekday = range ? hongKongParts(range.from.toISOString()).weekday : 0;
+  // A public holiday is compared with Sundays, whatever weekday it falls on.
+  const weekday = dayType(date);
   const sameWeekday = days.filter(
     (day) =>
       day.date !== date &&
       day.points.length >= minimumBucketsForUsual &&
-      hongKongParts(`${day.date}T04:00:00Z`).weekday === weekday,
+      dayType(day.date) === weekday,
   );
   const dayStart = range?.from.valueOf() ?? 0;
   // Minutes into the day -> the waits seen at that time on the other same weekdays.

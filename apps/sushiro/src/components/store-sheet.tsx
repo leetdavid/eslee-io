@@ -41,12 +41,12 @@ export function StoreSheet({ language, onClose, points = [], store }: StoreSheet
   const isSaved = savedIds.includes(store.id);
   const now = hongKongClock(new Date());
   const usual = useSharedJson<UsualResponse>(
-    `/api/queues/usual?weekday=${now.weekday}&storeIds=${store.id}`,
+    `/api/queues/usual?weekday=${now.dayType}&storeIds=${store.id}`,
     { maxAgeMs: 10 * 60_000 },
   );
   const usualSlot = usualAt(usual.data?.stores[0]?.slots ?? [], now.minute);
   const usualNow = usualSlot ? usualRange(usualSlot) : null;
-  const weekday = statsCopy[language].weekdaysLong[now.weekday] ?? "";
+  const weekday = statsCopy[language].weekdaysLong[now.dayType] ?? "";
 
   return (
     <>

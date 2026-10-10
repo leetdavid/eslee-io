@@ -19,8 +19,8 @@ type MyBranchRowsProps = {
   historyByStoreId: Map<number, QueueHistoryPoint[]>;
   historyWindow: { end: number; start: number };
   language: Language;
-  // Minutes since midnight and weekday in Hong Kong, for the usual wait at this time.
-  now: { minute: number; weekday: number };
+  // Minutes since midnight and the kind of day in Hong Kong, for the usual wait at this time.
+  now: { dayType: number; minute: number };
   onOpen: (store: QueueStore) => void;
   stores: QueueStore[];
   usual: UsualStore[];
@@ -45,7 +45,7 @@ export function MyBranchRows({
         <h2>{text.myBranches}</h2>
         <span className="caption">
           {fill(text.myBranchesNote, {
-            weekday: statsCopy[language].weekdaysLong[now.weekday] ?? "",
+            weekday: statsCopy[language].weekdaysLong[now.dayType] ?? "",
           })}
         </span>
       </div>
