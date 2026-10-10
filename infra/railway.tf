@@ -18,6 +18,16 @@ locals {
         content = "railway-verify=b60b6007ba63de6fcbc06c416e14b88409de5eb89711a8868d46200ae4b708bd"
       }
     }
+    # The trading desk's web app (leetdavid/trading, Railway project "trading").
+    trading = {
+      name    = "trading"
+      content = "7ge3botv.up.railway.app"
+      proxied = false
+      verification = {
+        name    = "_railway-verify.trading"
+        content = "railway-verify=ae8c1d1d5f0a8e9c993509bc5765f9ea4bbc48898cc4f93add47f90f290bc102"
+      }
+    }
   }
 }
 
