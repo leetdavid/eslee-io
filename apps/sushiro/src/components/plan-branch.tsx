@@ -3,9 +3,16 @@
 import { PlanChart } from "@/components/plan-chart";
 import { StarToggle } from "@/components/star-toggle";
 import { Badge } from "@/components/ui/badge";
-import { clockLabel, type PlanDomain, planAnswer, shorterNearby } from "@/lib/plan";
+import {
+  clockLabel,
+  eatPlan,
+  type PlanDomain,
+  type PlanMode,
+  planAnswer,
+  shorterNearby,
+} from "@/lib/plan";
 import { planCopy } from "@/lib/plan-copy";
-import { fill, type Language, shortStoreName, waitBand } from "@/lib/queue-presentation";
+import { copy, fill, type Language, shortStoreName, waitBand } from "@/lib/queue-presentation";
 import { isActiveStore, type QueueHistory, type QueueStore } from "@/lib/queues";
 import { useSharedJson } from "@/lib/shared-json";
 import { hongKongDate } from "@/lib/stats";
@@ -15,7 +22,9 @@ type PlanBranchProps = {
   domain: PlanDomain;
   isShortest: boolean;
   language: Language;
+  // The chosen time: when the ticket is taken, or in eat mode when the meal should start.
   minute: number;
+  mode: PlanMode;
   // Minutes since Hong Kong midnight when the chosen day is today. Null for another day.
   nowMinute: number | null;
   onPickTime: (minute: number) => void;
@@ -25,13 +34,15 @@ type PlanBranchProps = {
   top: number;
 };
 
-// One of My branches on Plan a meal: the usual wait for a ticket at the chosen time, when that
-// ticket would be called, the branch's day as a chart, and a shorter time nearby if there is one.
+// One of My branches on Plan a meal. By ticket time: the usual wait for a ticket then, when it
+// would be called, and a shorter time nearby if there is one. By eating time: the ticket to take.
+// Either way the branch's day is drawn as a chart.
 export function PlanBranch({
   domain,
   isShortest,
   language,
   minute,
+  mode,
   nowMinute,
   onPickTime,
   onToggleSaved,
@@ -61,11 +72,21 @@ export function PlanBranch({
     today.push({ minute: nowMinute, wait: store.wait });
   }
 
-  const answer = planAnswer(slots, minute);
-  const tipMinute = shorterNearby(slots, minute, nowMinute ?? 0);
+  const text = copy[language];
+  const eat = mode === "eat" ? eatPlan(slots, minute, nowMinute ?? 0) : null;
+  // When the ticket is taken: the chosen time, or the one worked back from the eating time.
+  const ticket = mode === "ticket" ? minute : eat && eat.kind !== "early" ? eat.minute : null;
+  const answer = ticket === null ? null : planAnswer(slots, ticket);
+  const tipMinute = mode === "ticket" ? shorterNearby(slots, minute, nowMinute ?? 0) : null;
   const tip = tipMinute === null ? null : planAnswer(slots, tipMinute);
   const range = (low: number, high: number) =>
     low === high ? String(high) : fill(plan.range, { high, low });
+  const time = clockLabel(minute);
+  const called =
+    answer && ticket !== null
+      ? { from: clockLabel(ticket + answer.low), to: clockLabel(ticket + answer.high) }
+      : null;
+  const isExact = answer?.low === answer?.high;
 
   return (
     <li className="plan-branch" data-band={answer ? waitBand(answer.median) : "muted"}>
@@ -74,7 +95,7 @@ export function PlanBranch({
           <span className="branch-row-name">{shortStoreName(store, language)}</span>
           {isShortest ? <Badge color="gray">{plan.shortest}</Badge> : null}
         </div>
-        {answer ? (
+        {mode === "ticket" && answer && called ? (
           <>
             <p className="plan-wait">
               {answer.high === 0 ? (
@@ -89,17 +110,41 @@ export function PlanBranch({
             <p className="caption">
               {answer.high === 0
                 ? plan.noWait
-                : answer.low === answer.high
-                  ? fill(plan.calledAt, { from: clockLabel(minute + answer.high) })
-                  : fill(plan.called, {
-                      from: clockLabel(minute + answer.low),
-                      to: clockLabel(minute + answer.high),
-                    })}
+                : fill(isExact ? plan.calledAt : plan.called, called)}
             </p>
           </>
-        ) : (
-          <p className="caption">{plan.noUsual}</p>
-        )}
+        ) : null}
+        {eat?.kind === "ticket" && answer && called ? (
+          <>
+            <p className="plan-wait">
+              <span className="caption">{plan.eatTicketBefore}</span>{" "}
+              <strong className="figure-m">{clockLabel(eat.minute)}</strong>
+              {plan.eatTicketAfter ? (
+                <>
+                  {" "}
+                  <span className="caption">{plan.eatTicketAfter}</span>
+                </>
+              ) : null}
+            </p>
+            <p className="caption">
+              {answer.high === 0
+                ? plan.noWait
+                : fill(isExact ? plan.eatCalledAt : plan.eatCalled, called)}
+            </p>
+          </>
+        ) : null}
+        {eat?.kind === "late" && called ? (
+          <>
+            <p className="plan-wait">
+              <strong className="plan-late">{plan.eatNow}</strong>
+            </p>
+            <p className="caption">
+              {fill(isExact ? plan.eatLateAt : plan.eatLate, { ...called, time })}
+            </p>
+          </>
+        ) : null}
+        {eat?.kind === "early" ? <p className="caption">{fill(plan.eatEarly, { time })}</p> : null}
+        {!answer && eat?.kind !== "early" ? <p className="caption">{plan.noUsual}</p> : null}
       </div>
       <PlanChart
         domain={domain}
@@ -110,10 +155,19 @@ export function PlanBranch({
           isToday && isActiveStore(store) ? fill(plan.now, { wait: store.wait }) : undefined
         }
         slots={slots}
+        ticket={mode === "eat" ? (ticket ?? undefined) : undefined}
         today={today}
         top={top}
       />
       <div className="plan-tip">
+        {mode === "eat" && answer && answer.high > 0 ? (
+          <>
+            <span className="caption">{plan.eatWaitThen}</span>
+            <strong className="plan-wait-then">
+              {range(answer.low, answer.high)} {text.minutes}
+            </strong>
+          </>
+        ) : null}
         {tip && tipMinute !== null ? (
           <>
             <span className="caption">{plan.shorterNearby}</span>
@@ -129,7 +183,8 @@ export function PlanBranch({
                 : fill(plan.tip, { range: range(tip.low, tip.high), time: clockLabel(tipMinute) })}
             </button>
           </>
-        ) : answer ? (
+        ) : null}
+        {mode === "ticket" && !tip && answer ? (
           <span className="caption">{plan.noShorter}</span>
         ) : null}
       </div>

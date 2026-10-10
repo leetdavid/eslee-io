@@ -1,11 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
   clockLabel,
+  eatPlan,
   openingMinute,
   parseClock,
   planAnswer,
   planDomain,
   rankBranches,
+  rankForEating,
   shorterNearby,
 } from "@/lib/plan";
 import type { UsualSlot } from "@/lib/usual";
@@ -94,5 +96,46 @@ describe("openingMinute", () => {
     expect(openingMinute(1400, domain)).toBe(1080);
     expect(openingMinute(null, domain)).toBe(1080);
     expect(openingMinute(null, { end: 1020, start: 630 })).toBe(1020);
+  });
+});
+
+describe("eatPlan and rankForEating", () => {
+  // 17:00 to 18:15, every 15 minutes. A ticket at 17:30 is called at 18:30, one at 17:45 at 19:15.
+  const rising = slotsFrom(1020, [20, 40, 60, 90, 120, 120]);
+
+  it("finds the latest ticket that is usually called by the eating time", () => {
+    expect(eatPlan(rising, 1110)).toEqual({ kind: "ticket", minute: 1050 });
+    expect(eatPlan(rising, 1155)).toEqual({ kind: "ticket", minute: 1065 });
+  });
+
+  it("says when even the first ticket is called too late", () => {
+    expect(eatPlan(rising, 1030)).toEqual({ kind: "early" });
+    expect(eatPlan([], 1110)).toBeNull();
+  });
+
+  it("offers the next ticket from now once the ticket time has passed", () => {
+    // At 18:00 the 17:30 ticket is gone, so the next one is 18:00.
+    expect(eatPlan(rising, 1110, 1080)).toEqual({ kind: "late", minute: 1080 });
+    // At 17:33 the 17:30 ticket still counts as now.
+    expect(eatPlan(rising, 1110, 1053)).toEqual({ kind: "ticket", minute: 1050 });
+    // After the last ticket of the day there is nothing left to offer.
+    expect(eatPlan(rising, 1110, 1200)).toBeNull();
+  });
+
+  it("ranks the branches that can still make it, shortest wait first", () => {
+    const stores = [
+      { slots: rising, storeId: 16 },
+      { slots: slotsFrom(1020, [10, 10, 15, 15, 20, 20]), storeId: 12 },
+      { slots: [], storeId: 99 },
+    ];
+
+    expect(rankForEating(stores, 1110).map(({ storeId, ticket }) => ({ storeId, ticket }))).toEqual(
+      [
+        { storeId: 12, ticket: 1080 },
+        { storeId: 16, ticket: 1050 },
+      ],
+    );
+    // At 18:03 only the branch whose ticket time is 18:00 can still make it.
+    expect(rankForEating(stores, 1110, 1083).map(({ storeId }) => storeId)).toEqual([12]);
   });
 });

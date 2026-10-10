@@ -12,7 +12,14 @@ import { QueueLegend } from "@/components/queue-legend";
 import { StarToggle } from "@/components/star-toggle";
 import { Button } from "@/components/ui/button";
 import { useMyBranches } from "@/lib/my-branches";
-import { clockLabel, openingMinute, planDomain, rankBranches } from "@/lib/plan";
+import {
+  clockLabel,
+  openingMinute,
+  type PlanMode,
+  planDomain,
+  rankBranches,
+  rankForEating,
+} from "@/lib/plan";
 import { planCopy } from "@/lib/plan-copy";
 import { copy, fill, shortStoreName, waitBand } from "@/lib/queue-presentation";
 import type { QueueSnapshot } from "@/lib/queues";
@@ -23,6 +30,7 @@ import { hongKongClock, type UsualResponse, type UsualSlot, usualStepMinutes } f
 
 type PlanViewProps = {
   initialMinute: number | null;
+  initialMode: PlanMode;
   initialWeekday: number | null;
 };
 
@@ -33,7 +41,7 @@ const territories: TerritoryBand[] = ["newTerritories", "kowloon", "hongKongIsla
 // the rest of the day.
 const maximumChartTop = 240;
 
-export function PlanView({ initialMinute, initialWeekday }: PlanViewProps) {
+export function PlanView({ initialMinute, initialMode, initialWeekday }: PlanViewProps) {
   const { language, setLanguage } = useLanguage();
   const feed = useSharedJson<QueueSnapshot>("/api/queues", { maxAgeMs: 60_000, pollMs: 60_000 });
   const { ids: savedIds, toggle: toggleSaved } = useMyBranches();
@@ -41,6 +49,8 @@ export function PlanView({ initialMinute, initialWeekday }: PlanViewProps) {
   const [clock, setClock] = useState<ReturnType<typeof hongKongClock> | null>(null);
   const [chosenWeekday, setChosenWeekday] = useState(initialWeekday);
   const [chosenMinute, setChosenMinute] = useState(initialMinute);
+  // Whether the chosen time is when the ticket is taken or when the meal should start.
+  const [mode, setMode] = useState(initialMode);
   const [territory, setTerritory] = useState<TerritoryBand | null>(null);
   const [showAll, setShowAll] = useState(false);
 
@@ -67,17 +77,22 @@ export function PlanView({ initialMinute, initialWeekday }: PlanViewProps) {
   );
 
   useEffect(() => {
-    if (chosenWeekday === null && chosenMinute === null) {
+    if (chosenWeekday === null && chosenMinute === null && mode === initialMode) {
       return;
     }
 
     const parts = [
       chosenWeekday === null ? null : `day=${chosenWeekday}`,
       chosenMinute === null ? null : `time=${clockLabel(chosenMinute)}`,
+      mode === "eat" ? "mode=eat" : null,
     ].filter(Boolean);
 
-    window.history.replaceState(window.history.state, "", `/plan?${parts.join("&")}`);
-  }, [chosenMinute, chosenWeekday]);
+    window.history.replaceState(
+      window.history.state,
+      "",
+      parts.length > 0 ? `/plan?${parts.join("&")}` : "/plan",
+    );
+  }, [chosenMinute, chosenWeekday, initialMode, mode]);
 
   const text = copy[language];
   const plan = planCopy[language];
@@ -89,9 +104,12 @@ export function PlanView({ initialMinute, initialWeekday }: PlanViewProps) {
   const mine = stores
     .filter(({ id }) => savedIds.includes(id))
     .map((store) => ({ slots: slotsByStore.get(store.id) ?? [], store }));
-  const order = new Map(
-    rankBranches(usualStores, minute).map(({ storeId }, index) => [storeId, index]),
-  );
+  const isEating = mode === "eat";
+  // By eating time, only branches whose ticket can still be called by then are ranked.
+  const ranking = isEating
+    ? rankForEating(usualStores, minute, isToday ? clock.minute : 0)
+    : rankBranches(usualStores, minute).map((entry) => ({ ...entry, ticket: minute }));
+  const order = new Map(ranking.map(({ storeId }, index) => [storeId, index]));
   const rankOf = (storeId: number) => order.get(storeId) ?? Number.POSITIVE_INFINITY;
 
   mine.sort(
@@ -101,7 +119,7 @@ export function PlanView({ initialMinute, initialWeekday }: PlanViewProps) {
 
   const highest = Math.max(0, ...mine.flatMap(({ slots }) => slots.map((slot) => slot.high)));
   const top = Math.min(maximumChartTop, Math.max(120, Math.ceil(highest / 60) * 60));
-  const ranked = rankBranches(usualStores, minute).flatMap((entry) => {
+  const ranked = ranking.flatMap((entry) => {
     const store = stores.find(({ id }) => id === entry.storeId);
     return store && (territory === null || territoryBandOf(store.nameEn) === territory)
       ? [{ ...entry, store }]
@@ -129,7 +147,12 @@ export function PlanView({ initialMinute, initialWeekday }: PlanViewProps) {
     />
   );
   const ruler = (
-    <PlanRuler domain={domain} label={plan.ticketTime} minute={minute} onChange={setChosenMinute} />
+    <PlanRuler
+      domain={domain}
+      label={isEating ? plan.eatTime : plan.ticketTime}
+      minute={minute}
+      onChange={setChosenMinute}
+    />
   );
   const stepper = (
     <div className="plan-stepper">
@@ -187,8 +210,16 @@ export function PlanView({ initialMinute, initialWeekday }: PlanViewProps) {
             ))}
           </fieldset>
           <div className="plan-time">
+            <fieldset aria-label={plan.modeLabel} className="segmented segmented-large plan-mode">
+              <button aria-pressed={!isEating} onClick={() => setMode("ticket")} type="button">
+                {plan.modeTicket}
+              </button>
+              <button aria-pressed={isEating} onClick={() => setMode("eat")} type="button">
+                {plan.modeEat}
+              </button>
+            </fieldset>
             <span className="plan-time-label">
-              <strong>{plan.takeTicketAt}</strong>
+              <strong>{isEating ? plan.eatQuestion : plan.ticketQuestion}</strong>
               <span className="caption">{fill(plan.stepNote, { day: dayName })}</span>
             </span>
             {stepper}
@@ -210,7 +241,9 @@ export function PlanView({ initialMinute, initialWeekday }: PlanViewProps) {
               <div className="plan-card-heading">
                 <div>
                   <h2 id="plan-mine">{text.myBranches}</h2>
-                  <p className="caption">{fill(plan.mineNote, { day: dayName, time })}</p>
+                  <p className="caption">
+                    {fill(isEating ? plan.mineNoteEat : plan.mineNote, { day: dayName, time })}
+                  </p>
                 </div>
                 <div className="plan-card-actions">
                   <p className="caption stats-keys">
@@ -237,7 +270,7 @@ export function PlanView({ initialMinute, initialWeekday }: PlanViewProps) {
               {mine.length > 0 ? (
                 <>
                   <div className="plan-branch plan-ruler-row">
-                    <span className="caption">{plan.dragNote}</span>
+                    <span className="caption">{isEating ? plan.dragNoteEat : plan.dragNote}</span>
                     {ruler}
                   </div>
                   <ul className="plan-branches">
@@ -250,6 +283,7 @@ export function PlanView({ initialMinute, initialWeekday }: PlanViewProps) {
                         key={store.id}
                         language={language}
                         minute={minute}
+                        mode={mode}
                         nowMinute={isToday ? clock.minute : null}
                         onPickTime={setChosenMinute}
                         onToggleSaved={() => toggleSaved(store.id)}
@@ -277,7 +311,9 @@ export function PlanView({ initialMinute, initialWeekday }: PlanViewProps) {
               <div className="plan-card-heading">
                 <div>
                   <h2 id="plan-all">{text.allBranches}</h2>
-                  <p className="caption">{fill(plan.allNote, { day: dayName, time })}</p>
+                  <p className="caption">
+                    {fill(isEating ? plan.allNoteEat : plan.allNote, { day: dayName, time })}
+                  </p>
                 </div>
                 <fieldset aria-label={text.allBranches} className="segmented plan-territories">
                   <button
@@ -302,39 +338,62 @@ export function PlanView({ initialMinute, initialWeekday }: PlanViewProps) {
               {ranked.length > 0 ? (
                 <ul className="plan-rows">
                   {(showAll ? ranked : ranked.slice(0, rankPreview)).map(
-                    ({ answer, slots, store }) => (
-                      <li className="plan-row" data-band={waitBand(answer.median)} key={store.id}>
-                        <i className="band-dot" />
-                        <span className="branch-row-main">
-                          <span className="branch-row-name">{shortStoreName(store, language)}</span>
-                          <span className="caption">{store.area}</span>
-                        </span>
-                        <span className="plan-row-answer">
-                          {answer.high === 0 ? (
-                            <strong>{plan.noQueue}</strong>
-                          ) : (
-                            <>
-                              <strong>
-                                {answer.low === answer.high
-                                  ? answer.high
-                                  : fill(plan.range, { high: answer.high, low: answer.low })}
-                              </strong>{" "}
-                              <span className="caption">{text.minutes}</span>
-                            </>
-                          )}
-                        </span>
-                        <PlanMini domain={domain} minute={minute} slots={slots} />
-                        <StarToggle
-                          isSaved={savedIds.includes(store.id)}
-                          language={language}
-                          onToggle={() => toggleSaved(store.id)}
-                        />
-                      </li>
-                    ),
+                    ({ answer, slots, store, ticket }) => {
+                      const waitRange =
+                        answer.low === answer.high
+                          ? String(answer.high)
+                          : fill(plan.range, { high: answer.high, low: answer.low });
+
+                      return (
+                        <li className="plan-row" data-band={waitBand(answer.median)} key={store.id}>
+                          <i className="band-dot" />
+                          <span className="branch-row-main">
+                            <span className="branch-row-name">
+                              {shortStoreName(store, language)}
+                            </span>
+                            <span className="caption">
+                              {isEating
+                                ? answer.high === 0
+                                  ? plan.rowNoQueueThen
+                                  : fill(plan.rowWaitThen, { range: waitRange })
+                                : store.area}
+                            </span>
+                          </span>
+                          <span className="plan-row-answer">
+                            {isEating ? (
+                              <>
+                                {plan.rowTicketBefore ? (
+                                  <span className="caption">{plan.rowTicketBefore} </span>
+                                ) : null}
+                                <strong>{clockLabel(ticket)}</strong>
+                                {plan.rowTicketAfter ? (
+                                  <span className="caption"> {plan.rowTicketAfter}</span>
+                                ) : null}
+                              </>
+                            ) : answer.high === 0 ? (
+                              <strong>{plan.noQueue}</strong>
+                            ) : (
+                              <>
+                                <strong>{waitRange}</strong>{" "}
+                                <span className="caption">{text.minutes}</span>
+                              </>
+                            )}
+                          </span>
+                          <PlanMini domain={domain} minute={ticket} slots={slots} />
+                          <StarToggle
+                            isSaved={savedIds.includes(store.id)}
+                            language={language}
+                            onToggle={() => toggleSaved(store.id)}
+                          />
+                        </li>
+                      );
+                    },
                   )}
                 </ul>
               ) : (
-                <p className="caption plan-empty">{plan.noUsual}</p>
+                <p className="caption plan-empty">
+                  {isEating ? fill(plan.noneInTime, { time }) : plan.noUsual}
+                </p>
               )}
               <div className="plan-card-footer">
                 {ranked.length > rankPreview ? (
@@ -347,7 +406,10 @@ export function PlanView({ initialMinute, initialWeekday }: PlanViewProps) {
                 <QueueLegend language={language} />
               </div>
             </section>
-            <p className="caption plan-footnote">{plan.footnote}</p>
+            <p className="caption plan-footnote">
+              {isEating ? `${plan.footnoteEat} ` : null}
+              {plan.footnote}
+            </p>
           </>
         ) : null}
       </div>
@@ -355,7 +417,7 @@ export function PlanView({ initialMinute, initialWeekday }: PlanViewProps) {
   );
 }
 
-// The shape of a branch's usual day, with a tick at the chosen time.
+// The shape of a branch's usual day, with a tick at the ticket time.
 function PlanMini({
   domain,
   minute,

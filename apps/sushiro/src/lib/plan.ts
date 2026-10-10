@@ -6,7 +6,13 @@ import {
   usualStepMinutes,
 } from "@/lib/usual";
 
-// Plan a meal: what a branch usually makes you wait for a ticket taken at a chosen time.
+// Plan a meal: what a branch usually makes you wait for a ticket taken at a chosen time, or the
+// ticket to take for a meal at a chosen time.
+export type PlanMode = "eat" | "ticket";
+// "ticket" is the latest ticket that is usually called by the eating time. "late" means that
+// ticket time has passed today, so the next ticket from now is called after it. "early" means
+// even the day's first ticket is usually called after it.
+export type EatPlan = { kind: "late" | "ticket"; minute: number } | { kind: "early" };
 export type PlanAnswer = { high: number; low: number; median: number };
 export type PlanDomain = { end: number; start: number };
 
@@ -96,6 +102,49 @@ export function rankBranches(stores: UsualStore[], minute: number) {
       (left, right) =>
         left.answer.median - right.answer.median ||
         left.answer.high - right.answer.high ||
+        left.storeId - right.storeId,
+    );
+}
+
+// Works back from the time a meal should start to the ticket to take. `earliest` is now when
+// planning today, so a ticket time already past is never offered.
+export function eatPlan(slots: UsualSlot[], eatMinute: number, earliest = 0): EatPlan | null {
+  if (slots.length === 0) {
+    return null;
+  }
+
+  const inTime = slots.filter((slot) => slot.minute + slot.median <= eatMinute);
+
+  if (inTime.length === 0) {
+    return { kind: "early" };
+  }
+
+  const latest = Math.max(...inTime.map((slot) => slot.minute));
+
+  // A ticket time within the current five minutes still counts as now.
+  if (latest + usualStepMinutes > earliest) {
+    return { kind: "ticket", minute: latest };
+  }
+
+  const fromNow = slots.filter((slot) => slot.minute >= earliest).map((slot) => slot.minute);
+  return fromNow.length > 0 ? { kind: "late", minute: Math.min(...fromNow) } : null;
+}
+
+// Every branch whose ticket can still be called by the eating time, shortest wait first.
+export function rankForEating(stores: UsualStore[], eatMinute: number, earliest = 0) {
+  return stores
+    .flatMap((store) => {
+      const plan = eatPlan(store.slots, eatMinute, earliest);
+      const answer = plan?.kind === "ticket" ? planAnswer(store.slots, plan.minute) : null;
+
+      return plan?.kind === "ticket" && answer
+        ? [{ answer, slots: store.slots, storeId: store.storeId, ticket: plan.minute }]
+        : [];
+    })
+    .sort(
+      (left, right) =>
+        left.answer.median - right.answer.median ||
+        right.ticket - left.ticket ||
         left.storeId - right.storeId,
     );
 }

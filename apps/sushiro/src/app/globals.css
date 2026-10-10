@@ -2286,12 +2286,8 @@ button.chip:hover {
   gap: 8px;
 }
 
-.plan-time-label strong {
-  color: var(--muted-foreground);
-  font-weight: 400;
-}
-
-.plan-time-label > .caption,
+/* On wide screens the switch names the time, so the question and the ruler stay with phones. */
+.plan-time-label,
 .plan-time-ruler {
   display: none;
 }
@@ -2396,6 +2392,17 @@ button.chip:hover {
 
 .plan-tip > .chip {
   gap: 6px;
+}
+
+.plan-late {
+  font-size: var(--fs-subtitle);
+  font-weight: 600;
+  line-height: 28px;
+}
+
+.plan-wait-then {
+  font-variant-numeric: tabular-nums;
+  font-weight: 550;
 }
 
 .plan-key-today {
@@ -2524,6 +2531,14 @@ button.chip:hover {
   position: absolute;
   transform: translate(-50%, 50%);
   width: 9px;
+}
+
+/* By eating time the dot marks the ticket, and a dashed line runs to when it is usually called. */
+.plan-span {
+  border-top: 1.5px dashed var(--foreground);
+  height: 0;
+  position: absolute;
+  transform: translateY(50%);
 }
 
 /* The label sits up and to the left of the last point of today's line, on a wash of the card
@@ -2711,6 +2726,7 @@ button.chip:hover {
 @media (max-width: 900px) {
   .plan-controls {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .plan-days {
@@ -2732,8 +2748,21 @@ button.chip:hover {
     padding: 10px 8px 8px 12px;
   }
 
+  .plan-mode {
+    display: flex;
+    grid-column: 1 / -1;
+    margin-right: 4px;
+  }
+
+  .plan-mode > button {
+    flex: 1;
+  }
+
+  .plan-time-label {
+    display: block;
+  }
+
   .plan-time-label strong {
-    color: var(--foreground);
     font-size: var(--fs-subtitle);
     font-weight: 550;
   }

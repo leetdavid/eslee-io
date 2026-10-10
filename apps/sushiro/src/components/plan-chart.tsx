@@ -11,6 +11,9 @@ type PlanChartProps = {
   // Text beside the end of today's line, such as "Now 20 min".
   nowLabel?: string;
   slots: UsualSlot[];
+  // When planning by eating time, the ticket time. The dot moves there and a dashed line runs
+  // from it to when that ticket is usually called.
+  ticket?: number;
   // Today's waits so far, by minutes since midnight.
   today?: { minute: number; wait: number }[];
   // The wait at the top of the chart, shared by the charts on the page so they compare.
@@ -27,6 +30,7 @@ export function PlanChart({
   minute,
   nowLabel,
   slots,
+  ticket,
   today = [],
   top,
 }: PlanChartProps) {
@@ -82,10 +86,20 @@ export function PlanChart({
           </span>
         ) : null}
         <span className="plan-marker" style={{ left: `${x(minute)}%` }} />
+        {ticket === undefined || !markerWait ? null : (
+          <span
+            className="plan-span"
+            style={{
+              bottom: `${100 - y(markerWait)}%`,
+              left: `${x(ticket)}%`,
+              width: `${Math.max(0, Math.min(100, x(ticket + markerWait)) - x(ticket))}%`,
+            }}
+          />
+        )}
         {markerWait === null ? null : (
           <span
             className="plan-marker-dot"
-            style={{ bottom: `${100 - y(markerWait)}%`, left: `${x(minute)}%` }}
+            style={{ bottom: `${100 - y(markerWait)}%`, left: `${x(ticket ?? minute)}%` }}
           />
         )}
       </div>
