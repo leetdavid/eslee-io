@@ -1,8 +1,9 @@
 "use client";
 
-import { ChartColumn, Star, X } from "lucide-react";
+import { CalendarClock, ChartColumn, X } from "lucide-react";
 import Link from "next/link";
 import { QueueChart } from "@/components/queue-chart";
+import { StarToggle } from "@/components/star-toggle";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useMyBranches } from "@/lib/my-branches";
@@ -65,16 +66,11 @@ export function StoreSheet({ language, onClose, points = [], store }: StoreSheet
             <h1>{name}</h1>
           </div>
           <div className="sheet-heading-actions">
-            <Button
-              aria-label={isSaved ? text.removeBranch : text.saveBranch}
-              aria-pressed={isSaved}
-              className="star-button"
-              onClick={() => toggleSaved(store.id)}
-              size="icon"
-              variant="ghost"
-            >
-              <Star fill={isSaved ? "currentColor" : "none"} size={16} />
-            </Button>
+            <StarToggle
+              isSaved={isSaved}
+              language={language}
+              onToggle={() => toggleSaved(store.id)}
+            />
             <Button aria-label={text.close} onClick={onClose} size="icon" variant="ghost">
               <X size={16} />
             </Button>
@@ -150,14 +146,14 @@ export function StoreSheet({ language, onClose, points = [], store }: StoreSheet
         <Button asChild className="sheet-action h-11">
           <Link href={`/tickets?storeId=${store.id}`}>{ticketCopy[language].link}</Link>
         </Button>
-        <Button
-          asChild
-          className="sheet-action sheet-action-secondary h-11"
-          leadingIcon={ChartColumn}
-          variant="secondary"
-        >
-          <Link href={`/stats?branch=${store.id}`}>{text.branchStats}</Link>
-        </Button>
+        <div className="sheet-links">
+          <Button asChild className="h-11" leadingIcon={CalendarClock} variant="secondary">
+            <Link href="/plan">{text.planMeal}</Link>
+          </Button>
+          <Button asChild className="h-11" leadingIcon={ChartColumn} variant="secondary">
+            <Link href={`/stats?branch=${store.id}`}>{text.branchStats}</Link>
+          </Button>
+        </div>
         <p className="caption sheet-footer">{text.dataSource}</p>
       </aside>
     </>

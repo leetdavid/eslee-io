@@ -162,9 +162,14 @@ export async function GET(request: Request) {
     );
   }
 
-  // One branch is small enough to return at half-hour detail over any range.
+  // One branch is small enough for half-hour detail over weeks. Up to a day it keeps the
+  // five-minute detail.
   const window = storeId
-    ? { ...trailingWindow(hours), bucketMinutes: dayBucketMinutes, storeId }
+    ? {
+        ...trailingWindow(hours),
+        bucketMinutes: hours > 24 ? dayBucketMinutes : bucketMinutes[hours],
+        storeId,
+      }
     : trailingWindow(hours);
   const history =
     hours === gridHistoryHours && !issuingOnly && !storeId

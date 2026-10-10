@@ -1,13 +1,20 @@
 "use client";
 
-import { ChartColumn, LayoutGrid, Map as MapIcon, RefreshCw, Ticket } from "lucide-react";
+import {
+  CalendarClock,
+  ChartColumn,
+  LayoutGrid,
+  Map as MapIcon,
+  RefreshCw,
+  Ticket,
+} from "lucide-react";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { copy, type Language } from "@/lib/queue-presentation";
 
 export type AppNavigationProps = {
-  activePage: "grid" | "map" | "stats" | "tickets";
+  activePage: "grid" | "map" | "plan" | "stats" | "tickets";
   isRefreshing: boolean;
   language: Language;
   onLanguageChange: (language: Language) => void;
@@ -16,6 +23,7 @@ export type AppNavigationProps = {
 
 const destinations = [
   { href: "/", icon: LayoutGrid, page: "grid" },
+  { href: "/plan", icon: CalendarClock, page: "plan" },
   { href: "/map", icon: MapIcon, page: "map" },
   { href: "/tickets", icon: Ticket, page: "tickets" },
   { href: "/stats", icon: ChartColumn, page: "stats" },

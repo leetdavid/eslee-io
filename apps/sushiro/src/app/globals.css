@@ -274,6 +274,7 @@
 }
 
 .app-content.grid-page,
+.app-content.plan-page,
 .app-content.stats-page,
 .app-content.tickets-page {
   overflow: auto;
@@ -387,7 +388,7 @@
   background: var(--surface-2);
   box-shadow: 0 -1px 0 var(--border);
   display: none;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   padding: 6px 8px calc(10px + env(safe-area-inset-bottom));
 }
 
@@ -1591,14 +1592,16 @@ button.chip:hover {
   padding: 8px 24px 32px;
 }
 
-.stats > header h1 {
+.stats > header h1,
+.plan > header h1 {
   font-size: var(--fs-display);
   font-weight: 700;
   line-height: var(--lh-display);
   margin: 0;
 }
 
-.stats > header p {
+.stats > header p,
+.plan > header p {
   color: var(--muted-foreground);
   margin: 4px 0 0;
 }
@@ -2018,8 +2021,15 @@ button.chip:hover {
   margin: 2px 0 0;
 }
 
-.sheet-action.sheet-action-secondary {
+.sheet-links {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 1fr 1fr;
   margin-top: 8px;
+}
+
+.sheet-links > a {
+  text-decoration: none;
 }
 
 @media (max-width: 1099px) {
@@ -2029,6 +2039,574 @@ button.chip:hover {
 
   .my-branches-side {
     display: none;
+  }
+}
+
+/* Plan a meal: a day and a ticket time, then each branch's usual wait for a ticket taken then. */
+.plan {
+  margin: 0 auto;
+  max-width: 1280px;
+  padding: 8px 24px 32px;
+}
+
+.plan-controls {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: space-between;
+  margin-top: 18px;
+}
+
+.plan-time,
+.plan-stepper {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+.plan-time-label strong {
+  color: var(--muted-foreground);
+  font-weight: 400;
+}
+
+.plan-time-label > .caption,
+.plan-time-ruler {
+  display: none;
+}
+
+.plan-stepper strong {
+  align-items: center;
+  background: var(--surface-3);
+  border-radius: var(--r-item);
+  box-shadow: var(--shadow-2);
+  display: flex;
+  font-size: var(--fs-body);
+  font-weight: 550;
+  height: 36px;
+  justify-content: center;
+  min-width: 72px;
+}
+
+.plan-card {
+  background: var(--surface-3);
+  border-radius: var(--r-container);
+  box-shadow: var(--shadow-2);
+  margin-top: 12px;
+  padding: 14px 0 8px;
+}
+
+.plan-card-heading,
+.plan-card-footer {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  justify-content: space-between;
+  padding: 0 16px 6px;
+}
+
+.plan-card-heading h2 {
+  font-size: var(--fs-title);
+  font-weight: 550;
+  line-height: var(--lh-title);
+  margin: 0 0 2px;
+}
+
+.plan-card-heading p {
+  margin: 0;
+}
+
+.plan-card-actions {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+}
+
+.plan-card-footer {
+  padding: 10px 16px 6px;
+}
+
+.plan-branches,
+.plan-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.plan-branches > li + li,
+.plan-rows > li + li {
+  box-shadow: 0 -1px 0 var(--border);
+}
+
+.plan-branch {
+  align-items: center;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 236px minmax(0, 1fr) 208px 36px;
+  padding: 8px 12px 8px 16px;
+}
+
+.plan-ruler-row {
+  align-items: start;
+  padding-bottom: 0;
+  padding-top: 10px;
+}
+
+.plan-name {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+}
+
+.plan-answer p {
+  margin: 0;
+}
+
+.plan-answer .plan-wait {
+  margin: 6px 0 2px;
+}
+
+.plan-tip {
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+}
+
+.plan-tip > .chip {
+  gap: 6px;
+}
+
+.plan-key-today {
+  background: var(--foreground);
+  border-radius: 1px;
+  height: 2px;
+  width: 14px;
+}
+
+.plan-empty {
+  margin: 0;
+  padding: 10px 16px 14px;
+}
+
+.plan-footnote {
+  color: var(--muted-foreground);
+  margin: 12px 0 0;
+}
+
+/* The chart's plot runs from the gutter to 8px short of the right edge. The ruler's thumb
+   travels exactly that span, so its time lines up with every chart's marker. */
+.plan-chart {
+  margin: 0;
+}
+
+.plan-plot {
+  box-shadow: 0 1px 0 var(--border);
+  height: 84px;
+  margin: 6px 8px 0 28px;
+  position: relative;
+}
+
+.plan-plot svg {
+  height: 100%;
+  inset: 0;
+  overflow: visible;
+  position: absolute;
+  width: 100%;
+}
+
+.plan-grid {
+  border-top: 1px solid var(--border);
+  left: 0;
+  position: absolute;
+  right: 0;
+}
+
+.plan-grid::before,
+.plan-hours,
+.plan-ruler-hours {
+  color: var(--muted-foreground);
+  font-size: var(--fs-micro);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--lh-micro);
+}
+
+.plan-grid::before {
+  content: attr(data-label);
+  left: -28px;
+  position: absolute;
+  text-align: right;
+  top: -7px;
+  width: 22px;
+}
+
+.plan-usual {
+  fill: var(--active);
+}
+
+.plan-today {
+  fill: none;
+  stroke: var(--foreground);
+  stroke-linejoin: round;
+  stroke-width: 1.75;
+  vector-effect: non-scaling-stroke;
+}
+
+.plan-marker {
+  background: var(--foreground);
+  bottom: 0;
+  position: absolute;
+  top: -6px;
+  width: 1px;
+}
+
+.plan-marker-dot {
+  background: var(--band);
+  border-radius: 50%;
+  box-shadow: 0 0 0 1.5px var(--surface-3);
+  height: 9px;
+  position: absolute;
+  transform: translate(-50%, 50%);
+  width: 9px;
+}
+
+/* The label sits up and to the left of the last point of today's line, on a wash of the card
+   colour so the line passing behind it stays out of the letters. The dot marks the point. */
+.plan-now {
+  background: color-mix(in srgb, var(--surface-3) 85%, transparent);
+  border-radius: 4px;
+  font-size: var(--fs-micro);
+  font-weight: 550;
+  line-height: var(--lh-micro);
+  padding: 0 3px;
+  position: absolute;
+  transform: translate(calc(-100% - 5px), -5px);
+  white-space: nowrap;
+}
+
+.plan-now::after {
+  background: var(--foreground);
+  border-radius: 50%;
+  bottom: -8px;
+  content: "";
+  height: 6px;
+  position: absolute;
+  right: -8px;
+  width: 6px;
+}
+
+.plan-add-narrow {
+  display: none;
+}
+
+.plan-hours {
+  height: 14px;
+  margin: 4px 8px 0 28px;
+  position: relative;
+}
+
+.plan-hours > span {
+  left: calc(var(--at) * 100%);
+  position: absolute;
+  transform: translateX(-50%);
+}
+
+.plan-ruler {
+  --thumb: 16px;
+  --thumb-at: calc(var(--thumb) / 2 + (100% - var(--thumb)) * var(--at));
+  margin: 0 calc(8px - var(--thumb) / 2) 0 calc(28px - var(--thumb) / 2);
+  padding-top: 22px;
+  position: relative;
+}
+
+.plan-ruler-time {
+  background: var(--foreground);
+  border-radius: 6px;
+  color: var(--background);
+  font-size: var(--fs-micro);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  left: var(--thumb-at);
+  line-height: 18px;
+  padding: 0 7px;
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+}
+
+.plan-range {
+  appearance: none;
+  background: none;
+  cursor: pointer;
+  display: block;
+  height: 20px;
+  margin: 0;
+  outline: none;
+  width: 100%;
+}
+
+.plan-range::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, var(--foreground) var(--thumb-at), var(--active) 0);
+  border-radius: 2px;
+  height: 4px;
+}
+
+.plan-range::-webkit-slider-thumb {
+  appearance: none;
+  background: var(--surface-3);
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--foreground);
+  height: var(--thumb);
+  margin-top: calc(2px - var(--thumb) / 2);
+  width: var(--thumb);
+}
+
+.plan-range:focus-visible::-webkit-slider-thumb {
+  box-shadow:
+    0 0 0 2px var(--foreground),
+    0 0 0 4px var(--focus-ring);
+}
+
+.plan-range::-moz-range-track {
+  background: var(--active);
+  border-radius: 2px;
+  height: 4px;
+}
+
+.plan-range::-moz-range-progress {
+  background: var(--foreground);
+  border-radius: 2px;
+  height: 4px;
+}
+
+.plan-range::-moz-range-thumb {
+  background: var(--surface-3);
+  border: 0;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--foreground);
+  height: var(--thumb);
+  width: var(--thumb);
+}
+
+.plan-ruler-hours {
+  height: 14px;
+  margin-top: 2px;
+  position: relative;
+}
+
+.plan-ruler-hours > span {
+  --thumb-at: calc(var(--thumb) / 2 + (100% - var(--thumb)) * var(--at));
+  left: var(--thumb-at);
+  position: absolute;
+  transform: translateX(-50%);
+}
+
+.plan-row {
+  align-items: center;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 8px 220px 190px minmax(0, 1fr) 36px;
+  min-height: 52px;
+  padding: 4px 12px 4px 16px;
+}
+
+.plan-row-answer strong {
+  font-size: 17px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.plan-mini {
+  color: var(--muted-foreground);
+  display: block;
+  height: 24px;
+  max-width: 460px;
+  position: relative;
+}
+
+.plan-mini svg {
+  height: 100%;
+  width: 100%;
+}
+
+.plan-mini-area {
+  fill: currentColor;
+  fill-opacity: 0.16;
+}
+
+.plan-mini-line {
+  fill: none;
+  stroke: currentColor;
+  stroke-linejoin: round;
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.plan-mini > i {
+  background: var(--foreground);
+  bottom: 2px;
+  position: absolute;
+  top: 2px;
+  width: 1px;
+}
+
+/* Narrower than a branch row needs: each branch becomes a card, and the ruler moves up beside
+   the time. */
+@media (max-width: 900px) {
+  .plan-controls {
+    display: grid;
+  }
+
+  .plan-days {
+    display: flex;
+  }
+
+  .plan-days > button {
+    flex: 1;
+    padding: 0 4px;
+  }
+
+  .plan-time {
+    background: var(--surface-3);
+    border-radius: var(--r-container);
+    box-shadow: var(--shadow-2);
+    display: grid;
+    gap: 8px 12px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding: 10px 8px 8px 12px;
+  }
+
+  .plan-time-label strong {
+    color: var(--foreground);
+    font-size: var(--fs-subtitle);
+    font-weight: 550;
+  }
+
+  .plan-time-label > .caption {
+    display: block;
+  }
+
+  .plan-time-ruler {
+    display: block;
+    grid-column: 1 / -1;
+  }
+
+  .plan-stepper strong {
+    background: none;
+    box-shadow: none;
+    font-size: 20px;
+    min-width: 64px;
+  }
+
+  .plan-stepper > button {
+    height: 44px;
+    width: 44px;
+  }
+
+  .plan-ruler {
+    --thumb: 22px;
+  }
+
+  .plan-range {
+    height: 32px;
+  }
+
+  .plan-ruler-hours > [data-alternate] {
+    display: none;
+  }
+
+  .plan-ruler-row {
+    display: none;
+  }
+
+  .plan-add-wide {
+    display: none;
+  }
+
+  /* A grid stretches the trigger, and the button inside it, to the full width. */
+  .plan-add-narrow {
+    display: grid;
+    margin-top: 8px;
+  }
+
+  .plan-add-narrow button {
+    height: 44px;
+    width: 100%;
+  }
+
+  .plan-mine {
+    background: none;
+    box-shadow: none;
+    padding: 8px 0 0;
+  }
+
+  .plan-mine > .plan-card-heading {
+    padding: 0 4px 8px;
+  }
+
+  .plan-branches {
+    display: grid;
+    gap: 8px;
+  }
+
+  .plan-branch,
+  .plan-branches > li + li {
+    box-shadow: var(--shadow-2);
+  }
+
+  .plan-branch {
+    align-items: start;
+    background: var(--surface-3);
+    border-radius: var(--r-container);
+    gap: 6px 8px;
+    grid-template-areas:
+      "answer star"
+      "chart chart"
+      "tip tip";
+    grid-template-columns: minmax(0, 1fr) 44px;
+    padding: 10px 8px 12px 12px;
+  }
+
+  .plan-answer {
+    grid-area: answer;
+  }
+
+  .plan-chart {
+    grid-area: chart;
+  }
+
+  .plan-tip {
+    grid-area: tip;
+  }
+
+  .plan-branch > .star-button {
+    grid-area: star;
+    height: 44px;
+    width: 44px;
+  }
+
+  .plan-wait .figure-m {
+    font-size: 24px;
+    line-height: 28px;
+  }
+
+  .plan-tip > .chip {
+    height: 36px;
+  }
+
+  .plan-row {
+    gap: 12px;
+    grid-template-columns: 8px minmax(0, 1fr) auto 40px;
+  }
+
+  .plan-mini {
+    display: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .plan {
+    padding: 8px 12px 24px;
   }
 }
 
