@@ -45,6 +45,9 @@ A subsequent rolling comparison uses ten next-day folds and 23,558 proxy outcome
 - On 11 October the owner approved the second Plan a meal drawing and it was built, with the branch picker and a fifth navigation item.
 - The owner found two-hour slots on Patterns too broad to be useful. Patterns now shows every weekday by half hour, and public holidays count as Sundays there and in usual waits.
 - Stats tables read as lists on phones, and the loading, load error, stale, all-closed and nothing-saved states are designed and built.
+- The owner found a usual range of "0 to 135 min" useless. The cause was one public holiday among five quiet days, with every snapshot pooled. Each day now counts once and the usual range is the middle half of days. On eight branches this cut the median width from 35 to 15 minutes. Charts keep the quiet and busy days as a lighter band.
+- Plan a meal can be asked by eating time as well as ticket time.
+- My tickets can alert when a ticket is within ten numbers, and again when it is up. The alert needs the page open. Push notifications to a locked phone are not built.
 - Still undecided: whether today's remaining slots should be adjusted by live conditions. The drawings show today's line beside the usual range and do not blend them.
 
 ## Broader product direction and agreed constraints

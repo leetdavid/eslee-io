@@ -51,12 +51,16 @@ A diner's report of when their ticket was actually called, which can be entered 
 _Avoid_: feed sighting, seating confirmation
 
 **Plan a meal page**:
-A dedicated page that helps diners choose when to take a ticket and where. The visitor picks a weekday and a ticket time on the time ruler, and each branch answers with its usual wait for a ticket taken then and the time that ticket would be called. My branches lead the page, each with a chart of its day. Every branch is ranked underneath, with no branch selection needed.
+A dedicated page that helps diners choose when to take a ticket and where. The visitor picks a weekday and a time on the time ruler. The time is either a ticket time or an eating time. For a ticket time each branch answers with its usual wait for a ticket taken then and the time that ticket would be called. For an eating time each branch answers with the ticket to take. My branches lead the page, each with a chart of its day. Every branch is ranked underneath, with no branch selection needed.
 _Avoid_: Stats page, store detail sheet
 
 **Time ruler**:
 The slider on Plan a meal that sets the ticket time in five-minute steps. Its thumb lines up with the marker in every branch chart below it.
 _Avoid_: time picker, hour cells
+
+**Eating time**:
+The time a visitor wants to sit down, chosen with "I want to eat at" on Plan a meal. Each branch works back to the latest ticket time whose usual wait ends by then. When planning today and that ticket time has passed, the branch says to take a ticket now and when it would usually be called. Only branches that can still make it are ranked.
+_Avoid_: reservation, booking time
 
 **Shorter nearby**:
 A time within an hour of the chosen ticket time whose usual wait is at least 30% and ten minutes shorter. Plan a meal offers the nearest such time for each of My branches. When planning today it never offers a time already past.
@@ -79,7 +83,7 @@ A branch is issuing tickets when it is open and its ticketing is on. A branch th
 _Avoid_: open, active, no queue
 
 **My branches**:
-The branches a visitor has starred from the store detail sheet. The list is kept on their device with no account. Those branches lead Home with their wait now and their usual wait for this time, and their tiles carry a ring in the grid.
+The branches a visitor has starred from the store detail sheet. The list is kept on their device with no account. Those branches lead Home with their wait now and their usual wait for this time, and their tiles carry a ring in the grid. Their tiles on Home and their markers on the Map carry a foreground ring.
 _Avoid_: favourites, account, saved searches
 
 **Stats page**:
@@ -93,6 +97,14 @@ _Avoid_: two-hour slots, weekly chart
 **Kind of day**:
 What a date counts as for queues: its weekday, or Sunday when it is a Hong Kong public holiday. Usual waits, the Patterns grid and same-weekday comparisons all group by it.
 _Avoid_: day of week, calendar weekday
+
+**Nearly called**:
+A tracked ticket is nearly called when the highest number its branch is calling is within ten of it. It is up when its own number is called or every number being called is past it. Numbers are not called strictly in order, so both are a guide.
+_Avoid_: next in line, position in queue
+
+**Ticket alert**:
+A notification a visitor turns on for one tracked ticket. It goes out once when the ticket is nearly called and once when it is up. It needs My tickets to stay open, and it is remembered on the device.
+_Avoid_: push notification, reminder
 
 **Stale notice**:
 The bar under the top bar shown when a refresh fails while older figures are still on screen. It gives the time those figures were loaded and a retry.
