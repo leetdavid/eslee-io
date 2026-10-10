@@ -42,6 +42,9 @@ A subsequent rolling comparison uses ten next-day folds and 23,558 proxy outcome
 - From 11 October the collector takes a snapshot every minute between 10:00 and 22:00 in Hong Kong, and every five minutes otherwise, as agreed earlier. It applies when the Railway configuration is next applied from `main`.
 - My branches is built: starred branches are kept on the device and lead Home with their usual wait for the current time.
 - Plan a meal is drawn on Doop and not built. The first drawing, a grid of hourly cells, was hard to follow. The second asks one question (which day, and what time to take a ticket) with a five-minute time ruler, then answers per branch with a range, the time the ticket would be called, and a chart of the day. The owner has not yet reviewed the second drawing.
+- On 11 October the owner approved the second Plan a meal drawing and it was built, with the branch picker and a fifth navigation item.
+- The owner found two-hour slots on Patterns too broad to be useful. Patterns now shows every weekday by half hour, and public holidays count as Sundays there and in usual waits.
+- Stats tables read as lists on phones, and the loading, load error, stale, all-closed and nothing-saved states are designed and built.
 - Still undecided: whether today's remaining slots should be adjusted by live conditions. The drawings show today's line beside the usual range and do not blend them.
 
 ## Broader product direction and agreed constraints

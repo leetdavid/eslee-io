@@ -30,7 +30,7 @@ A feed sighting does not set or overwrite `called_at`. Its timestamp is the time
 
 Matching uses branch, Hong Kong date and the normalized complete ticket number. Leading zeroes are normalized; suffixes remain distinct. A higher called number does not prove that a smaller ticket was called. Automatic matching stops across the Hong Kong date boundary to avoid matching a reused ticket on the next day.
 
-The page checks once per minute while open. Matching is also hooked into the existing queue-snapshot collector for background checks. Its current Railway configuration runs every five minutes; the previously discussed one-minute background collection still requires a separate scheduler update. Exact matches may be missed between captures, which is why user-reported calls remain useful.
+The page checks once per minute while open. Matching is also hooked into the existing queue-snapshot collector for background checks. Its Railway configuration takes a snapshot every minute between 10:00 and 22:00 in Hong Kong, and every five minutes otherwise. Exact matches may be missed between captures, which is why user-reported calls remain useful.
 
 ## Ownership and retries
 

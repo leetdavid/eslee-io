@@ -51,8 +51,20 @@ A diner's report of when their ticket was actually called, which can be entered 
 _Avoid_: feed sighting, seating confirmation
 
 **Plan a meal page**:
-A dedicated page of weekday time-slot waiting-duration estimates that helps diners choose when to join a Sushiro queue. It shows all Hong Kong branches by default, with branch selection optional.
+A dedicated page that helps diners choose when to take a ticket and where. The visitor picks a weekday and a ticket time on the time ruler, and each branch answers with its usual wait for a ticket taken then and the time that ticket would be called. My branches lead the page, each with a chart of its day. Every branch is ranked underneath, with no branch selection needed.
 _Avoid_: Stats page, store detail sheet
+
+**Time ruler**:
+The slider on Plan a meal that sets the ticket time in five-minute steps. Its thumb lines up with the marker in every branch chart below it.
+_Avoid_: time picker, hour cells
+
+**Shorter nearby**:
+A time within an hour of the chosen ticket time whose usual wait is at least 30% and ten minutes shorter. Plan a meal offers the nearest such time for each of My branches. When planning today it never offers a time already past.
+_Avoid_: best time, recommendation
+
+**Branch picker**:
+A searchable list of branches grouped by territory. It chooses one branch on Stats, and stars several for My branches on Plan a meal. It is a popover on wide screens and a bottom sheet on phones.
+_Avoid_: dropdown, select box
 
 **Typical week**:
 Recurring weekday time-slot estimates for a branch, informed by historical queue behavior. These describe weekday patterns rather than forecasts for named future dates.
@@ -73,6 +85,18 @@ _Avoid_: favourites, account, saved searches
 **Stats page**:
 A primarily informational page of observed Sushiro queue statistics. Its Daily history view shows recorded data for a selected date; its Patterns view shows historical patterns and comparisons. Either view can be narrowed to one branch, chosen from a row and kept in the address. Statistics count only the times a branch was issuing tickets.
 _Avoid_: meal planner, queue forecast
+
+**Patterns grid**:
+The average wait for each weekday and half hour on Stats, from the last 30 days. Each branch counts once per cell. Cells in the long band darken from an hour's wait and again from two.
+_Avoid_: two-hour slots, weekly chart
+
+**Kind of day**:
+What a date counts as for queues: its weekday, or Sunday when it is a Hong Kong public holiday. Usual waits, the Patterns grid and same-weekday comparisons all group by it.
+_Avoid_: day of week, calendar weekday
+
+**Stale notice**:
+The bar under the top bar shown when a refresh fails while older figures are still on screen. It gives the time those figures were loaded and a retry.
+_Avoid_: error banner, offline mode
 
 ## Map
 
