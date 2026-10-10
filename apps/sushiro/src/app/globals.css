@@ -893,6 +893,15 @@ button.chip:hover {
     overflow-wrap: anywhere;
   }
 
+  /* English names have words wider than a phone tile. Slightly smaller, tighter type that runs
+     closer to the tile's edge keeps each word whole. */
+  :lang(en) .tile-name {
+    font-size: 10px;
+    letter-spacing: -0.2px;
+    margin-inline: -3px;
+    overflow-wrap: break-word;
+  }
+
   .tile-figure {
     font-size: 17px;
     line-height: 18px;
