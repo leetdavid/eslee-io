@@ -229,6 +229,11 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  /* Icons are blocks, so they centre in their row instead of sitting on the text baseline. */
+  svg {
+    display: block;
+  }
+
   button {
     background: none;
     color: inherit;
