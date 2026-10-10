@@ -9,11 +9,12 @@ export const planCopy = {
     earlier: "5 minutes earlier",
     emptyMine: "Star the branches you are choosing between to compare them here.",
     footnote:
-      "Usual ranges come from the same weekday over the last eight weeks and cover eight waits in ten. Public holidays count as Sundays. The dot colour is the queue band at the chosen time.",
+      "The usual range is where the wait sat on the middle half of days, from the same weekday over the last eight weeks. The lighter band reaches the quiet and busy days. Public holidays count as Sundays. The dot colour is the queue band at the chosen time.",
     intro:
       "Pick a day and the time you would take a ticket. Each branch shows how long people usually waited from then until their number was called.",
     keyToday: "Today so far",
     keyUsual: "Usual range on {day}s",
+    keyWide: "Quiet and busy days",
     later: "5 minutes later",
     mineNote: "If you take a ticket at {time} on a {day}. Shortest wait first.",
     noQueue: "No queue",
@@ -45,10 +46,11 @@ export const planCopy = {
     earlier: "早 5 分鐘",
     emptyMine: "幫你考慮緊嘅分店加星，就可以喺度比較。",
     footnote:
-      "平時範圍嚟自過去八個星期同一個星期幾嘅紀錄，包到十次入面八次嘅輪候時間。公眾假期當星期日計。圓點顏色係所揀時間嘅輪候級別。",
+      "平時範圍係過去八個星期同一個星期幾入面，中間一半日子嘅輪候時間。淺色範圍包埋特別靜同特別旺嘅日子。公眾假期當星期日計。圓點顏色係所揀時間嘅輪候級別。",
     intro: "揀邊日同幾點攞籌，就睇到每間分店通常要等幾耐先叫到號。",
     keyToday: "今日至今",
     keyUsual: "平時範圍",
+    keyWide: "特別靜或者特別旺嘅日子",
     later: "遲 5 分鐘",
     mineNote: "{day} {time} 攞籌，由最短輪候排起",
     noQueue: "暫無輪候",

@@ -2479,8 +2479,25 @@ button.chip:hover {
   width: 22px;
 }
 
+/* The usual range sits on a lighter band that reaches the quiet and busy days. */
 .plan-usual {
-  fill: var(--active);
+  fill: color-mix(in oklch, var(--foreground) 17%, var(--surface-3));
+}
+
+.plan-usual-wide {
+  fill: color-mix(in oklch, var(--foreground) 7%, var(--surface-3));
+}
+
+.plan-key-usual,
+.plan-key-wide {
+  background: color-mix(in oklch, var(--foreground) 17%, var(--surface-3));
+  border-radius: 2px;
+  height: 10px;
+  width: 14px;
+}
+
+.plan-key-wide {
+  background: color-mix(in oklch, var(--foreground) 7%, var(--surface-3));
 }
 
 .plan-today {

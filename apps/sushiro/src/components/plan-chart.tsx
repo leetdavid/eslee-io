@@ -17,7 +17,8 @@ type PlanChartProps = {
   top: number;
 };
 
-// A branch's day: the usual range as a grey band, today so far as a line, and a marker at the
+// A branch's day: the usual range as a grey band over a lighter one that reaches the quiet and
+// busy days, today so far as a line, and a marker at the
 // chosen time. The plot stretches with its column and labels are HTML so they keep their size.
 export function PlanChart({
   domain,
@@ -39,12 +40,14 @@ export function PlanChart({
           `${index === 0 ? "M" : "L"}${x(point.minute).toFixed(2)},${y(point.wait).toFixed(2)}`,
       )
       .join(" ");
-  const usual =
+  const band = (upper: "high" | "most", lower: "least" | "low") =>
     slots.length > 1
-      ? `${path(slots.map((slot) => ({ minute: slot.minute, wait: slot.high })))} ${path(
-          slots.toReversed().map((slot) => ({ minute: slot.minute, wait: slot.low })),
+      ? `${path(slots.map((slot) => ({ minute: slot.minute, wait: slot[upper] })))} ${path(
+          slots.toReversed().map((slot) => ({ minute: slot.minute, wait: slot[lower] })),
         ).replace("M", "L")} Z`
       : null;
+  const usual = band("high", "low");
+  const wide = band("most", "least");
   const now = today.at(-1);
   const hours: number[] = [];
 
@@ -66,6 +69,7 @@ export function PlanChart({
           ),
         )}
         <svg aria-hidden="true" preserveAspectRatio="none" viewBox="0 0 100 100">
+          {wide ? <path className="plan-usual-wide" d={wide} /> : null}
           {usual ? <path className="plan-usual" d={usual} /> : null}
           {today.length > 1 ? <path className="plan-today" d={path(today)} /> : null}
         </svg>

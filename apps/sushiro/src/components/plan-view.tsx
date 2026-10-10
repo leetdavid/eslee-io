@@ -221,8 +221,12 @@ export function PlanView({ initialMinute, initialWeekday }: PlanViewProps) {
                       </span>
                     ) : null}
                     <span>
-                      <i className="stats-key-range" />
+                      <i className="plan-key-usual" />
                       {fill(plan.keyUsual, { day: dayName })}
+                    </span>
+                    <span>
+                      <i className="plan-key-wide" />
+                      {plan.keyWide}
                     </span>
                   </p>
                   {mine.length > 0 ? (

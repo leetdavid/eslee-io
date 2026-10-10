@@ -71,7 +71,7 @@ Recurring weekday time-slot estimates for a branch, informed by historical queue
 _Avoid_: forecast calendar, By date planner
 
 **Usual wait**:
-The range of official waits a branch recorded around a time of day on the same weekday over the last eight weeks, not counting today. It is worked out for every five minutes from the snapshots within ten minutes either side, covers the middle 80% of them, and is shown rounded outward to five minutes. A typical week is a branch's usual waits across each weekday.
+The range of official waits a branch recorded around a time of day on the same weekday over the last eight weeks, not counting today. It is worked out for every five minutes. Each day counts once, as its middle wait within ten minutes either side, and the range covers the middle half of days, shown rounded outward to five minutes. One unusual day, such as a public holiday, does not move it. A typical week is a branch's usual waits across each weekday.
 _Avoid_: forecast, queue-now estimate, average wait
 
 **Issuing tickets**:

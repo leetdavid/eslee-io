@@ -4,15 +4,22 @@ import { dayType } from "@/lib/holidays";
 // last weeks. It is the app's estimate for a ticket taken then.
 export const usualStepMinutes = 5;
 
-// Snapshots this close to a slot count toward it, so each five-minute slot has enough to form a
-// range while still following fast changes at peak times.
+// Snapshots this close to a slot count toward it, so a day's figure for a five-minute slot is
+// steady while still following fast changes at peak times.
 const windowMinutes = 10;
-const minimumValues = 3;
 const minimumDays = 2;
 const hongKongOffset = 8 * 60 * 60_000;
 
 export type UsualRow = { day: string; minute: number; wait: number };
-export type UsualSlot = { high: number; low: number; median: number; minute: number };
+// `low` to `high` is the usual range. `least` to `most` reaches the quiet and busy days.
+export type UsualSlot = {
+  high: number;
+  least: number;
+  low: number;
+  median: number;
+  minute: number;
+  most: number;
+};
 export type UsualStore = { slots: UsualSlot[]; storeId: number };
 export type UsualResponse = { stores: UsualStore[]; weekday: number };
 
@@ -37,8 +44,10 @@ export function hongKongClock(at: Date) {
   };
 }
 
-// One branch's rows for one weekday -> a low, median and high for every five-minute slot. The
-// range covers the middle 80% of what was recorded, so one freak day does not set it.
+// One branch's rows for one weekday -> a usual wait for every five-minute slot. Each day counts
+// once, as its middle wait around the slot, so one day cannot set the range however many
+// snapshots it has. The usual range is the middle half of days, and `least` to `most` covers
+// all but the extreme tenth at each end.
 export function usualSlots(rows: UsualRow[]): UsualSlot[] {
   if (rows.length === 0) {
     return [];
@@ -52,19 +61,34 @@ export function usualSlots(rows: UsualRow[]): UsualSlot[] {
     minute <= Math.max(...minutes);
     minute += usualStepMinutes
   ) {
-    const near = rows.filter((row) => Math.abs(row.minute - minute) <= windowMinutes);
+    const waitsByDay = new Map<string, number[]>();
 
-    if (near.length < minimumValues || new Set(near.map((row) => row.day)).size < minimumDays) {
+    for (const row of rows) {
+      if (Math.abs(row.minute - minute) <= windowMinutes) {
+        waitsByDay.set(row.day, [...(waitsByDay.get(row.day) ?? []), row.wait]);
+      }
+    }
+
+    if (waitsByDay.size < minimumDays) {
       continue;
     }
 
-    const waits = near.map((row) => row.wait).sort((left, right) => left - right);
+    const days = [...waitsByDay.values()]
+      .map((waits) =>
+        quantile(
+          waits.sort((left, right) => left - right),
+          0.5,
+        ),
+      )
+      .sort((left, right) => left - right);
 
     slots.push({
-      high: Math.round(quantile(waits, 0.9)),
-      low: Math.round(quantile(waits, 0.1)),
-      median: Math.round(quantile(waits, 0.5)),
+      high: Math.round(quantile(days, 0.75)),
+      least: Math.round(quantile(days, 0.1)),
+      low: Math.round(quantile(days, 0.25)),
+      median: Math.round(quantile(days, 0.5)),
       minute,
+      most: Math.round(quantile(days, 0.9)),
     });
   }
 

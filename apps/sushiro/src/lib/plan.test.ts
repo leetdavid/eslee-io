@@ -14,9 +14,11 @@ import type { UsualSlot } from "@/lib/usual";
 function slotsFrom(start: number, medians: number[]): UsualSlot[] {
   return medians.map((median, index) => ({
     high: median + 8,
+    least: Math.max(0, median - 20),
     low: Math.max(0, median - 8),
     median,
     minute: start + index * 15,
+    most: median + 20,
   }));
 }
 

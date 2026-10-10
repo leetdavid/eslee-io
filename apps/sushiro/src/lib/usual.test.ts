@@ -37,24 +37,56 @@ describe("usualSlots", () => {
   ];
   const slots = usualSlots(rows);
 
-  it("gives every five-minute slot a range from the snapshots around it", () => {
+  it("gives every five-minute slot a range across days", () => {
     expect(slots.map((slot) => slot.minute)).toEqual([1020, 1025, 1030, 1035, 1040]);
-    // 17:00 draws on 17:00 to 17:10 from both days: 10, 15, 20, 20, 25, 30.
-    expect(slots[0]).toEqual({ high: 28, low: 13, median: 20, minute: 1020 });
+    // 17:00 draws on 17:00 to 17:10. The first day's middle wait is 15 and the second's is 25.
+    expect(slots[0]).toEqual({ high: 23, least: 16, low: 18, median: 20, minute: 1020, most: 24 });
   });
 
   it("follows a fast rise instead of flattening it", () => {
     expect(slots[4]?.median).toBeGreaterThan((slots[0]?.median ?? 0) * 3);
   });
 
-  it("needs two days and three values before calling anything usual", () => {
+  it("needs two days before calling anything usual", () => {
     expect(usualSlots(rows.filter((row) => row.day === "2026-09-26"))).toEqual([]);
     expect(usualSlots([])).toEqual([]);
+  });
+
+  it("keeps one unusual day out of the usual range", () => {
+    // No queue at 17:20 on four days, and 140 minutes on a public holiday.
+    const quiet = ["2026-09-20", "2026-09-26", "2026-09-27", "2026-10-04"].flatMap((day) =>
+      [1030, 1035, 1040, 1045, 1050].map((minute) => ({ day, minute, wait: 0 })),
+    );
+    const holiday = [85, 125, 140, 160, 165].map((wait, index) => ({
+      day: "2026-10-01",
+      minute: 1030 + index * 5,
+      wait,
+    }));
+
+    expect(usualSlots([...quiet, ...holiday]).find((slot) => slot.minute === 1040)).toEqual({
+      high: 0,
+      least: 0,
+      low: 0,
+      median: 0,
+      minute: 1040,
+      most: 84,
+    });
+  });
+
+  it("counts a day once however many snapshots it has", () => {
+    const sparse = [{ day: "2026-09-27", minute: 1040, wait: 30 }];
+    const dense = [1030, 1035, 1040, 1045, 1050].map((minute) => ({
+      day: "2026-10-04",
+      minute,
+      wait: 90,
+    }));
+
+    expect(usualSlots([...sparse, ...dense]).find((slot) => slot.minute === 1040)?.median).toBe(60);
   });
 });
 
 describe("usualAt and usualRange", () => {
-  const slots = [{ high: 62, low: 13, median: 30, minute: 1050 }];
+  const slots = [{ high: 62, least: 5, low: 13, median: 30, minute: 1050, most: 90 }];
 
   it("finds the slot nearest a time of day", () => {
     expect(usualAt(slots, 1052)?.minute).toBe(1050);
