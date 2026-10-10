@@ -48,10 +48,23 @@ export default defineRailway((ctx) => {
     region: "asia-southeast1-eqsg3a",
     sizeMB: 50000,
   });
+  // Railway cron cannot run more often than every five minutes. While branches issue tickets
+  // (10:00 to 22:00 in Hong Kong, 02:00 to 14:00 UTC) each run takes a snapshot a minute for
+  // five minutes. Outside those hours it takes one. Each request is bounded to 50 seconds, so
+  // a run always ends before the next one is due. The script must not contain a single quote.
+  const collectorScript = [
+    "start=$(date +%s)",
+    "hour=$((1$(date -u +%H) - 100))",
+    "runs=1",
+    'if [ "$hour" -ge 2 ] && [ "$hour" -lt 14 ]; then runs=5; fi',
+    "run=0",
+    "status=0",
+    'while [ "$run" -lt "$runs" ]; do pause=$((start + run * 60 - $(date +%s))); if [ "$pause" -gt 0 ]; then sleep "$pause"; fi; curl --fail-with-body --silent --show-error --connect-timeout 10 --max-time 40 --retry 1 --retry-delay 3 --retry-max-time 50 --header "Authorization: Bearer $CRON_SECRET" "$SUSHIRO_CRON_URL" || status=1; run=$((run + 1)); done',
+    'exit "$status"',
+  ].join("; ");
   const sushiroQueueCollector = service("sushiro-queue-collector", {
     source: image("curlimages/curl:8.17.0"),
-    start:
-      'sh -c \'exec curl --fail-with-body --silent --show-error --connect-timeout 10 --max-time 65 --retry 2 --retry-delay 5 --retry-max-time 210 --header "Authorization: Bearer $CRON_SECRET" "$SUSHIRO_CRON_URL"\'',
+    start: `sh -c '${collectorScript}'`,
     replicas: { "asia-southeast1-eqsg3a": 1 },
     deploy: {
       cronSchedule: "*/5 * * * *",

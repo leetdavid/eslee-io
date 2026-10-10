@@ -18,7 +18,7 @@ pnpm --filter @eslee/sushiro infra:configure
 
 `sushiro-preview-postgres` is a separate Postgres server. CI creates one database and restricted login per same-repository PR, with no production data. Preview databases are disposable and are deleted when their PR closes. They do not have scheduled backups.
 
-The collector runs every five minutes. Its HTTP client has bounded timeouts, retries transient HTTP errors twice, and logs failed response bodies. A run is successful only if the snapshot endpoint returns success.
+The collector is a cron service that starts every five minutes, the shortest interval Railway allows. While branches issue tickets (10:00 to 22:00 in Hong Kong) each run takes a snapshot a minute for five minutes. Outside those hours it takes one. Each request is bounded to 50 seconds and retried once, so a run always ends before the next is due. A run fails if any of its requests fails.
 
 See [`apps/sushiro/docs/database.md`](../apps/sushiro/docs/database.md) for migrations, the September 2026 incident, and deferred Neon backfill.
 
