@@ -60,6 +60,7 @@ export const copy = {
     globalQueues: "全港輪候組數",
     groups: "組",
     history: "輪候趨勢",
+    sixHours: "6 小時",
     historyEmpty: "首次收集後將顯示趨勢。",
     historyPeriod: {
       24: "過去 24 小時",
@@ -156,6 +157,7 @@ export const copy = {
     globalQueues: "All-store queue",
     groups: "groups",
     history: "Queue trends",
+    sixHours: "6h",
     historyEmpty: "Trends will appear after the first collection.",
     historyPeriod: {
       24: "Last 24 hours",

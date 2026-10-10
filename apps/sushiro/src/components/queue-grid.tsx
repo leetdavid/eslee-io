@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import { useLanguage } from "@/components/language-provider";
@@ -315,14 +316,18 @@ export function QueueGrid() {
         ) : null}
       </div>
 
-      {selectedStore ? (
-        <StoreSheet
-          language={language}
-          onClose={() => closeStore()}
-          points={historyByStoreId.get(selectedStore.id) ?? []}
-          store={selectedStore}
-        />
-      ) : null}
+      {/* Keeps the sheet mounted while it animates out. */}
+      <AnimatePresence>
+        {selectedStore ? (
+          <StoreSheet
+            key="sheet"
+            language={language}
+            onClose={() => closeStore()}
+            points={historyByStoreId.get(selectedStore.id) ?? []}
+            store={selectedStore}
+          />
+        ) : null}
+      </AnimatePresence>
     </AppShell>
   );
 }

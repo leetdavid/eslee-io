@@ -703,12 +703,14 @@ button.chip:hover {
   border-radius: var(--r-sheet);
   bottom: 20px;
   box-shadow: var(--shadow-5);
-  left: 50%;
+  /* Centred by its margins, so the transform stays free for the open and close motion. */
+  left: 0;
+  margin-inline: auto;
   max-height: calc(100dvh - 40px);
   overflow-y: auto;
   padding: 8px 20px 20px;
   position: fixed;
-  transform: translateX(-50%);
+  right: 0;
   width: min(640px, calc(100% - 40px));
   z-index: 4;
 }
@@ -808,7 +810,7 @@ button.chip:hover {
 }
 
 .map-page .store-sheet {
-  left: calc((100% - var(--history-sidebar-width)) / 2);
+  right: var(--history-sidebar-width);
 }
 
 @media (max-width: 1099px) {
@@ -889,10 +891,9 @@ button.chip:hover {
   .map-page .store-sheet {
     border-radius: var(--r-sheet) var(--r-sheet) 0 0;
     bottom: 0;
-    left: 0;
     max-height: calc(100dvh - 24px);
     padding: 8px 16px 20px;
-    transform: none;
+    right: 0;
     width: 100%;
   }
 }

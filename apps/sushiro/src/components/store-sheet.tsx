@@ -1,11 +1,14 @@
 "use client";
 
+import { motion, useReducedMotion } from "framer-motion";
 import { CalendarClock, ChartColumn, X } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 import { QueueChart } from "@/components/queue-chart";
 import { StarToggle } from "@/components/star-toggle";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useIsNarrow } from "@/lib/media";
 import { useMyBranches } from "@/lib/my-branches";
 import {
   copy,
@@ -16,7 +19,14 @@ import {
   storeName,
   waitingGroups,
 } from "@/lib/queue-presentation";
-import { isTicketing, type QueueHistoryPoint, type QueueStore } from "@/lib/queues";
+import {
+  type HistoryRange,
+  historyRanges,
+  isTicketing,
+  type QueueHistory,
+  type QueueHistoryPoint,
+  type QueueStore,
+} from "@/lib/queues";
 import { useSharedJson } from "@/lib/shared-json";
 import { statsCopy } from "@/lib/stats-copy";
 import { ticketCopy } from "@/lib/ticket-copy";
@@ -25,9 +35,14 @@ import { hongKongClock, type UsualResponse, usualAt, usualRange } from "@/lib/us
 type StoreSheetProps = {
   language: Language;
   onClose: () => void;
+  // The six-hour trend the page already holds, shown until the sheet's own request returns.
   points?: QueueHistoryPoint[];
   store: QueueStore;
 };
+
+// The trend opens on the last six hours. A day and a week are one tap away.
+const trendRanges = [6, ...historyRanges.filter((range) => range <= 168)] as const;
+type TrendRange = 6 | HistoryRange;
 
 // The band badge takes its tint and text from the band tokens, not the Badge palette, so it
 // matches the tiles and rows exactly.
@@ -48,17 +63,41 @@ export function StoreSheet({ language, onClose, points = [], store }: StoreSheet
   const usualSlot = usualAt(usual.data?.stores[0]?.slots ?? [], now.minute);
   const usualNow = usualSlot ? usualRange(usualSlot) : null;
   const weekday = statsCopy[language].weekdaysLong[now.dayType] ?? "";
+  const [trendRange, setTrendRange] = useState<TrendRange>(6);
+  const trend = useSharedJson<QueueHistory>(
+    `/api/queues/charts?storeId=${store.id}&hours=${trendRange}`,
+    { maxAgeMs: 5 * 60_000 },
+  );
+  const trendPoints = trend.data?.stores[0]?.points ?? (trendRange === 6 ? points : []);
+  const isNarrow = useIsNarrow();
+  const reduceMotion = useReducedMotion();
+  // A bottom sheet rises from the edge. The floating card on wide screens lifts a little.
+  const away = reduceMotion ? { opacity: 0 } : isNarrow ? { y: "100%" } : { opacity: 0, y: 24 };
 
   return (
     <>
-      <button
+      <motion.button
+        animate={{ opacity: 1 }}
         aria-label={text.close}
         className="sheet-backdrop"
+        exit={{ opacity: 0 }}
+        initial={{ opacity: 0 }}
+        transition={{ duration: 0.16 }}
         onClick={onClose}
         tabIndex={-1}
         type="button"
       />
-      <aside aria-label={name} className="store-sheet" data-band={band}>
+      <motion.aside
+        animate={{ opacity: 1, y: 0 }}
+        aria-label={name}
+        className="store-sheet"
+        data-band={band}
+        exit={{ ...away, transition: { duration: 0.16, ease: "easeIn" } }}
+        initial={away}
+        transition={
+          reduceMotion ? { duration: 0 } : { bounce: 0.15, duration: 0.3, type: "spring" }
+        }
+      >
         <div className="sheet-handle" />
         <div className="sheet-heading">
           <div>
@@ -113,15 +152,26 @@ export function StoreSheet({ language, onClose, points = [], store }: StoreSheet
           </div>
         </div>
 
-        {points.length > 0 ? (
-          <QueueChart
-            label={text.history}
-            latestWait={store.wait}
-            locale={language}
-            points={points}
-            valueLabel={text.minutes}
-          />
-        ) : null}
+        <QueueChart
+          controls={
+            <fieldset aria-label={text.history} className="segmented">
+              {trendRanges.map((range) => (
+                <button
+                  aria-pressed={range === trendRange}
+                  key={range}
+                  onClick={() => setTrendRange(range)}
+                  type="button"
+                >
+                  {range === 6 ? text.sixHours : text.historyRange[range]}
+                </button>
+              ))}
+            </fieldset>
+          }
+          label={text.history}
+          locale={language}
+          points={trendPoints}
+          valueLabel={text.minutes}
+        />
 
         <section className="sheet-section">
           <p className="caption">{text.calledTickets}</p>
@@ -155,7 +205,7 @@ export function StoreSheet({ language, onClose, points = [], store }: StoreSheet
           </Button>
         </div>
         <p className="caption sheet-footer">{text.dataSource}</p>
-      </aside>
+      </motion.aside>
     </>
   );
 }

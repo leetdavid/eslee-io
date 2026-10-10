@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { useState } from "react";
 import { AppShell } from "@/components/app-shell";
@@ -207,14 +208,18 @@ export function QueueMap() {
         </section>
       ) : null}
 
-      {selectedStore ? (
-        <StoreSheet
-          language={language}
-          onClose={() => closeStore()}
-          points={history?.stores.find(({ storeId }) => storeId === selectedStore.id)?.points}
-          store={selectedStore}
-        />
-      ) : null}
+      {/* Keeps the sheet mounted while it animates out. */}
+      <AnimatePresence>
+        {selectedStore ? (
+          <StoreSheet
+            key="sheet"
+            language={language}
+            onClose={() => closeStore()}
+            points={history?.stores.find(({ storeId }) => storeId === selectedStore.id)?.points}
+            store={selectedStore}
+          />
+        ) : null}
+      </AnimatePresence>
     </AppShell>
   );
 }

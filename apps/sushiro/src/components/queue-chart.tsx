@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 import { QueueChartSeries } from "@/components/queue-chart-series";
 import type { QueueHistoryPoint } from "@/lib/queues";
 
 type QueueChartProps = {
+  // Shown at the right of the caption in place of the latest figure, such as a range switch.
+  controls?: ReactNode;
   label: string;
   latestWait?: number;
   locale: string;
@@ -17,6 +19,7 @@ const chartHeight = 52;
 const chartPadding = 4;
 
 export function QueueChart({
+  controls,
   label,
   latestWait: currentWait,
   locale,
@@ -70,9 +73,11 @@ export function QueueChart({
     <div className="queue-chart min-w-0 max-w-full">
       <div className="queue-chart-caption">
         <span>{label}</span>
-        <strong>
-          {latestWait} <small>{valueLabel}</small>
-        </strong>
+        {controls ?? (
+          <strong>
+            {latestWait} <small>{valueLabel}</small>
+          </strong>
+        )}
       </div>
       {points.length > 0 ? (
         <div className="queue-chart-plot">
