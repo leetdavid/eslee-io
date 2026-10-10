@@ -127,6 +127,7 @@ export function StatsView({ initialBranch, initialDate, initialView }: StatsView
       language={language}
       onLanguageChange={setLanguage}
       onRefresh={resource.refresh}
+      updatedAt={resource.loadedAt}
     >
       <div className="stats">
         <header>

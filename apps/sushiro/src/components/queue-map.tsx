@@ -77,6 +77,7 @@ export function QueueMap() {
       language={language}
       onLanguageChange={setLanguage}
       onRefresh={feed.refresh}
+      updatedAt={feed.loadedAt}
     >
       {status === "ready" && snapshot ? (
         <MapViewport language={language}>

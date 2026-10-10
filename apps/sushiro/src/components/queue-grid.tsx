@@ -109,6 +109,7 @@ export function QueueGrid() {
       language={language}
       onLanguageChange={setLanguage}
       onRefresh={feed.refresh}
+      updatedAt={feed.loadedAt}
     >
       <div className="home">
         {status === "ready" && snapshot ? (
@@ -121,7 +122,12 @@ export function QueueGrid() {
                 </div>
                 <p className="caption home-meta">
                   {fill(text.branchesIssuing, { count: total.activeStores })}
-                  {updatedTime ? ` · ${fill(text.updated, { time: updatedTime })}` : null}
+                  {updatedTime ? (
+                    <span className="home-updated">
+                      {" · "}
+                      {fill(text.updated, { time: updatedTime })}
+                    </span>
+                  ) : null}
                 </p>
               </div>
               {savedStores.length > 0 ? (

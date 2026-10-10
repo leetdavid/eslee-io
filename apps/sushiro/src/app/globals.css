@@ -420,6 +420,17 @@
   display: none;
 }
 
+/* When the data last loaded: in the top bar on wide screens, in Home's summary line on phones. */
+.topbar-updated {
+  color: var(--muted-foreground);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.home-updated {
+  display: none;
+}
+
 /* Home: the network total, the banded grid, then the no-queue and queueing lists. */
 .home {
   display: grid;
@@ -842,6 +853,14 @@ button.chip:hover {
 
   .only-narrow {
     display: inline-flex;
+  }
+
+  .topbar-updated {
+    display: none;
+  }
+
+  .home-updated {
+    display: inline;
   }
 
   .bottom-nav {

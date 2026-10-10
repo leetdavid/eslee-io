@@ -161,6 +161,7 @@ export function PlanView({ initialMinute, initialWeekday }: PlanViewProps) {
       language={language}
       onLanguageChange={setLanguage}
       onRefresh={refresh}
+      updatedAt={feed.loadedAt}
     >
       <div className="plan">
         <header>

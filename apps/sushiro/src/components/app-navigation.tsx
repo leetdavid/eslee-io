@@ -11,7 +11,7 @@ import {
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { copy, type Language } from "@/lib/queue-presentation";
+import { copy, fill, type Language } from "@/lib/queue-presentation";
 
 export type AppNavigationProps = {
   activePage: "grid" | "map" | "plan" | "stats" | "tickets";
@@ -19,6 +19,8 @@ export type AppNavigationProps = {
   language: Language;
   onLanguageChange: (language: Language) => void;
   onRefresh: () => void;
+  // When the page's data last loaded, in epoch milliseconds. Shown in the top bar on wide screens.
+  updatedAt?: number;
 };
 
 const destinations = [
@@ -56,8 +58,16 @@ export function AppNavigation({
   language,
   onLanguageChange,
   onRefresh,
+  updatedAt,
 }: AppNavigationProps) {
   const text = copy[language];
+  const updatedTime = updatedAt
+    ? new Intl.DateTimeFormat(language, {
+        hour: "2-digit",
+        hourCycle: "h23",
+        minute: "2-digit",
+      }).format(new Date(updatedAt))
+    : null;
 
   return (
     <header className="topbar">
@@ -68,6 +78,11 @@ export function AppNavigation({
         </nav>
       </div>
       <div className="topbar-actions">
+        {updatedTime ? (
+          <span className="caption topbar-updated">
+            {fill(text.updated, { time: updatedTime })}
+          </span>
+        ) : null}
         <fieldset aria-label={text.language} className="segmented">
           <button
             aria-pressed={language === "zh-HK"}
