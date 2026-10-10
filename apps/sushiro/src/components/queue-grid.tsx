@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import { QueueAreaChart } from "@/components/queue-area-chart";
+import { QueueLegend } from "@/components/queue-legend";
 import { StoreSheet } from "@/components/store-sheet";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,7 +12,6 @@ import {
   homeLists,
   type Language,
   networkTotal,
-  type QueueBand,
   queueBand,
   shortStoreName,
   storeName,
@@ -27,7 +27,6 @@ import { storeGridBands, storeGridNames } from "@/lib/store-grid";
 
 // Rows shown in the queueing list before "Show all".
 const queueingPreview = 8;
-const legendBands: Exclude<QueueBand, "muted">[] = ["none", "short", "moderate", "long"];
 
 function normalizedStoreName(name: string) {
   return name.trim().replaceAll(/\s+/g, " ").toLocaleLowerCase();
@@ -266,15 +265,7 @@ export function QueueGrid() {
                 </section>
               ))}
 
-              <div className="legend">
-                {legendBands.map((band) => (
-                  <span data-band={band} key={band}>
-                    <i className="band-dot" />
-                    {text.bandRange[band]}
-                  </span>
-                ))}
-                <span>{text.legendNote}</span>
-              </div>
+              <QueueLegend language={language} />
 
               {unplacedStores.length > 0 ? (
                 <section aria-labelledby="unplaced-stores-heading">

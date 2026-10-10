@@ -128,15 +128,6 @@
   --band-muted-text: #666666;
   --band-muted-tint: #e9e9e9;
 
-  /* Names the Map and My tickets styles still use, pointed at the version 2 tokens. */
-  --black: var(--foreground);
-  --line: color-mix(in oklab, var(--foreground) 17%, transparent);
-  --land: var(--surface-3);
-  --sea: var(--background);
-  --green: var(--band-none-text);
-  --lime: var(--band-short-text);
-  --yellow: var(--band-moderate-text);
-  --red: var(--band-long-text);
   --history-sidebar-width: clamp(280px, 28vw, 360px);
 }
 
@@ -1153,7 +1144,7 @@ button.chip:hover {
   }
 }
 
-/* Styles for Map, carried over from version 1 until that page is rebuilt. */
+/* Map: the basemap with one marker per store, and the trends panel beside it. */
 .map-stage {
   bottom: 0;
   container-type: size;
@@ -1162,13 +1153,12 @@ button.chip:hover {
   overflow: hidden;
   position: absolute;
   right: var(--history-sidebar-width);
-  touch-action: none;
   top: 0;
+  touch-action: none;
   user-select: none;
 }
 
 .map-stage:focus-visible {
-  outline: 2px solid var(--black);
   outline-offset: -2px;
 }
 
@@ -1191,7 +1181,7 @@ button.chip:hover {
 
 .basemap {
   display: block;
-  filter: drop-shadow(0 0 0.75px var(--black));
+  filter: drop-shadow(0 0 0.6px rgb(0 0 0 / 0.35)) drop-shadow(0 1px 1px rgb(0 0 0 / 0.05));
   height: 100%;
   pointer-events: none;
   position: relative;
@@ -1199,59 +1189,48 @@ button.chip:hover {
   z-index: 1;
 }
 
+/* The basemap file is white land. Dimming it to 14.5% gives the dark card surface. */
+.dark .basemap {
+  filter: brightness(0.145) drop-shadow(0 0 0.6px rgb(255 255 255 / 0.3));
+}
+
 .store-marker {
-  appearance: none;
-  background: #525252;
-  border: 1px solid var(--sea);
+  align-items: center;
+  background: var(--band);
   border-radius: 999px;
-  cursor: pointer;
-  display: grid;
-  font-size: clamp(9px, 1.2cqw, 13px);
-  font-weight: 700;
-  min-height: clamp(24px, 2.8cqw, 31px);
-  min-width: clamp(24px, 2.8cqw, 31px);
-  padding: 0;
+  box-shadow: 0 0 0 1.5px var(--background);
+  color: #ffffff;
+  display: flex;
+  font-size: clamp(10px, 1.2cqw, 12px);
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+  justify-content: center;
+  min-height: clamp(22px, 2.6cqw, 28px);
+  min-width: clamp(22px, 2.6cqw, 28px);
+  padding: 0 5px;
   position: absolute;
-  place-items: center;
   transform: translate(-50%, -50%);
   z-index: 2;
 }
 
-.store-marker[data-has-queue="true"] {
-  border-width: 2px;
-  color: var(--land);
+.store-marker[data-band="short"],
+.store-marker[data-band="moderate"] {
+  color: #1a1a1a;
 }
 
-.store-marker-none {
-  background: var(--green);
-}
-
-.store-marker-short {
-  background: var(--lime);
-}
-
-.store-marker-moderate {
-  background: var(--yellow);
-  color: var(--black);
-}
-
-.store-marker-long {
-  background: var(--red);
-}
-
-.store-marker-muted {
-  color: #737373;
-}
-
-.store-marker:is(:hover, :focus-visible, [data-selected="true"]) {
-  outline: 2px solid var(--black);
-  outline-offset: 3px;
+.store-marker:is(:hover, :focus-visible) {
+  box-shadow:
+    0 0 0 1.5px var(--background),
+    0 0 0 3px var(--muted-foreground);
+  outline: none;
   z-index: 3;
 }
 
-.store-marker:focus-visible {
-  outline: 1px solid var(--black);
-  outline-offset: 3px;
+.store-marker[data-selected="true"] {
+  box-shadow:
+    0 0 0 1.5px var(--background),
+    0 0 0 3.5px var(--foreground);
+  z-index: 4;
 }
 
 .map-stage[data-dragging="true"],
@@ -1260,135 +1239,86 @@ button.chip:hover {
 }
 
 .map-zoom-controls {
-  background: var(--land);
-  border: 1px solid var(--black);
-  bottom: clamp(18px, 3vw, 48px);
+  background: var(--surface-3);
+  border-radius: var(--r-container);
+  bottom: 24px;
+  box-shadow: var(--shadow-2);
   display: grid;
   margin: 0;
-  padding: 0;
+  min-width: 0;
+  padding: 2px;
   position: absolute;
-  right: clamp(18px, 3vw, 48px);
+  right: 24px;
   z-index: 3;
 }
 
 .map-zoom-controls button {
-  background: var(--land);
-  border: 0;
-  cursor: pointer;
-  font-size: 20px;
-  height: 32px;
-  line-height: 1;
-  padding: 0;
-  width: 32px;
+  align-items: center;
+  border-radius: var(--r-item);
+  color: var(--muted-foreground);
+  display: flex;
+  height: 36px;
+  justify-content: center;
+  width: 36px;
 }
 
-.map-zoom-controls button + button {
-  border-top: 1px solid var(--black);
+.map-zoom-controls button:hover:not(:disabled) {
+  background: var(--hover);
+  color: var(--foreground);
 }
 
 .map-zoom-controls button:disabled {
-  color: #737373;
   cursor: default;
+  opacity: 0.4;
 }
 
-.map-zoom-controls .map-fit-control {
-  font-size: 11px;
+.telemetry,
+.map-legend {
+  left: 24px;
+  pointer-events: none;
+  position: absolute;
+  z-index: 1;
 }
 
 .telemetry {
-  left: clamp(18px, 3vw, 48px);
+  top: 12px;
+}
+
+.map-legend {
+  bottom: 24px;
+}
+
+.map-legend .legend {
+  padding: 0;
+}
+
+.map-legend .caption {
+  margin-top: 4px;
+}
+
+.map-status {
+  align-items: center;
+  color: var(--muted-foreground);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  left: calc((100% - var(--history-sidebar-width)) / 2);
   position: absolute;
-  pointer-events: none;
-  top: clamp(18px, 3vw, 48px);
+  top: 50%;
+  transform: translate(-50%, -50%);
   z-index: 1;
 }
 
-.telemetry p,
-.telemetry small {
-  font-size: 12px;
-  letter-spacing: -0.01em;
+.map-status p {
   margin: 0;
 }
 
-.telemetry p {
-  font-weight: 600;
-}
-
-.telemetry div {
-  align-items: baseline;
-  display: flex;
-  gap: 4px;
-  line-height: 0.9;
-  margin: 8px 0 4px;
-}
-
-.telemetry strong {
-  font-size: clamp(32px, 4vw, 54px);
-  font-weight: 700;
-  letter-spacing: -0.1em;
-}
-
-.telemetry small {
-  color: #525252;
-}
-
-.controls {
-  align-items: center;
-  display: flex;
-  gap: 8px;
-  position: absolute;
-  right: calc(var(--history-sidebar-width) + clamp(18px, 3vw, 48px));
-  top: clamp(18px, 3vw, 48px);
-  z-index: 1;
-}
-
-.history-store {
-  --queue-chart-color: var(--green);
-}
-
-.history-store[data-band="short"] {
-  --queue-chart-color: var(--lime);
-}
-
-.history-store[data-band="moderate"] {
-  --queue-chart-color: var(--yellow);
-}
-
-.history-store[data-band="long"] {
-  --queue-chart-color: var(--red);
-}
-
-.history-store[data-band="muted"] {
-  --queue-chart-color: #737373;
-}
-
-.error-state button {
-  background: var(--land);
-  border: 1px solid var(--black);
-  border-radius: 0;
-  font-size: 12px;
-  height: 32px;
-}
-
-.error-state button {
-  cursor: pointer;
-  padding: 0 11px;
-}
-
-.loading {
-  bottom: 24px;
-  font-size: 12px;
-  left: 50%;
-  position: absolute;
-  transform: translateX(-50%);
-}
-
 .history-sidebar {
-  background: var(--land);
-  border-left: 1px solid var(--black);
+  background: var(--surface-2);
   bottom: 0;
+  box-shadow: -1px 0 0 var(--border);
   overflow-y: auto;
-  padding: 20px;
+  padding: 16px;
   position: absolute;
   right: 0;
   top: 0;
@@ -1397,105 +1327,101 @@ button.chip:hover {
 }
 
 .history-sidebar header {
-  align-items: flex-end;
-  border-bottom: 1px solid var(--black);
+  align-items: center;
   display: flex;
+  gap: 12px;
   justify-content: space-between;
-  padding-bottom: 12px;
-}
-
-.history-sidebar h2,
-.history-sidebar p {
-  margin: 0;
 }
 
 .history-sidebar h2 {
-  font-size: 17px;
-  letter-spacing: -0.03em;
+  font-size: var(--fs-title);
+  font-weight: 550;
+  line-height: var(--lh-title);
+  margin: 0;
 }
 
 .history-sidebar header p,
 .history-loading,
-.history-empty {
-  color: #525252;
-  font-size: 12px;
-}
-
-.history-sidebar header p {
-  margin-top: 3px;
-}
-
-.history-range {
-  border: 0;
-  display: flex;
+.history-empty,
+.history-list-label {
+  color: var(--muted-foreground);
+  font-size: var(--fs-caption);
+  line-height: var(--lh-caption);
   margin: 0;
-  padding: 0;
-}
-
-.history-range button {
-  background: var(--land);
-  border: 1px solid var(--black);
-  border-right: 0;
-  cursor: pointer;
-  font-size: 11px;
-  height: 28px;
-  min-width: 34px;
-  padding: 0 6px;
-}
-
-.history-range button:last-child {
-  border-right: 1px solid var(--black);
-}
-
-.history-range button[aria-pressed="true"] {
-  background: var(--black);
-  color: var(--land);
 }
 
 .history-sidebar .history-loading,
 .history-sidebar .history-empty {
-  line-height: 1.5;
   margin-top: 16px;
 }
 
 .history-charts {
   display: grid;
-  gap: 16px;
-  margin-top: 16px;
+  gap: 12px;
+  margin-top: 12px;
 }
 
+.history-list-label {
+  margin: 4px 4px 0;
+}
+
+.history-store-list {
+  display: grid;
+}
+
+.history-store {
+  --queue-chart-color: var(--band);
+  border-radius: var(--r-item);
+  display: block;
+  padding: 10px 4px;
+  width: 100%;
+}
+
+.history-store + .history-store {
+  box-shadow: 0 -1px 0 var(--border);
+}
+
+.history-store:disabled {
+  color: var(--muted-foreground);
+  cursor: default;
+}
+
+.history-store:not(:disabled):hover {
+  background: var(--hover);
+}
+
+/* Trend chart, shared by the Map panel and the store detail sheet. */
 .queue-chart {
   margin: 0;
+  min-width: 0;
 }
 
 .queue-chart-caption {
   align-items: baseline;
   display: flex;
-  font-size: 12px;
+  gap: 12px;
   justify-content: space-between;
-  line-height: 1.2;
   margin-bottom: 6px;
 }
 
 .queue-chart-caption span {
-  font-weight: 600;
+  font-weight: 550;
   overflow: hidden;
-  text-align: left;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .queue-chart-caption strong {
-  font-size: 14px;
+  font-size: var(--fs-subtitle);
   font-variant-numeric: tabular-nums;
-  margin-left: 12px;
+  font-weight: 600;
   white-space: nowrap;
 }
 
 .queue-chart-caption small {
-  color: #525252;
-  font-size: 10px;
-  font-weight: 500;
+  color: var(--muted-foreground);
+  font-size: var(--fs-caption);
+  font-weight: 400;
 }
 
 .queue-chart-plot {
@@ -1503,7 +1429,7 @@ button.chip:hover {
 }
 
 .queue-chart svg {
-  color: var(--queue-chart-color, var(--black));
+  color: var(--queue-chart-color, var(--foreground));
   cursor: crosshair;
   display: block;
   height: 52px;
@@ -1512,7 +1438,7 @@ button.chip:hover {
 }
 
 .queue-chart-baseline {
-  stroke: var(--line);
+  stroke: var(--border);
   stroke-width: 1;
 }
 
@@ -1526,17 +1452,18 @@ button.chip:hover {
 }
 
 .queue-chart-hover-dot {
-  fill: var(--land);
+  fill: var(--surface-3);
   stroke: currentColor;
   stroke-width: 2;
 }
 
 .queue-chart-tooltip {
-  background: var(--black);
-  color: var(--land);
-  font-size: 10px;
-  line-height: 1.3;
-  padding: 4px 6px;
+  background: var(--foreground);
+  border-radius: 6px;
+  color: var(--background);
+  font-size: var(--fs-micro);
+  line-height: var(--lh-micro);
+  padding: 4px 8px;
   pointer-events: none;
   position: absolute;
   white-space: nowrap;
@@ -1548,12 +1475,8 @@ button.chip:hover {
   display: block;
 }
 
-.queue-chart-tooltip strong {
-  font-size: 11px;
-}
-
 .queue-chart-tooltip time {
-  color: #d4d4d4;
+  opacity: 0.7;
 }
 
 .queue-chart-tooltip[data-align="left"][data-position="above"] {
@@ -1581,66 +1504,30 @@ button.chip:hover {
 }
 
 .queue-chart-empty {
-  border-bottom: 1px solid var(--line);
-  color: #737373;
-  font-size: 12px;
+  color: var(--muted-foreground);
   margin: 0;
-  padding: 18px 0;
-}
-
-.history-store-list {
-  border-top: 1px solid var(--black);
-}
-
-.history-store {
-  background: none;
-  border: 0;
-  border-bottom: 1px solid var(--line);
-  cursor: pointer;
-  display: block;
   padding: 12px 0;
-  text-align: left;
-  width: 100%;
 }
 
-.history-store:disabled {
-  color: #737373;
-  cursor: default;
+.history-charts > .queue-chart {
+  background: var(--surface-3);
+  border-radius: var(--r-container);
+  box-shadow: var(--shadow-2);
+  padding: 12px;
 }
 
-.history-store:not(:disabled):is(:hover, :focus-visible) {
-  background: var(--sea);
+/* The sheet's trend chart takes the store's band colour and more height. */
+.store-sheet .queue-chart {
+  --queue-chart-color: var(--band);
+  margin-top: 18px;
 }
 
-.history-store:active:not(:disabled) {
-  scale: 0.96;
+.store-sheet .queue-chart svg {
+  height: 96px;
 }
 
-.error-state {
-  align-items: center;
-  background: var(--land);
-  border: 1px solid var(--black);
-  display: flex;
-  gap: 16px;
-  left: 50%;
-  padding: 16px;
-  position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.error-state p {
-  font-size: 14px;
-  margin: 0;
-  white-space: nowrap;
-}
-
-.telemetry div span {
-  font-size: 15px;
-  font-weight: 600;
-}
-
-@media (max-width: 600px) {
+/* On phones the trends panel sits under the map instead of beside it. */
+@media (max-width: 700px) {
   :root {
     --history-sidebar-width: 100%;
     --history-panel-height: min(288px, 32dvh);
@@ -1665,30 +1552,24 @@ button.chip:hover {
     width: 44px;
   }
 
-  .controls {
-    right: 18px;
+  .telemetry,
+  .map-legend {
+    left: 16px;
+  }
+
+  .map-legend {
+    bottom: calc(var(--history-panel-height) + 12px);
+    right: 76px;
+  }
+
+  .map-status {
+    left: 50%;
   }
 
   .history-sidebar {
-    border-left: 0;
-    border-top: 1px solid var(--black);
+    box-shadow: 0 -1px 0 var(--border);
     height: var(--history-panel-height);
-    padding: 16px;
     top: auto;
     width: 100%;
   }
-
-  .telemetry strong {
-    font-size: 36px;
-  }
-}
-
-/* The sheet's trend chart takes the store's band colour and more height. */
-.store-sheet .queue-chart {
-  --queue-chart-color: var(--band);
-  margin-top: 18px;
-}
-
-.store-sheet .queue-chart svg {
-  height: 96px;
 }

@@ -5,9 +5,19 @@ import { useEffect, useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import { MapViewport } from "@/components/map-viewport";
 import { QueueChart } from "@/components/queue-chart";
+import { QueueLegend } from "@/components/queue-legend";
 import { StoreSheet } from "@/components/store-sheet";
+import { Button } from "@/components/ui/button";
 import { projectMapLocation } from "@/lib/map-projection";
-import { copy, type Language, queueBand } from "@/lib/queue-presentation";
+import {
+  copy,
+  fill,
+  type Language,
+  networkTotal,
+  queueBand,
+  storeName,
+  waitingGroups,
+} from "@/lib/queue-presentation";
 import {
   type HistoryRange,
   historyRanges,
@@ -143,7 +153,15 @@ export function QueueMap() {
 
   const text = copy[language];
   const activeStores = snapshot?.stores.filter(isActiveStore) ?? [];
-  const total = activeStores.reduce((sum, store) => sum + store.wait, 0);
+  const total = networkTotal(snapshot?.stores ?? []);
+  const averageWait = Math.round(
+    activeStores.reduce((sum, store) => sum + store.wait, 0) / Math.max(1, activeStores.length),
+  );
+  // The history total sums every store's wait, so divide it back into an average wait.
+  const averageHistory = (history?.global ?? []).map((point) => ({
+    ...point,
+    wait: Math.round(point.wait / Math.max(1, history?.stores.length ?? 1)),
+  }));
   const historyStores = history
     ? [...history.stores].sort((left, right) => {
         const leftWait =
@@ -189,16 +207,14 @@ export function QueueMap() {
           />
           {snapshot.stores.map((store) => {
             const { x, y } = projectMapLocation(store);
-            const storeName = language === "en" ? store.nameEn || store.name : store.name;
             const band = queueBand(store);
             const isSelected = selectedStore?.id === store.id;
-            const hasQueue = isActiveStore(store) && store.wait > 0;
 
             return (
               <button
-                aria-label={`${storeName}: ${store.wait} ${text.groups}`}
-                className={`store-marker store-marker-${band}`}
-                data-has-queue={hasQueue}
+                aria-label={`${storeName(store, language)}: ${store.wait} ${text.minutes}, ${waitingGroups(store)} ${text.groups}`}
+                className="store-marker"
+                data-band={band}
                 data-selected={isSelected}
                 key={store.id}
                 onClick={() => setSelectedStore(store)}
@@ -208,7 +224,7 @@ export function QueueMap() {
                 }}
                 type="button"
               >
-                <strong>{store.wait}</strong>
+                {band === "muted" ? text.pausedFigure : store.wait}
               </button>
             );
           })}
@@ -216,16 +232,19 @@ export function QueueMap() {
       ) : null}
 
       {status === "ready" ? (
-        <section className="telemetry" aria-label={text.mapLabel}>
-          <p>{text.mapLabel}</p>
-          <div>
-            <strong>{total}</strong>
-            <span>{text.groups}</span>
+        <>
+          <section aria-label={text.mapLabel} className="telemetry">
+            <div className="home-total">
+              <strong className="figure-l">{total.groups}</strong>
+              <span>{text.groupsWaiting}</span>
+            </div>
+            <p className="caption">{fill(text.branchesIssuing, { count: total.activeStores })}</p>
+          </section>
+          <div className="map-legend">
+            <QueueLegend language={language} />
+            <p className="caption">{text.mapCredit}</p>
           </div>
-          <small>
-            {activeStores.length} {text.activeStores}
-          </small>
-        </section>
+        </>
       ) : null}
 
       <aside aria-labelledby="history-heading" className="history-sidebar min-w-0">
@@ -234,7 +253,7 @@ export function QueueMap() {
             <h2 id="history-heading">{text.history}</h2>
             <p>{text.historyPeriod[historyRange]}</p>
           </div>
-          <fieldset aria-label={text.history} className="history-range shrink-0">
+          <fieldset aria-label={text.history} className="segmented">
             {historyRanges.map((range) => (
               <button
                 aria-pressed={historyRange === range}
@@ -254,20 +273,21 @@ export function QueueMap() {
         {history && history.global.length > 0 ? (
           <div className="history-charts min-w-0">
             <QueueChart
-              label={text.globalQueues}
-              latestWait={snapshot ? total : undefined}
+              label={text.averageWait}
+              latestWait={snapshot ? averageWait : undefined}
               locale={language}
-              points={history.global}
-              valueLabel={text.groups}
+              points={averageHistory}
+              valueLabel={text.minutes}
             />
+            <p className="history-list-label">{text.longestWaits}</p>
             <div className="history-store-list">
               {historyStores.map((store) => {
-                const storeName = language === "en" ? store.nameEn || store.name : store.name;
+                const name = language === "en" ? store.nameEn || store.name : store.name;
                 const matchingStore = snapshot?.stores.find(({ id }) => id === store.storeId);
 
                 return (
                   <button
-                    aria-label={`${storeName}: ${matchingStore?.wait ?? store.latestWait} ${text.groups}`}
+                    aria-label={`${name}: ${matchingStore?.wait ?? store.latestWait} ${text.minutes}`}
                     className="history-store min-w-0"
                     data-band={matchingStore ? queueBand(matchingStore) : "muted"}
                     disabled={!matchingStore}
@@ -276,11 +296,11 @@ export function QueueMap() {
                     type="button"
                   >
                     <QueueChart
-                      label={storeName}
+                      label={name.replace(/店$/, "")}
                       latestWait={matchingStore?.wait}
                       locale={language}
                       points={store.points}
-                      valueLabel={text.groups}
+                      valueLabel={text.minutes}
                     />
                   </button>
                 );
@@ -291,17 +311,17 @@ export function QueueMap() {
       </aside>
 
       {status === "loading" ? (
-        <div aria-live="polite" className="loading">
+        <div aria-live="polite" className="map-status">
           {text.loading}
         </div>
       ) : null}
 
       {status === "error" ? (
-        <section className="error-state" role="alert">
+        <section className="map-status" role="alert">
           <p>{text.unavailable}</p>
-          <button onClick={refreshQueues} type="button">
+          <Button onClick={refreshQueues} variant="secondary">
             {text.retry}
-          </button>
+          </Button>
         </section>
       ) : null}
 
@@ -309,6 +329,7 @@ export function QueueMap() {
         <StoreSheet
           language={language}
           onClose={() => setSelectedStore(null)}
+          points={history?.stores.find(({ storeId }) => storeId === selectedStore.id)?.points}
           store={selectedStore}
         />
       ) : null}

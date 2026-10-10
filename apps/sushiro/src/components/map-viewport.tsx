@@ -1,6 +1,7 @@
 "use client";
 
 import { select } from "d3-selection";
+import { Maximize, Minus, Plus } from "lucide-react";
 import "d3-transition";
 import { type D3ZoomEvent, type ZoomBehavior, zoom, zoomTransform } from "d3-zoom";
 import {
@@ -186,7 +187,7 @@ export function MapViewport({ children, language }: MapViewportProps) {
           onClick={() => changeZoom(zoomFactor)}
           type="button"
         >
-          +
+          <Plus size={16} />
         </button>
         <button
           aria-label={text.zoomOut}
@@ -194,15 +195,10 @@ export function MapViewport({ children, language }: MapViewportProps) {
           onClick={() => changeZoom(1 / zoomFactor)}
           type="button"
         >
-          -
+          <Minus size={16} />
         </button>
-        <button
-          aria-label={text.resetMap}
-          className="map-fit-control"
-          onClick={fitMap}
-          type="button"
-        >
-          {text.fitMap}
+        <button aria-label={text.resetMap} onClick={fitMap} type="button">
+          <Maximize size={16} />
         </button>
       </fieldset>
     </div>
