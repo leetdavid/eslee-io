@@ -1,6 +1,9 @@
 "use client";
 
+import { Check } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import type { Language } from "@/lib/queue-presentation";
 import type { QueueStore } from "@/lib/queues";
 import { ticketCopy } from "@/lib/ticket-copy";
@@ -100,7 +103,10 @@ export function TicketReportCard({
             {report.ticketNumber}
           </p>
         </div>
-        <span className={`ticket-status ticket-status-${state}`}>{text[state]}</span>
+        <Badge>
+          {state === "confirmed" ? <Check className="mr-1 inline-block" size={12} /> : null}
+          {text[state]}
+        </Badge>
       </div>
       <dl className="ticket-times">
         <div>
@@ -127,9 +133,17 @@ export function TicketReportCard({
       {!report.calledAt && !report.leftAt && !expired ? (
         <p className="ticket-live-numbers">
           <span>{text.feed}</span>
-          <strong>
-            {store ? store.storeQueue.join(", ") || text.noCalls : text.feedUnavailable}
-          </strong>
+          {store && store.storeQueue.length > 0 ? (
+            <span className="ticket-chips">
+              {store.storeQueue.map((ticket) => (
+                <span className="chip" key={ticket}>
+                  {ticket}
+                </span>
+              ))}
+            </span>
+          ) : (
+            <strong>{store ? text.noCalls : text.feedUnavailable}</strong>
+          )}
         </p>
       ) : null}
       {report.firstSeenCalledAt ? (
@@ -171,39 +185,46 @@ export function TicketReportCard({
             aria-describedby={error ? `error-${report.id}` : undefined}
           />
           <div className="ticket-actions">
-            <button className="ticket-primary" disabled={saving} type="submit">
+            <Button className="h-11" disabled={saving} type="submit">
               {saving ? text.saving : text.confirm}
-            </button>
-            <button
-              type="button"
+            </Button>
+            <Button
+              className="h-11"
               disabled={saving}
               onClick={() => {
                 setEditing(false);
                 setError(null);
               }}
+              type="button"
+              variant="ghost"
             >
               {text.cancel}
-            </button>
+            </Button>
           </div>
         </form>
       ) : (
         <div className="ticket-actions">
-          <button
-            className={report.calledAt ? "" : "ticket-primary"}
-            type="button"
+          <Button
+            className={report.calledAt ? "h-11" : "h-11 flex-1"}
             disabled={saving}
             onClick={() => {
               setCalledValue(hongKongInput(new Date(report.calledAt ?? Date.now())));
               setError(null);
               setEditing(true);
             }}
+            variant={report.calledAt ? "secondary" : "primary"}
           >
             {report.calledAt ? text.editCall : text.called}
-          </button>
+          </Button>
           {!report.calledAt && !report.leftAt ? (
-            <button type="button" disabled={saving} onClick={() => void update("leave")}>
+            <Button
+              className="h-11"
+              disabled={saving}
+              onClick={() => void update("leave")}
+              variant="ghost"
+            >
               {text.leave}
-            </button>
+            </Button>
           ) : null}
         </div>
       )}

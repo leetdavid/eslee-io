@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import { TicketReportCard } from "@/components/ticket-report-card";
+import { Button } from "@/components/ui/button";
 import type { Language } from "@/lib/queue-presentation";
 import type { QueueStore } from "@/lib/queues";
 import { ticketCopy } from "@/lib/ticket-copy";
@@ -149,9 +150,13 @@ export function TicketTracker({ initialStoreId }: { initialStoreId: string }) {
         {loadError ? (
           <p className="ticket-error" role="alert">
             {text.loadError}{" "}
-            <button type="button" onClick={() => setRefreshVersion((value) => value + 1)}>
+            <Button
+              onClick={() => setRefreshVersion((value) => value + 1)}
+              size="compact"
+              variant="secondary"
+            >
               {text.retry}
-            </button>
+            </Button>
           </p>
         ) : null}
         {data && !data.feedAvailable ? (
@@ -272,13 +277,13 @@ export function TicketTracker({ initialStoreId }: { initialStoreId: string }) {
                   ) : null}
                 </div>
               ) : null}
-              <button
-                className="ticket-primary ticket-submit"
-                type="submit"
+              <Button
+                className="h-11 w-full"
                 disabled={saving || !data?.stores.length}
+                type="submit"
               >
                 {saving ? text.saving : text.save}
-              </button>
+              </Button>
               {saveError ? (
                 <p className="ticket-error" role="alert">
                   {text.saveError}
