@@ -2917,6 +2917,15 @@ button.chip:hover {
   font-weight: 550;
 }
 
+/* A long branch name in a bar ends in an ellipsis instead of being cut off. */
+.stats-bar .row-link {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .tag {
   background: var(--tint);
   border-radius: 6px;
