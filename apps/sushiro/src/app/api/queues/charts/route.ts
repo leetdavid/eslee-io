@@ -36,7 +36,7 @@ function parseHours(value: string | null) {
 // A single Hong Kong date is plotted in half-hour buckets for the Stats page.
 const dayBucketMinutes = 30;
 
-type ChartHistoryWindow = { bucketMinutes: number; from: Date; to?: Date };
+type ChartHistoryWindow = { bucketMinutes: number; from: Date; issuingOnly?: boolean; to?: Date };
 
 function trailingWindow(hours: ChartHistoryRange): ChartHistoryWindow {
   return {
@@ -48,11 +48,13 @@ function trailingWindow(hours: ChartHistoryRange): ChartHistoryWindow {
 async function loadChartHistory({
   bucketMinutes: minutes,
   from,
+  issuingOnly,
   to,
 }: ChartHistoryWindow): Promise<QueueHistory> {
   const bucketInterval = sql.raw(`${minutes} * interval '1 minute'`);
   const bucketedAt = sql<string>`date_bin(${bucketInterval}, ${sushiroQueueSnapshot.collectedAt}, timestamptz '2000-01-01')`;
-  const activeWait = sql<number>`round(avg(case when ${sushiroQueueSnapshot.storeStatus} = 'OPEN' and (${sushiroQueueSnapshot.netTicketStatus} like '%MANUAL%' or ${sushiroQueueSnapshot.netTicketStatus} like '%ONLINE%') then ${sushiroQueueSnapshot.wait} else 0 end))::integer`;
+  const issuing = sql`${sushiroQueueSnapshot.storeStatus} = 'OPEN' and (${sushiroQueueSnapshot.netTicketStatus} like '%MANUAL%' or ${sushiroQueueSnapshot.netTicketStatus} like '%ONLINE%')`;
+  const activeWait = sql<number>`round(avg(case when ${issuing} then ${sushiroQueueSnapshot.wait} else 0 end))::integer`;
   const { db } = await import("@/lib/db");
   const snapshots = await db
     .select({
@@ -67,6 +69,9 @@ async function loadChartHistory({
       and(
         gte(sushiroQueueSnapshot.collectedAt, from),
         to ? lt(sushiroQueueSnapshot.collectedAt, to) : undefined,
+        // Trend charts keep closed hours as a zero wait. Statistics leave those snapshots out, so
+        // a branch that has stopped issuing tickets is not counted as having no queue.
+        issuingOnly ? issuing : undefined,
       ),
     )
     .groupBy(sushiroQueueSnapshot.storeId, bucketedAt)
@@ -112,6 +117,7 @@ async function loadChartHistory({
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const date = searchParams.get("date");
+  const issuingOnly = searchParams.get("issuing") === "1";
 
   // ?date=YYYY-MM-DD returns one Hong Kong calendar day. It cannot be a future date.
   if (date !== null) {
@@ -124,7 +130,11 @@ export async function GET(request: Request) {
       );
     }
 
-    const history = await loadChartHistory({ ...range, bucketMinutes: dayBucketMinutes });
+    const history = await loadChartHistory({
+      ...range,
+      bucketMinutes: dayBucketMinutes,
+      issuingOnly,
+    });
     return Response.json(history, { headers: { "Cache-Control": "no-store" } });
   }
 
@@ -138,9 +148,9 @@ export async function GET(request: Request) {
   }
 
   const history =
-    hours === gridHistoryHours
+    hours === gridHistoryHours && !issuingOnly
       ? await getGridChartHistory(() => loadChartHistory(trailingWindow(hours)))
-      : await loadChartHistory(trailingWindow(hours));
+      : await loadChartHistory({ ...trailingWindow(hours), issuingOnly });
 
   return Response.json(history, { headers: { "Cache-Control": "no-store" } });
 }

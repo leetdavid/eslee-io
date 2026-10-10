@@ -9,14 +9,7 @@ import { StatsChart } from "@/components/stats-chart";
 import { Button } from "@/components/ui/button";
 import { copy, fill, type Language, waitBand } from "@/lib/queue-presentation";
 import type { QueueHistory } from "@/lib/queues";
-import {
-  dailyStats,
-  hongKongDate,
-  hongKongDayRange,
-  patternSlots,
-  patternStats,
-  shiftDate,
-} from "@/lib/stats";
+import { dailyStats, hongKongDate, hongKongDayRange, patternStats, shiftDate } from "@/lib/stats";
 import { statsCopy } from "@/lib/stats-copy";
 
 type StatsViewName = "daily" | "patterns";
@@ -73,7 +66,9 @@ export function StatsView({ initialDate, initialView }: StatsViewProps) {
     }
 
     let cancelled = false;
-    const query = view === "patterns" ? "hours=720" : `date=${date}`;
+    // issuing=1 leaves out the hours a branch was not issuing tickets, so they do not read as
+    // a zero wait.
+    const query = `${view === "patterns" ? "hours=720" : `date=${date}`}&issuing=1`;
 
     async function loadHistory() {
       setStatus("loading");
@@ -383,7 +378,7 @@ export function StatsView({ initialDate, initialView }: StatsViewProps) {
                     <thead>
                       <tr>
                         <td />
-                        {patternSlots.map((slot) => (
+                        {patterns.slots.map((slot) => (
                           <th key={slot} scope="col">
                             {String(slot).padStart(2, "0")}:00
                           </th>
@@ -396,9 +391,12 @@ export function StatsView({ initialDate, initialView }: StatsViewProps) {
                           <th scope="row">{stats.weekdays[weekday]}</th>
                           {row.map((wait, index) =>
                             wait === null ? (
-                              <td key={patternSlots[index]} />
+                              <td key={patterns.slots[index]} />
                             ) : (
-                              <td data-band={waitBand(Math.round(wait))} key={patternSlots[index]}>
+                              <td
+                                data-band={waitBand(Math.round(wait))}
+                                key={patterns.slots[index]}
+                              >
                                 {Math.round(wait)}
                               </td>
                             ),

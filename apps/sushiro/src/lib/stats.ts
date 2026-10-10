@@ -3,10 +3,13 @@ import type { QueueHistory, QueueHistoryPoint } from "@/lib/queues";
 const hour = 60 * 60_000;
 const hongKongOffset = 8 * hour;
 
-// Branches open in the late morning. Earlier buckets are closed hours and would only dilute
-// the averages.
+// Branches open in the late morning, so nothing earlier is counted.
 export const serviceStartHour = 10;
 export const patternSlots = [10, 12, 14, 16, 18, 20, 22];
+
+// A time counts toward the all-branch average only when at least this share of the day's
+// branches were issuing tickets. It keeps one late branch from standing in for Hong Kong.
+const minimumBranchShare = 0.25;
 
 export type TimedWait = { collectedAt: string; wait: number };
 export type SlotWait = { hour: number; wait: number; weekday: number };
@@ -53,7 +56,8 @@ function lowest<T extends { wait: number }>(items: T[]) {
   return items.reduce<T | null>((low, item) => (!low || item.wait < low.wait ? item : low), null);
 }
 
-// One Hong Kong day of bucketed history, summarised for the Daily history view.
+// One Hong Kong day of bucketed history, summarised for the Daily history view. The history
+// holds only the times each branch was issuing tickets.
 export function dailyStats(history: QueueHistory, bucketHours = 0.5) {
   const branches = history.stores
     .map((store) => {
@@ -87,7 +91,9 @@ export function dailyStats(history: QueueHistory, bucketHours = 0.5) {
     }
   }
 
+  const minimumBranches = Math.max(1, Math.ceil(branches.length * minimumBranchShare));
   const average: TimedWait[] = [...waitsByTime]
+    .filter(([, waits]) => waits.length >= minimumBranches)
     .sort(([left], [right]) => left.localeCompare(right))
     .map(([collectedAt, waits]) => ({ collectedAt, wait: mean(waits) }));
 
@@ -123,22 +129,26 @@ export function patternStats(history: QueueHistory) {
       const key = `${weekday}-${slot}`;
       waitsBySlot.set(key, [...(waitsBySlot.get(key) ?? []), point.wait]);
 
-      // Weekend dinner: Saturday and Sunday, 18:00 to 22:00.
+      // Weekend dinner: Saturday and Sunday, from 18:00 until tickets stop.
       if (weekday >= 5 && (slot === 18 || slot === 20)) {
         dinnerWaits.set(store.storeId, [...(dinnerWaits.get(store.storeId) ?? []), point.wait]);
       }
     }
   }
 
+  // Only the slots in which some branch was issuing tickets become columns.
+  const slotsWithData = patternSlots.filter((slot) =>
+    Array.from({ length: 7 }, (_, weekday) => waitsBySlot.has(`${weekday}-${slot}`)).some(Boolean),
+  );
   const grid = Array.from({ length: 7 }, (_, weekday) =>
-    patternSlots.map((slot) => {
+    slotsWithData.map((slot) => {
       const waits = waitsBySlot.get(`${weekday}-${slot}`);
       return waits ? mean(waits) : null;
     }),
   );
   const slots: SlotWait[] = grid.flatMap((row, weekday) =>
     row.flatMap((wait, index) =>
-      wait === null ? [] : [{ hour: patternSlots[index] ?? 0, wait, weekday }],
+      wait === null ? [] : [{ hour: slotsWithData[index] ?? 0, wait, weekday }],
     ),
   );
   const days = grid.flatMap((row, weekday) => {
@@ -160,8 +170,9 @@ export function patternStats(history: QueueHistory) {
     calmestDay: lowest(days),
     from: from || null,
     grid,
-    // Lunch through dinner only: a quiet 22:00 slot is no use to someone planning a meal.
+    // Lunch through dinner only.
     quietest: lowest(slots.filter((slot) => slot.hour >= 12 && slot.hour <= 20)),
+    slots: slotsWithData,
     to: to || null,
   };
 }

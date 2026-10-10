@@ -103,6 +103,28 @@ describe("dailyStats", () => {
     expect(stats.quietest?.storeId).toBe(2);
   });
 
+  it("leaves a time out of the all-branch average when few branches were issuing", () => {
+    const busyDay = dailyStats(
+      history([
+        ...[1, 2, 3, 4, 5].map((id) => ({
+          id,
+          points: [[at(day, "19:00"), 40]] as Array<[string, number]>,
+        })),
+        // One branch still issuing late must not stand in for all of Hong Kong.
+        {
+          id: 6,
+          points: [
+            [at(day, "19:00"), 40],
+            [at(day, "21:30"), 300],
+          ] as Array<[string, number]>,
+        },
+      ]),
+    );
+
+    expect(busyDay.average).toEqual([{ collectedAt: at(day, "19:00"), wait: 40 }]);
+    expect(busyDay.branches[0]?.peak).toBe(300);
+  });
+
   it("returns empty results for a day with no data", () => {
     const empty = dailyStats(history([]));
 
@@ -135,9 +157,10 @@ describe("patternStats", () => {
     ]),
   );
 
-  it("averages each weekday and two-hour slot, leaving gaps empty", () => {
-    expect(stats.grid[4]?.[4]).toBe(110); // Friday 18:00
-    expect(stats.grid[0]?.[2]).toBe(4); // Monday 14:00
+  it("averages each weekday and two-hour slot, with columns only for slots that have data", () => {
+    expect(stats.slots).toEqual([14, 18, 20]);
+    expect(stats.grid[4]?.[1]).toBe(110); // Friday 18:00
+    expect(stats.grid[0]?.[0]).toBe(4); // Monday 14:00
     expect(stats.grid[1]?.[0]).toBeNull();
   });
 
