@@ -326,7 +326,7 @@ export function StatsView({ initialBranch, initialDate, initialView }: StatsView
                             {branchName(branch, language)}
                           </button>
                         </th>
-                        <td className="numeric">
+                        <td className="numeric cell-peak">
                           <strong>
                             {branch.peak} {text.minutes}
                           </strong>{" "}
@@ -334,13 +334,13 @@ export function StatsView({ initialBranch, initialDate, initialView }: StatsView
                             {fill(stats.peakAt, { time: branch.peakAt ? time(branch.peakAt) : "" })}
                           </span>
                         </td>
-                        <td className="numeric">
+                        <td className="numeric cell-average" data-label={stats.averageShort}>
                           {Math.round(branch.average)} {text.minutes}
                         </td>
-                        <td className="numeric">
+                        <td className="numeric cell-over" data-label={stats.columnOver30}>
                           {branch.hoursOver30} {stats.hours}
                         </td>
-                        <td>
+                        <td className="cell-spark">
                           <QueueAreaChart
                             end={range.to.valueOf()}
                             maximumWait={Math.max(30, branch.peak)}

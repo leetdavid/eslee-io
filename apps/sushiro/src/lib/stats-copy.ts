@@ -3,6 +3,7 @@ export const statsCopy = {
     againstRank: "{branch} ranks {rank} of {count}, longest first.",
     againstTitle: "Against other branches",
     averageAcross: "Average wait {wait} min across all branches",
+    averageShort: "Average",
     branchHeat: "{branch} by weekday and half hour",
     branchHeatNote:
       "{from} to {to}, in minutes, counted only while tickets were being issued. Public holidays count as Sundays.",
@@ -78,6 +79,7 @@ export const statsCopy = {
     againstRank: "{branch}排第 {rank}，共 {count} 間，由最長排起。",
     againstTitle: "同其他分店比較",
     averageAcross: "全部分店平均輪候 {wait} 分鐘",
+    averageShort: "平均",
     branchHeat: "{branch}：按星期同半個鐘",
     branchHeatNote: "{from} 至 {to}，單位係分鐘，只計派籌期間。公眾假期當星期日計。",
     branchesNote: "按最長輪候排序。揀一間分店睇佢當日情況。",

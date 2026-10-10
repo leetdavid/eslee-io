@@ -2111,6 +2111,102 @@ button.chip:hover {
   box-shadow: var(--shadow-2);
   display: flex;
   font-size: var(--fs-body);
+  /* The branch and day tables read as lists: the name, the average and time over 30 minutes
+     under it, then the day's shape and the longest wait. */
+  .stats-table-scroll {
+    margin: 8px -16px 0;
+    overflow: visible;
+  }
+
+  .stats-table,
+  .stats-table tbody {
+    display: block;
+    min-width: 0;
+  }
+
+  .stats-table thead {
+    display: none;
+  }
+
+  .stats-table tbody tr {
+    align-items: center;
+    column-gap: 10px;
+    display: grid;
+    grid-template-areas:
+      "name name spark peak"
+      "average over spark peak";
+    grid-template-columns: auto minmax(0, 1fr) 48px auto;
+    min-height: 60px;
+    padding: 8px 14px;
+  }
+
+  .stats-table tbody th,
+  .stats-table tbody td {
+    display: block;
+    height: auto;
+    padding: 0;
+  }
+
+  .stats-table tbody th {
+    font-size: var(--fs-subtitle);
+    grid-area: name;
+    line-height: var(--lh-subtitle);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .stats-table .cell-average,
+  .stats-table .cell-over {
+    color: var(--muted-foreground);
+    font-size: var(--fs-micro);
+    line-height: var(--lh-micro);
+    text-align: left;
+  }
+
+  .stats-table .cell-average {
+    grid-area: average;
+  }
+
+  .stats-table .cell-average::before {
+    content: attr(data-label) " ";
+  }
+
+  .stats-table .cell-over {
+    grid-area: over;
+  }
+
+  .stats-table .cell-over::before {
+    content: "· " attr(data-label) " ";
+  }
+
+  .stats-table .cell-spark {
+    grid-area: spark;
+  }
+
+  .stats-table .cell-spark .sparkline {
+    width: 48px;
+  }
+
+  .stats-table .cell-peak {
+    grid-area: peak;
+  }
+
+  .stats-table .cell-peak > span {
+    display: block;
+    font-size: var(--fs-caption);
+    line-height: var(--lh-caption);
+  }
+
+  .stats-card > button {
+    height: 44px;
+    margin-top: 8px;
+    width: 100%;
+  }
+
+  .stale-notice {
+    padding-left: 16px;
+  }
+
   font-weight: 550;
   height: 36px;
   justify-content: center;

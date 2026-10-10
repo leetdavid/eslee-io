@@ -167,7 +167,7 @@ export function StatsBranchDay({
                       </button>
                       {row.date === date ? <span className="tag">{stats.shownAbove}</span> : null}
                     </th>
-                    <td className="numeric">
+                    <td className="numeric cell-peak">
                       <strong>
                         {row.peak} {text.minutes}
                       </strong>{" "}
@@ -175,13 +175,13 @@ export function StatsBranchDay({
                         {fill(stats.peakAt, { time: row.peakAt ? time(row.peakAt) : "" })}
                       </span>
                     </td>
-                    <td className="numeric">
+                    <td className="numeric cell-average" data-label={stats.averageShort}>
                       {Math.round(row.average)} {text.minutes}
                     </td>
-                    <td className="numeric">
+                    <td className="numeric cell-over" data-label={stats.columnOver30}>
                       {row.hoursOver30} {stats.hours}
                     </td>
-                    <td>
+                    <td className="cell-spark">
                       {rowRange ? (
                         <QueueAreaChart
                           end={rowRange.to.valueOf()}
