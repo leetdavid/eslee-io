@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { QueueHistory } from "@/lib/queues";
 import {
+  branchDailyStats,
   dailyStats,
   hongKongDate,
   hongKongDayRange,
@@ -177,5 +178,68 @@ describe("patternStats", () => {
     ]);
     expect(stats.from).toBe(at("2026-10-05", "14:00"));
     expect(stats.to).toBe(at("2026-10-11", "19:00"));
+  });
+});
+
+describe("branchDailyStats", () => {
+  // Half-hour buckets from 10:00 for one day, as [time, wait] pairs.
+  function dayOf(date: string, waits: number[]) {
+    return waits.map((wait, index) => ({
+      collectedAt: at(
+        date,
+        `${String(10 + Math.floor(index / 2)).padStart(2, "0")}:${index % 2 ? "30" : "00"}`,
+      ),
+      wait,
+    }));
+  }
+
+  const flat = (wait: number) => Array.from({ length: 14 }, () => wait);
+  const points = [
+    ...dayOf("2026-09-25", [...flat(10).slice(0, 13), 200]), // Friday, peak 200
+    ...dayOf("2026-10-02", [...flat(40).slice(0, 13), 120]), // Friday, peak 120
+    ...dayOf("2026-10-08", flat(5)), // Thursday
+    ...dayOf("2026-10-09", [0, 20, 40, 150, 35, ...flat(10).slice(0, 9)]), // the chosen Friday
+    ...dayOf("2026-10-07", [90]), // too little data to count as a usual day
+  ];
+  const stats = branchDailyStats(points, "2026-10-09");
+
+  it("summarises the chosen day", () => {
+    expect(stats.weekday).toBe(4);
+    expect(stats.day).toMatchObject({
+      date: "2026-10-09",
+      hoursOver30: 1.5,
+      over30From: at("2026-10-09", "11:00"),
+      over30To: at("2026-10-09", "12:00"),
+      peak: 150,
+      peakAt: at("2026-10-09", "11:30"),
+    });
+  });
+
+  it("builds the usual range from other days of the same weekday only", () => {
+    expect(stats.usualPeak).toEqual({ high: 200, low: 120 });
+    expect(stats.usual[0]).toEqual({ collectedAt: at("2026-10-09", "10:00"), high: 40, low: 10 });
+    expect(stats.usual.at(-1)).toEqual({
+      collectedAt: at("2026-10-09", "16:30"),
+      high: 200,
+      low: 120,
+    });
+  });
+
+  it("lists every recorded day, newest first", () => {
+    expect(stats.days.map((day) => day.date)).toEqual([
+      "2026-10-09",
+      "2026-10-08",
+      "2026-10-07",
+      "2026-10-02",
+      "2026-09-25",
+    ]);
+  });
+
+  it("has no usual range when no other same weekday is recorded", () => {
+    const alone = branchDailyStats(dayOf("2026-10-09", flat(15)), "2026-10-09");
+
+    expect(alone.usualPeak).toBeNull();
+    expect(alone.usual).toEqual([]);
+    expect(branchDailyStats([], "2026-10-09").day).toBeNull();
   });
 });

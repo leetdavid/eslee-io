@@ -1904,6 +1904,112 @@ button.chip:hover {
   }
 }
 
+/* Stats for one branch: the branch chip, selectable rows, and the day against its usual range. */
+.branch-chip {
+  box-shadow:
+    var(--shadow-2),
+    0 0 0 1.5px var(--foreground);
+}
+
+.branch-chip,
+.date-trigger {
+  white-space: nowrap;
+}
+
+/* On narrow screens the branch chip drops under the date controls. */
+.stats-date {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.stats-table tbody tr,
+.stats-bar {
+  position: relative;
+}
+
+.row-link {
+  font-weight: inherit;
+  text-align: left;
+}
+
+/* The whole row is the button's target. */
+.row-link::after {
+  content: "";
+  inset: 0;
+  position: absolute;
+}
+
+.stats-table tbody tr:has(.row-link:hover),
+.stats-bar:has(.row-link:hover),
+.stats-bar[aria-current="true"] {
+  background: var(--tint);
+}
+
+.stats-bar {
+  border-radius: 6px;
+  padding: 0 6px;
+}
+
+.stats-bar[aria-current="true"] > span:first-child {
+  font-weight: 550;
+}
+
+.tag {
+  background: var(--tint);
+  border-radius: 6px;
+  font-size: var(--fs-caption);
+  font-weight: 400;
+  margin-left: 6px;
+  padding: 3px 7px;
+}
+
+.stats-chart[data-band] .stats-chart-plot {
+  color: var(--band);
+}
+
+/* The label stays in the text colour. Only the line and the dot carry the band. */
+.stats-chart[data-band] .stats-chart-marker {
+  color: var(--foreground);
+}
+
+.stats-chart[data-band] .stats-chart-marker::before {
+  border-color: var(--band);
+}
+
+/* The hairline keeps the range visible when only one other day has been recorded. */
+.stats-chart-range {
+  fill: var(--active);
+  stroke: var(--active);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.stats-keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+}
+
+.stats-keys > span {
+  align-items: center;
+  display: inline-flex;
+  gap: 6px;
+}
+
+.stats-key-line {
+  background: var(--band);
+  border-radius: 1px;
+  height: 2px;
+  width: 14px;
+}
+
+.stats-key-range {
+  background: var(--active);
+  border-radius: 2px;
+  height: 10px;
+  width: 14px;
+}
+
 /* Popover: surface 3 with the menu shadow. Opens with the moderate spring, closes as a tween. */
 .popover-positioner {
   z-index: 60;

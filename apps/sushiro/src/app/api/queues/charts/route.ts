@@ -1,5 +1,5 @@
 import { sushiroQueueSnapshot } from "@eslee/db/schema";
-import { and, asc, gte, lt, sql } from "drizzle-orm";
+import { and, asc, eq, gte, lt, sql } from "drizzle-orm";
 import { getGridChartHistory } from "@/lib/queue-cache";
 import {
   gridHistoryHours,
@@ -36,7 +36,13 @@ function parseHours(value: string | null) {
 // A single Hong Kong date is plotted in half-hour buckets for the Stats page.
 const dayBucketMinutes = 30;
 
-type ChartHistoryWindow = { bucketMinutes: number; from: Date; issuingOnly?: boolean; to?: Date };
+type ChartHistoryWindow = {
+  bucketMinutes: number;
+  from: Date;
+  issuingOnly?: boolean;
+  storeId?: number;
+  to?: Date;
+};
 
 function trailingWindow(hours: ChartHistoryRange): ChartHistoryWindow {
   return {
@@ -49,6 +55,7 @@ async function loadChartHistory({
   bucketMinutes: minutes,
   from,
   issuingOnly,
+  storeId,
   to,
 }: ChartHistoryWindow): Promise<QueueHistory> {
   const bucketInterval = sql.raw(`${minutes} * interval '1 minute'`);
@@ -72,6 +79,7 @@ async function loadChartHistory({
         // Trend charts keep closed hours as a zero wait. Statistics leave those snapshots out, so
         // a branch that has stopped issuing tickets is not counted as having no queue.
         issuingOnly ? issuing : undefined,
+        storeId ? eq(sushiroQueueSnapshot.storeId, storeId) : undefined,
       ),
     )
     .groupBy(sushiroQueueSnapshot.storeId, bucketedAt)
@@ -118,6 +126,12 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const date = searchParams.get("date");
   const issuingOnly = searchParams.get("issuing") === "1";
+  const storeParameter = searchParams.get("storeId");
+  const storeId = storeParameter === null ? undefined : Number(storeParameter);
+
+  if (storeId !== undefined && !(Number.isSafeInteger(storeId) && storeId > 0)) {
+    return Response.json({ error: "storeId must be a branch number" }, { status: 400 });
+  }
 
   // ?date=YYYY-MM-DD returns one Hong Kong calendar day. It cannot be a future date.
   if (date !== null) {
@@ -134,6 +148,7 @@ export async function GET(request: Request) {
       ...range,
       bucketMinutes: dayBucketMinutes,
       issuingOnly,
+      storeId,
     });
     return Response.json(history, { headers: { "Cache-Control": "no-store" } });
   }
@@ -147,10 +162,14 @@ export async function GET(request: Request) {
     );
   }
 
+  // One branch is small enough to return at half-hour detail over any range.
+  const window = storeId
+    ? { ...trailingWindow(hours), bucketMinutes: dayBucketMinutes, storeId }
+    : trailingWindow(hours);
   const history =
-    hours === gridHistoryHours && !issuingOnly
-      ? await getGridChartHistory(() => loadChartHistory(trailingWindow(hours)))
-      : await loadChartHistory({ ...trailingWindow(hours), issuingOnly });
+    hours === gridHistoryHours && !issuingOnly && !storeId
+      ? await getGridChartHistory(() => loadChartHistory(window))
+      : await loadChartHistory({ ...window, issuingOnly });
 
   return Response.json(history, { headers: { "Cache-Control": "no-store" } });
 }

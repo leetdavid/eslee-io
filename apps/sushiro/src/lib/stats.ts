@@ -56,27 +56,36 @@ function lowest<T extends { wait: number }>(items: T[]) {
   return items.reduce<T | null>((low, item) => (!low || item.wait < low.wait ? item : low), null);
 }
 
+// One branch's waits on one day, from the times it was issuing tickets.
+export function summariseDay(allPoints: QueueHistoryPoint[], bucketHours = 0.5) {
+  const points = allPoints.filter(
+    (point) => hongKongParts(point.collectedAt).hour >= serviceStartHour,
+  );
+  const peak = highest<QueueHistoryPoint>(points);
+  const over30 = points.filter((point) => point.wait > 30);
+
+  return {
+    average: mean(points.map((point) => point.wait)),
+    hoursOver30: over30.length * bucketHours,
+    // First and last buckets over 30 minutes. The day may dip under in between.
+    over30From: over30[0]?.collectedAt ?? null,
+    over30To: over30.at(-1)?.collectedAt ?? null,
+    peak: peak?.wait ?? 0,
+    peakAt: peak?.collectedAt ?? null,
+    points,
+  };
+}
+
 // One Hong Kong day of bucketed history, summarised for the Daily history view. The history
 // holds only the times each branch was issuing tickets.
 export function dailyStats(history: QueueHistory, bucketHours = 0.5) {
   const branches = history.stores
-    .map((store) => {
-      const points = store.points.filter(
-        (point) => hongKongParts(point.collectedAt).hour >= serviceStartHour,
-      );
-      const peak = highest<QueueHistoryPoint>(points);
-
-      return {
-        average: mean(points.map((point) => point.wait)),
-        hoursOver30: points.filter((point) => point.wait > 30).length * bucketHours,
-        name: store.name,
-        nameEn: store.nameEn,
-        peak: peak?.wait ?? 0,
-        peakAt: peak?.collectedAt ?? null,
-        points,
-        storeId: store.storeId,
-      };
-    })
+    .map((store) => ({
+      ...summariseDay(store.points, bucketHours),
+      name: store.name,
+      nameEn: store.nameEn,
+      storeId: store.storeId,
+    }))
     .filter((branch) => branch.points.length > 0)
     .sort((left, right) => right.peak - left.peak || left.storeId - right.storeId);
 
@@ -157,6 +166,7 @@ export function patternStats(history: QueueHistory) {
   });
 
   return {
+    // Every branch with weekend dinner data, longest wait first.
     branches: history.stores
       .flatMap((store) => {
         const waits = dinnerWaits.get(store.storeId);
@@ -164,8 +174,7 @@ export function patternStats(history: QueueHistory) {
           ? [{ name: store.name, nameEn: store.nameEn, storeId: store.storeId, wait: mean(waits) }]
           : [];
       })
-      .sort((left, right) => right.wait - left.wait || left.storeId - right.storeId)
-      .slice(0, 10),
+      .sort((left, right) => right.wait - left.wait || left.storeId - right.storeId),
     busiest: highest(slots),
     calmestDay: lowest(days),
     from: from || null,
@@ -174,5 +183,66 @@ export function patternStats(history: QueueHistory) {
     quietest: lowest(slots.filter((slot) => slot.hour >= 12 && slot.hour <= 20)),
     slots: slotsWithData,
     to: to || null,
+  };
+}
+
+// A day needs this many half-hour buckets before it counts toward a branch's usual range, so a
+// day the recorder mostly missed does not set the range.
+const minimumBucketsForUsual = 12;
+
+// One branch across several weeks of half-hour history: the chosen day, how the same weekday
+// usually runs, and each recorded day for the list.
+export function branchDailyStats(points: QueueHistoryPoint[], date: string, bucketHours = 0.5) {
+  const pointsByDate = new Map<string, QueueHistoryPoint[]>();
+
+  for (const point of points) {
+    const pointDate = hongKongDate(new Date(point.collectedAt));
+    pointsByDate.set(pointDate, [...(pointsByDate.get(pointDate) ?? []), point]);
+  }
+
+  const days = [...pointsByDate]
+    .map(([dayDate, dayPoints]) => ({ date: dayDate, ...summariseDay(dayPoints, bucketHours) }))
+    .filter((day) => day.points.length > 0)
+    .sort((left, right) => right.date.localeCompare(left.date));
+  const range = hongKongDayRange(date);
+  const weekday = range ? hongKongParts(range.from.toISOString()).weekday : 0;
+  const sameWeekday = days.filter(
+    (day) =>
+      day.date !== date &&
+      day.points.length >= minimumBucketsForUsual &&
+      hongKongParts(`${day.date}T04:00:00Z`).weekday === weekday,
+  );
+  const dayStart = range?.from.valueOf() ?? 0;
+  // Minutes into the day -> the waits seen at that time on the other same weekdays.
+  const waitsByMinute = new Map<number, number[]>();
+
+  for (const day of sameWeekday) {
+    const start = hongKongDayRange(day.date)?.from.valueOf() ?? 0;
+
+    for (const point of day.points) {
+      const minute = Math.round((Date.parse(point.collectedAt) - start) / 60_000);
+      waitsByMinute.set(minute, [...(waitsByMinute.get(minute) ?? []), point.wait]);
+    }
+  }
+
+  return {
+    day: days.find((day) => day.date === date) ?? null,
+    days,
+    // The same weekday's low and high at each time, placed on the chosen date for charting.
+    usual: [...waitsByMinute]
+      .sort(([left], [right]) => left - right)
+      .map(([minute, waits]) => ({
+        collectedAt: new Date(dayStart + minute * 60_000).toISOString(),
+        high: Math.max(...waits),
+        low: Math.min(...waits),
+      })),
+    usualPeak:
+      sameWeekday.length > 0
+        ? {
+            high: Math.max(...sameWeekday.map((day) => day.peak)),
+            low: Math.min(...sameWeekday.map((day) => day.peak)),
+          }
+        : null,
+    weekday,
   };
 }
