@@ -58,8 +58,20 @@ _Avoid_: Stats page, store detail sheet
 Recurring weekday time-slot estimates for a branch, informed by historical queue behavior. These describe weekday patterns rather than forecasts for named future dates.
 _Avoid_: forecast calendar, By date planner
 
+**Usual wait**:
+The range of official waits a branch recorded around a time of day on the same weekday over the last eight weeks, not counting today. It is worked out for every five minutes from the snapshots within ten minutes either side, covers the middle 80% of them, and is shown rounded outward to five minutes. A typical week is a branch's usual waits across each weekday.
+_Avoid_: forecast, queue-now estimate, average wait
+
+**Issuing tickets**:
+A branch is issuing tickets when it is open and its ticketing is on. A branch that has stopped issuing reports a zero wait, which is not a queue of zero, so statistics and usual waits leave those snapshots out. Trend charts still draw them as zero.
+_Avoid_: open, active, no queue
+
+**My branches**:
+The branches a visitor has starred from the store detail sheet. The list is kept on their device with no account. Those branches lead Home with their wait now and their usual wait for this time, and their tiles carry a ring in the grid.
+_Avoid_: favourites, account, saved searches
+
 **Stats page**:
-A primarily informational page of observed Sushiro queue statistics. Its Daily history view shows recorded data for a selected date; its Patterns view shows historical patterns and comparisons.
+A primarily informational page of observed Sushiro queue statistics. Its Daily history view shows recorded data for a selected date; its Patterns view shows historical patterns and comparisons. Either view can be narrowed to one branch, chosen from a row and kept in the address. Statistics count only the times a branch was issuing tickets.
 _Avoid_: meal planner, queue forecast
 
 ## Map

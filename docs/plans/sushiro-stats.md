@@ -34,6 +34,15 @@ The first chronological backtest used 204,864 snapshots and 7,496 held-out recon
 
 A subsequent rolling comparison uses ten next-day folds and 23,558 proxy outcomes on 8 through 17 September. A three-coefficient, regularized upstream correction lowers mean proxy error from the source baseline's 16.32 to 15.03 minutes. Adaptive ranges yield 93.0% proxy coverage with 45-minute median width. The fraction within ten minutes remains approximately 60%, so this improves large errors and ranges without establishing the desired typical precision. This is retrospective development evidence; later days and pilot observations remain needed for independent validation. See the model report for the comparison protocol and all baselines.
 
+## Progress on 10 October 2026
+
+- Stats shipped with Daily history and Patterns. Either view can now be narrowed to one branch, and the date control is a calendar popover.
+- Statistics now count only the times a branch was issuing tickets. Before this, closed hours counted as a zero wait.
+- The owner asked for very granular slots, because estimates change quickly at peak times. Usual waits are worked out for every five minutes from the snapshots within ten minutes either side, over the last eight weeks of the same weekday, and shown as the middle 80% of what was recorded. Snapshots are still captured about every five minutes.
+- My branches is built: starred branches are kept on the device and lead Home with their usual wait for the current time.
+- Plan a meal is drawn on Doop and not built. The first drawing, a grid of hourly cells, was hard to follow. The second asks one question (which day, and what time to take a ticket) with a five-minute time ruler, then answers per branch with a range, the time the ticket would be called, and a chart of the day. The owner has not yet reviewed the second drawing.
+- Still undecided: whether today's remaining slots should be adjusted by live conditions. The drawings show today's line beside the usual range and do not blend them.
+
 ## Broader product direction and agreed constraints
 
 - The primary question is: "If I want to eat Sushiro today, approximately when should I queue?"
