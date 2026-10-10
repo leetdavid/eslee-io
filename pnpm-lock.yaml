@@ -596,6 +596,9 @@ importers:
 
   apps/sushiro:
     dependencies:
+      '@base-ui/react':
+        specifier: ^1.2.0
+        version: 1.2.0(@types/react@19.1.4)(react-dom@19.1.4(react@19.1.4))(react@19.1.4)
       '@eslee/db':
         specifier: workspace:*
         version: link:../../packages/db
@@ -635,6 +638,9 @@ importers:
       react:
         specifier: catalog:react19
         version: 19.1.4
+      react-day-picker:
+        specifier: ^10.0.2
+        version: 10.0.2(@types/react@19.1.4)(react@19.1.4)
       react-dom:
         specifier: catalog:react19
         version: 19.1.4(react@19.1.4)
@@ -8505,6 +8511,16 @@ packages:
     peerDependencies:
       react: ^16.9.0 || ^17 || ^18 || ^19 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17 || ^18 || ^19 || ^19.0.0-rc
+
+  react-day-picker@10.0.2:
+    resolution: {integrity: sha512-QetiKtZWE9Uaw/pM/SYNv6WPYOTRnSJ2puL0GgwkmUFMIwiY0dtjH1W4B7DOVXVNQM0ZOClGpH/heOfBSzWeiA==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@types/react': '>=16.8.0'
+      react: '>=16.8.0'
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
 
   react-day-picker@9.13.2:
     resolution: {integrity: sha512-IMPiXfXVIAuR5Yk58DDPBC8QKClrhdXV+Tr/alBrwrHUw0qDDYB1m5zPNuTnnPIr/gmJ4ChMxmtqPdxm8+R4Eg==}
@@ -17649,6 +17665,14 @@ snapshots:
       date-fns: 3.6.0
       react: 19.1.4
       react-dom: 19.1.4(react@19.1.4)
+
+  react-day-picker@10.0.2(@types/react@19.1.4)(react@19.1.4):
+    dependencies:
+      '@date-fns/tz': 1.4.1
+      date-fns: 4.1.0
+      react: 19.1.4
+    optionalDependencies:
+      '@types/react': 19.1.4
 
   react-day-picker@9.13.2(react@19.1.4):
     dependencies:

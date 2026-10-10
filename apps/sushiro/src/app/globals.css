@@ -76,6 +76,10 @@
 
   --shadow-1: 0 0 0 1px var(--border);
   --shadow-2: 0 0 0 1px var(--border), 0 1px 1px -0.5px var(--shadow-drop);
+  --shadow-4:
+    0 0 0 1px var(--border), 0 1px 1px -0.5px var(--shadow-drop),
+    0 3px 3px -1.5px var(--shadow-drop), 0 6px 6px -3px var(--shadow-drop),
+    0 12px 12px -6px var(--shadow-drop);
   --shadow-5:
     0 0 0 1px var(--border), 0 1px 1px -0.5px var(--shadow-drop),
     0 3px 3px -1.5px var(--shadow-drop), 0 6px 6px -3px var(--shadow-drop),
@@ -1625,18 +1629,6 @@ button.chip:hover {
   gap: 8px;
 }
 
-.stats-date input {
-  appearance: none;
-  background: var(--surface-3);
-  border-radius: var(--r-item);
-  box-shadow: var(--shadow-2);
-  color: var(--foreground);
-  font: inherit;
-  font-variant-numeric: tabular-nums;
-  height: 36px;
-  padding: 0 12px;
-}
-
 .stats-cards {
   display: grid;
   gap: 12px;
@@ -1909,5 +1901,167 @@ button.chip:hover {
 
   .stats-chart-plot {
     height: 180px;
+  }
+}
+
+/* Popover: surface 3 with the menu shadow. Opens with the moderate spring, closes as a tween. */
+.popover-positioner {
+  z-index: 60;
+}
+
+.popover {
+  background: var(--surface-3);
+  border-radius: var(--r-container);
+  box-shadow: var(--shadow-4);
+  color: var(--foreground);
+  outline: none;
+  padding: 12px;
+  transform-origin: var(--transform-origin);
+  transition:
+    opacity 160ms ease-out,
+    transform 160ms cubic-bezier(0.2, 0.9, 0.3, 1.1);
+}
+
+.popover[data-starting-style],
+.popover[data-ending-style] {
+  opacity: 0;
+  transform: scale(0.97);
+}
+
+.popover[data-ending-style] {
+  transition-duration: 80ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .popover {
+    transition: none;
+  }
+}
+
+/* Calendar: the shadcn date picker in the v2 tokens. Days are 36px, or 44px on phones. */
+.date-trigger {
+  font-variant-numeric: tabular-nums;
+}
+
+.calendar {
+  --cell: 36px;
+}
+
+.calendar-months {
+  position: relative;
+}
+
+.calendar-nav {
+  display: flex;
+  inset: 0 0 auto;
+  justify-content: space-between;
+  pointer-events: none;
+  position: absolute;
+}
+
+.calendar-step {
+  align-items: center;
+  border-radius: var(--r-item);
+  color: var(--muted-foreground);
+  display: flex;
+  height: 28px;
+  justify-content: center;
+  pointer-events: auto;
+  width: 28px;
+}
+
+.calendar-step:hover:not([aria-disabled="true"]) {
+  background: var(--hover);
+  color: var(--foreground);
+}
+
+.calendar-step[aria-disabled="true"] {
+  cursor: default;
+  opacity: 0.4;
+}
+
+.calendar-month-caption {
+  align-items: center;
+  display: flex;
+  height: 28px;
+  justify-content: center;
+}
+
+.calendar-caption {
+  font-size: var(--fs-subtitle);
+  font-weight: 550;
+  line-height: var(--lh-subtitle);
+}
+
+.calendar-grid {
+  border-collapse: separate;
+  border-spacing: 2px;
+  margin: 4px -2px 0;
+}
+
+.calendar-weekday {
+  color: var(--muted-foreground);
+  font-size: var(--fs-caption);
+  font-weight: 400;
+  height: 28px;
+  width: var(--cell);
+}
+
+.calendar-day {
+  padding: 0;
+}
+
+.calendar-day-button {
+  border-radius: var(--r-item);
+  font-size: var(--fs-body);
+  font-variant-numeric: tabular-nums;
+  height: var(--cell);
+  text-align: center;
+  width: var(--cell);
+}
+
+.calendar-day-button:hover:not(:disabled) {
+  background: var(--hover);
+}
+
+.is-today > .calendar-day-button {
+  box-shadow: inset 0 0 0 1px var(--muted-foreground);
+}
+
+.is-outside > .calendar-day-button {
+  color: var(--muted-foreground);
+}
+
+.is-disabled > .calendar-day-button {
+  color: var(--muted-foreground);
+  cursor: default;
+  opacity: 0.45;
+}
+
+.is-selected > .calendar-day-button,
+.is-selected > .calendar-day-button:hover {
+  background: var(--foreground);
+  box-shadow: none;
+  color: var(--background);
+  font-weight: 550;
+}
+
+.is-hidden {
+  visibility: hidden;
+}
+
+.calendar-footer {
+  align-items: center;
+  box-shadow: 0 -1px 0 var(--border);
+  color: var(--muted-foreground);
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  padding-top: 10px;
+}
+
+@media (max-width: 700px) {
+  .calendar {
+    --cell: 44px;
   }
 }

@@ -3,6 +3,7 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { AppShell } from "@/components/app-shell";
+import { DatePicker } from "@/components/date-picker";
 import { useLanguage } from "@/components/language-provider";
 import { QueueAreaChart } from "@/components/queue-area-chart";
 import { QueueLegend } from "@/components/queue-legend";
@@ -42,6 +43,9 @@ export function StatsView({ initialDate, initialView }: StatsViewProps) {
   });
   const history = resource.data;
   const status = history ? "ready" : resource.error ? "error" : "loading";
+  const firstDate =
+    useSharedJson<{ first: string | null }>("/api/queues/range", { maxAgeMs: 60 * 60_000 }).data
+      ?.first ?? null;
 
   useEffect(() => {
     // Without a date in the URL, open on yesterday: the latest complete day.
@@ -118,21 +122,27 @@ export function StatsView({ initialDate, initialView }: StatsViewProps) {
             <div className="stats-date">
               <Button
                 aria-label={stats.previousDay}
+                disabled={firstDate !== null && date <= firstDate}
                 onClick={() => setDate(shiftDate(date, -1))}
                 size="icon"
                 variant="secondary"
               >
                 <ChevronLeft size={16} />
               </Button>
-              <input
-                aria-label={stats.date}
-                max={today}
-                onChange={(event) => {
-                  if (hongKongDayRange(event.target.value)) {
-                    setDate(event.target.value);
-                  }
-                }}
-                type="date"
+              <DatePicker
+                first={firstDate}
+                label={stats.date}
+                language={language}
+                last={today}
+                note={
+                  firstDate
+                    ? fill(stats.recordsFrom, {
+                        date: dayMonth.format(new Date(`${firstDate}T00:00:00+08:00`)),
+                      })
+                    : undefined
+                }
+                onChange={setDate}
+                todayLabel={stats.today}
                 value={date}
               />
               <Button
