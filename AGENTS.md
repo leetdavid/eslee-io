@@ -127,6 +127,7 @@ If working on Payload CMS functionality, you must follow these rules defined in 
 
 Design frames for every site in this monorepo live on one Doop canvas: `_kQrdcpH9P`.
 
+- **Design before implementation:** Always create or update the design on Doop before implementing an interface change. Do not start the implementation until its frames exist on the site's page.
 - **One page per site and version:** Give each site, and each design version of that site, its own page on the canvas, named for both (e.g., `sushiro v2`). Never put two sites, or two versions of one site, on the same page.
 - **New version, new page:** Start a redesign on a new page and leave the earlier version's page as it is.
 - **Sushiro v1 has no page:** It was never drawn on Doop, by the owner's decision. Sushiro's pages start at `sushiro v2`; do not backfill v1.
