@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { copy, type Language } from "@/lib/queue-presentation";
 
 export type AppNavigationProps = {
-  activePage: "grid" | "map" | "tickets";
+  activePage: "grid" | "map" | "stats" | "tickets";
   isRefreshing: boolean;
   language: Language;
   onLanguageChange: (language: Language) => void;
@@ -18,13 +18,13 @@ const destinations = [
   { href: "/", icon: LayoutGrid, page: "grid" },
   { href: "/map", icon: MapIcon, page: "map" },
   { href: "/tickets", icon: Ticket, page: "tickets" },
+  { href: "/stats", icon: ChartColumn, page: "stats" },
 ] as const;
 
 type DestinationsProps = Pick<AppNavigationProps, "activePage" | "language"> & {
   iconSize: number;
 };
 
-// Stats stays unavailable, with its "Coming soon" hint, until the Stats page is built.
 function Destinations({ activePage, iconSize, language }: DestinationsProps) {
   const text = copy[language];
 
@@ -38,12 +38,6 @@ function Destinations({ activePage, iconSize, language }: DestinationsProps) {
           <span>{text[page]}</span>
         </Link>
       ))}
-      <span aria-disabled="true" title={text.comingSoon}>
-        <span>
-          <ChartColumn size={iconSize} strokeWidth={1.75} />
-        </span>
-        <span>{text.stats}</span>
-      </span>
     </>
   );
 }

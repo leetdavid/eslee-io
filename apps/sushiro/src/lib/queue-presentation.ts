@@ -217,24 +217,20 @@ export function homeLists(stores: QueueStore[], language: Language) {
 }
 
 // Bands are set from the official wait in minutes: 0, 5-10, 15-30, then 35 and over.
-export function queueBand(store: QueueStore): QueueBand {
-  if (!isActiveStore(store)) {
-    return "muted";
-  }
-
-  if (store.wait === 0) {
+export function waitBand(wait: number): Exclude<QueueBand, "muted"> {
+  if (wait <= 0) {
     return "none";
   }
 
-  if (store.wait <= 10) {
+  if (wait <= 10) {
     return "short";
   }
 
-  if (store.wait <= 30) {
-    return "moderate";
-  }
+  return wait <= 30 ? "moderate" : "long";
+}
 
-  return "long";
+export function queueBand(store: QueueStore): QueueBand {
+  return isActiveStore(store) ? waitBand(store.wait) : "muted";
 }
 
 export function queueBandLabel(store: QueueStore, language: Language) {

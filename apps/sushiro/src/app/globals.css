@@ -265,6 +265,7 @@
 }
 
 .app-content.grid-page,
+.app-content.stats-page,
 .app-content.tickets-page {
   overflow: auto;
 }
@@ -1571,5 +1572,337 @@ button.chip:hover {
     height: var(--history-panel-height);
     top: auto;
     width: 100%;
+  }
+}
+
+/* Stats: Daily history and Patterns. */
+.stats {
+  margin: 0 auto;
+  max-width: 1280px;
+  padding: 8px 24px 32px;
+}
+
+.stats > header h1 {
+  font-size: var(--fs-display);
+  font-weight: 700;
+  line-height: var(--lh-display);
+  margin: 0;
+}
+
+.stats > header p {
+  color: var(--muted-foreground);
+  margin: 4px 0 0;
+}
+
+.stats-controls {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: space-between;
+  margin-top: 18px;
+}
+
+.segmented-large {
+  border-radius: 10px;
+}
+
+.segmented-large > button {
+  border-radius: var(--r-item);
+  font-size: var(--fs-body);
+  height: 32px;
+  padding: 0 12px;
+}
+
+.stats-date {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+.stats-date input {
+  appearance: none;
+  background: var(--surface-3);
+  border-radius: var(--r-item);
+  box-shadow: var(--shadow-2);
+  color: var(--foreground);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  height: 36px;
+  padding: 0 12px;
+}
+
+.stats-cards {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 16px;
+}
+
+.stats-cards-three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.stats-card {
+  background: var(--surface-3);
+  border-radius: var(--r-container);
+  box-shadow: var(--shadow-2);
+  min-width: 0;
+  padding: 14px 16px;
+}
+
+.stats > .stats-card,
+.stats-split {
+  margin-top: 12px;
+}
+
+.stats-card h2 {
+  font-size: var(--fs-title);
+  font-weight: 550;
+  line-height: var(--lh-title);
+  margin: 0 0 2px;
+}
+
+.stats-figure {
+  margin: 6px 0 4px;
+}
+
+.stats-split {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+}
+
+.stats-status {
+  align-items: center;
+  color: var(--muted-foreground);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 72px 0;
+}
+
+.stats-status p {
+  margin: 0;
+}
+
+.stats-chart {
+  margin: 14px 0 0;
+  padding-left: 32px;
+}
+
+.stats-chart-plot {
+  color: var(--foreground);
+  height: 220px;
+  position: relative;
+}
+
+.stats-chart-plot svg {
+  height: 100%;
+  inset: 0;
+  overflow: visible;
+  position: absolute;
+  width: 100%;
+}
+
+.stats-chart-tick {
+  border-top: 1px solid var(--border);
+  left: 0;
+  position: absolute;
+  right: 0;
+}
+
+.stats-chart-tick::before,
+.stats-chart-hours {
+  color: var(--muted-foreground);
+  font-size: var(--fs-micro);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--lh-micro);
+}
+
+.stats-chart-tick::before {
+  content: attr(data-tick);
+  left: -32px;
+  position: absolute;
+  text-align: right;
+  top: -7px;
+  width: 26px;
+}
+
+/* The label sits up and to one side of the peak, and its dot marks the peak itself. */
+.stats-chart-marker {
+  font-size: var(--fs-micro);
+  font-weight: 550;
+  line-height: var(--lh-micro);
+  position: absolute;
+  transform: translate(8px, -20px);
+  white-space: nowrap;
+}
+
+.stats-chart-marker::before {
+  background: var(--surface-3);
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  content: "";
+  height: 8px;
+  left: -12px;
+  position: absolute;
+  top: 16px;
+  width: 8px;
+}
+
+.stats-chart-marker[data-side="left"] {
+  transform: translate(calc(-100% - 8px), -20px);
+}
+
+.stats-chart-marker[data-side="left"]::before {
+  left: auto;
+  right: -12px;
+}
+
+.stats-chart-hours {
+  height: 14px;
+  margin-top: 6px;
+  position: relative;
+}
+
+.stats-chart-hours span {
+  position: absolute;
+  transform: translateX(-50%);
+}
+
+.stats-table-scroll {
+  margin: 8px -4px 0;
+  overflow-x: auto;
+}
+
+.stats-table {
+  border-collapse: collapse;
+  min-width: 640px;
+  width: 100%;
+}
+
+.stats-table th,
+.stats-table td {
+  height: 44px;
+  padding: 0 12px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.stats-table thead th {
+  color: var(--muted-foreground);
+  font-size: var(--fs-caption);
+  font-weight: 400;
+  height: 36px;
+}
+
+.stats-table tbody tr {
+  box-shadow: 0 -1px 0 var(--border);
+}
+
+.stats-table tbody th,
+.stats-table td strong {
+  font-weight: 550;
+}
+
+.stats-table .numeric {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.stats-table td span {
+  color: var(--muted-foreground);
+}
+
+.stats-table .sparkline {
+  width: 120px;
+}
+
+.heat {
+  border-collapse: separate;
+  border-spacing: 4px;
+  min-width: 420px;
+  width: 100%;
+}
+
+.heat th {
+  color: var(--muted-foreground);
+  font-size: var(--fs-caption);
+  font-weight: 400;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.heat thead th {
+  text-align: center;
+}
+
+.heat tbody td {
+  background: var(--band-tint, transparent);
+  border-radius: 6px;
+  color: var(--band-text);
+  font-variant-numeric: tabular-nums;
+  font-weight: 550;
+  height: 40px;
+  text-align: center;
+}
+
+.stats-card > .legend {
+  padding-top: 10px;
+}
+
+.stats-bars {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+}
+
+.stats-bar {
+  align-items: center;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(0, 150px) minmax(0, 1fr) auto;
+  min-height: 32px;
+}
+
+.stats-bar > span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stats-bar i {
+  background: var(--band);
+  border-radius: 3px;
+  display: block;
+  height: 8px;
+}
+
+.stats-bar strong {
+  font-variant-numeric: tabular-nums;
+  font-weight: 550;
+  text-align: right;
+}
+
+@media (max-width: 900px) {
+  .stats-cards,
+  .stats-cards-three {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stats-split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .stats {
+    padding: 8px 12px 24px;
+  }
+
+  .stats-chart-plot {
+    height: 180px;
   }
 }
