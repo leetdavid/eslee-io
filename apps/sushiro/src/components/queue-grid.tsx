@@ -4,14 +4,30 @@ import { useEffect, useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import { QueueAreaChart } from "@/components/queue-area-chart";
 import { StoreSheet } from "@/components/store-sheet";
-import { copy, type Language, queueBand } from "@/lib/queue-presentation";
+import { Button } from "@/components/ui/button";
+import {
+  copy,
+  fill,
+  homeLists,
+  type Language,
+  networkTotal,
+  type QueueBand,
+  queueBand,
+  shortStoreName,
+  storeName,
+  waitingGroups,
+} from "@/lib/queue-presentation";
 import {
   gridHistoryHours,
   type QueueHistory,
   type QueueSnapshot,
   type QueueStore,
 } from "@/lib/queues";
-import { storeGridCells } from "@/lib/store-grid";
+import { storeGridBands, storeGridNames } from "@/lib/store-grid";
+
+// Rows shown in the queueing list before "Show all".
+const queueingPreview = 8;
+const legendBands: Exclude<QueueBand, "muted">[] = ["none", "short", "moderate", "long"];
 
 function normalizedStoreName(name: string) {
   return name.trim().replaceAll(/\s+/g, " ").toLocaleLowerCase();
@@ -29,6 +45,8 @@ export function QueueGrid() {
   const [selectedStore, setSelectedStore] = useState<QueueStore | null>(null);
   const [refreshVersion, setRefreshVersion] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(true);
+  const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
+  const [showAllQueueing, setShowAllQueueing] = useState(false);
 
   useEffect(() => {
     const storedLanguage = window.localStorage.getItem("sushiro-language");
@@ -62,6 +80,7 @@ export function QueueGrid() {
 
         if (!cancelled) {
           setSnapshot(nextSnapshot);
+          setUpdatedAt(new Date());
           setStatus("ready");
           setSelectedStore((store) =>
             store ? (nextSnapshot.stores.find(({ id }) => id === store.id) ?? null) : null,
@@ -151,14 +170,13 @@ export function QueueGrid() {
   }
 
   const text = copy[language];
+  const stores = snapshot?.stores ?? [];
   const storesByGridName = new Map(
-    (snapshot?.stores ?? []).map((store) => [
-      normalizedStoreName(store.nameEn || store.name),
-      store,
-    ]),
+    stores.map((store) => [normalizedStoreName(store.nameEn || store.name), store]),
   );
-  const configuredNames = new Set(
-    storeGridCells.flatMap(({ name }) => (name ? [normalizedStoreName(name)] : [])),
+  const configuredNames = new Set(storeGridNames.map(normalizedStoreName));
+  const unplacedStores = stores.filter(
+    (store) => !configuredNames.has(normalizedStoreName(store.nameEn || store.name)),
   );
   const historyByStoreId = new Map(
     (history?.stores ?? []).map((store) => [
@@ -169,14 +187,20 @@ export function QueueGrid() {
       }),
     ]),
   );
-  const maximumWait = Math.max(
-    1,
-    ...(snapshot?.stores.map((store) => store.wait) ?? []),
-    ...[...historyByStoreId.values()].flatMap((points) => points.map((point) => point.wait)),
-  );
-  const unplacedStores = (snapshot?.stores ?? []).filter(
-    (store) => !configuredNames.has(normalizedStoreName(store.nameEn || store.name)),
-  );
+  const total = networkTotal(stores);
+  const { noQueue, queueing } = homeLists(stores, language);
+  const visibleQueueing = showAllQueueing ? queueing : queueing.slice(0, queueingPreview);
+  const updatedTime = updatedAt
+    ? new Intl.DateTimeFormat(language, {
+        hour: "2-digit",
+        hourCycle: "h23",
+        minute: "2-digit",
+      }).format(updatedAt)
+    : null;
+
+  function describe(store: QueueStore) {
+    return `${storeName(store, language)}: ${store.wait} ${text.minutes}, ${waitingGroups(store)} ${text.groups}`;
+  }
 
   return (
     <AppShell
@@ -186,87 +210,200 @@ export function QueueGrid() {
       onLanguageChange={changeLanguage}
       onRefresh={refreshQueues}
     >
-      <div className="grid-home">
+      <div className="home">
         {status === "ready" && snapshot ? (
-          <section aria-label={text.mapLabel} className="store-grid">
-            {storeGridCells.map(({ key, name: gridName }) => {
-              const store = gridName ? storesByGridName.get(normalizedStoreName(gridName)) : null;
-
-              if (!store) {
-                return <div aria-hidden="true" className="grid-card-empty" key={key} />;
-              }
-
-              const storeName = language === "en" ? store.nameEn || store.name : store.name;
-              const points = historyByStoreId.get(store.id) ?? [];
-
-              return (
-                <button
-                  aria-label={`${storeName}: ${store.wait} ${text.groups}. ${text.calledTickets} ${store.storeQueue.join(", ") || "—"}.`}
-                  className="grid-queue-card"
-                  data-band={queueBand(store)}
-                  key={store.id}
-                  onClick={() => setSelectedStore(store)}
-                  type="button"
-                >
-                  <QueueAreaChart
-                    end={historyWindow.end}
-                    maximumWait={maximumWait}
-                    points={points}
-                    start={historyWindow.start}
-                  />
-                  <span className="grid-card-name">{storeName}</span>
-                  <strong>{store.wait}</strong>
-                  <span aria-hidden="true" className="grid-card-tickets">
-                    {store.storeQueue.length > 0 ? (
-                      store.storeQueue.map((ticket) => <span key={ticket}>{ticket}</span>)
-                    ) : (
-                      <span>—</span>
-                    )}
-                  </span>
-                </button>
-              );
-            })}
-          </section>
-        ) : null}
-
-        {status === "ready" && unplacedStores.length > 0 ? (
-          <section aria-labelledby="unplaced-stores-heading" className="unplaced-stores">
-            <h1 id="unplaced-stores-heading">{text.unplacedStores}</h1>
+          <>
             <div>
-              {unplacedStores.map((store) => {
-                const storeName = language === "en" ? store.nameEn || store.name : store.name;
+              <div className="home-summary">
+                <div className="home-total">
+                  <strong className="figure-l">{total.groups}</strong>
+                  <span>{text.groupsWaiting}</span>
+                </div>
+                <p className="caption home-meta">
+                  {fill(text.branchesIssuing, { count: total.activeStores })}
+                  {updatedTime ? ` · ${fill(text.updated, { time: updatedTime })}` : null}
+                </p>
+              </div>
 
-                return (
-                  <button key={store.id} onClick={() => setSelectedStore(store)} type="button">
-                    {storeName}
-                  </button>
-                );
-              })}
+              {storeGridBands.map(({ band, cells }) => (
+                <section aria-label={text.territory[band]} key={band}>
+                  {band === "hongKongIsland" ? (
+                    <p aria-hidden="true" className="harbour">
+                      <span>{text.territory.harbour}</span>
+                    </p>
+                  ) : null}
+                  <p aria-hidden="true" className="band-label">
+                    <span>{text.territory[band]}</span>
+                    {band === "kowloon" ? <span>{text.territory.tseungKwanO}</span> : null}
+                  </p>
+                  <div className="tile-grid">
+                    {cells.map(({ key, name }) => {
+                      const store = name ? storesByGridName.get(normalizedStoreName(name)) : null;
+
+                      if (!store) {
+                        return <div aria-hidden="true" className="tile tile-empty" key={key} />;
+                      }
+
+                      const band = queueBand(store);
+
+                      return (
+                        <button
+                          aria-label={describe(store)}
+                          className="tile"
+                          data-band={band}
+                          key={store.id}
+                          onClick={() => setSelectedStore(store)}
+                          type="button"
+                        >
+                          <span className="tile-name">{shortStoreName(store, language)}</span>
+                          <span className="tile-figure">
+                            {band === "muted" ? text.pausedFigure : store.wait}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </section>
+              ))}
+
+              <div className="legend">
+                {legendBands.map((band) => (
+                  <span data-band={band} key={band}>
+                    <i className="band-dot" />
+                    {text.bandRange[band]}
+                  </span>
+                ))}
+                <span>{text.legendNote}</span>
+              </div>
+
+              {unplacedStores.length > 0 ? (
+                <section aria-labelledby="unplaced-stores-heading">
+                  <div className="unplaced-heading list-heading">
+                    <h2 id="unplaced-stores-heading">{text.unplacedStores}</h2>
+                  </div>
+                  <div className="chip-list">
+                    {unplacedStores.map((store) => (
+                      <button
+                        className="chip"
+                        key={store.id}
+                        onClick={() => setSelectedStore(store)}
+                        type="button"
+                      >
+                        {shortStoreName(store, language)}
+                      </button>
+                    ))}
+                  </div>
+                </section>
+              ) : null}
             </div>
-          </section>
+
+            <div className="home-lists">
+              {noQueue.length > 0 ? (
+                <section aria-labelledby="no-queue-heading">
+                  <div className="list-heading">
+                    <h2 id="no-queue-heading">{text.noQueue}</h2>
+                    <span className="caption">
+                      {fill(text.branchCount, { count: noQueue.length })}
+                    </span>
+                  </div>
+                  <div className="chip-list">
+                    {noQueue.map((store) => (
+                      <button
+                        className="chip"
+                        key={store.id}
+                        onClick={() => setSelectedStore(store)}
+                        type="button"
+                      >
+                        {shortStoreName(store, language)}
+                      </button>
+                    ))}
+                  </div>
+                </section>
+              ) : null}
+
+              <section aria-labelledby="queueing-heading">
+                <div className="list-heading">
+                  <h2 id="queueing-heading">{text.queueing}</h2>
+                  <span className="caption">
+                    {fill(text.branchCount, { count: queueing.length })}
+                  </span>
+                </div>
+                <ul className="branch-rows">
+                  {visibleQueueing.map((store) => {
+                    const points = historyByStoreId.get(store.id) ?? [];
+
+                    return (
+                      <li key={store.id}>
+                        <button
+                          aria-label={describe(store)}
+                          className="branch-row"
+                          data-band={queueBand(store)}
+                          onClick={() => setSelectedStore(store)}
+                          type="button"
+                        >
+                          <i className="band-dot" />
+                          <span className="branch-row-main">
+                            <span className="branch-row-name">
+                              {shortStoreName(store, language)}
+                            </span>
+                            <span className="caption">
+                              {store.area} · {waitingGroups(store)} {text.groups}
+                            </span>
+                          </span>
+                          {/* Each row scales to its own peak, with a 30-minute floor so a quiet
+                              branch does not look dramatic. */}
+                          <QueueAreaChart
+                            end={historyWindow.end}
+                            maximumWait={Math.max(30, ...points.map((point) => point.wait))}
+                            points={points}
+                            start={historyWindow.start}
+                          />
+                          <span className="branch-row-figure">
+                            <strong className="figure-m">{store.wait}</strong>
+                            <span className="caption">{text.minutes}</span>
+                          </span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+                {queueing.length > queueingPreview ? (
+                  <Button
+                    className="w-full"
+                    onClick={() => setShowAllQueueing((showAll) => !showAll)}
+                    variant="secondary"
+                  >
+                    {showAllQueueing
+                      ? text.showFewer
+                      : fill(text.showAll, { count: queueing.length })}
+                  </Button>
+                ) : null}
+              </section>
+            </div>
+          </>
         ) : null}
 
         {status === "loading" ? (
-          <div aria-live="polite" className="loading">
+          <div aria-live="polite" className="home-status">
             {text.loading}
           </div>
         ) : null}
 
         {status === "error" ? (
-          <section className="error-state" role="alert">
+          <section className="home-status" role="alert">
             <p>{text.unavailable}</p>
-            <button onClick={refreshQueues} type="button">
+            <Button onClick={refreshQueues} variant="secondary">
               {text.retry}
-            </button>
+            </Button>
           </section>
         ) : null}
       </div>
-      <div aria-hidden="true" className="general-stats-space" />
 
       {selectedStore ? (
         <StoreSheet
           language={language}
           onClose={() => setSelectedStore(null)}
+          points={historyByStoreId.get(selectedStore.id) ?? []}
           store={selectedStore}
         />
       ) : null}

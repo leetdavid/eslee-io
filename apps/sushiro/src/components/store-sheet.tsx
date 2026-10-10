@@ -1,17 +1,35 @@
+import { X } from "lucide-react";
 import Link from "next/link";
-import { copy, type Language, queueBand, queueBandLabel } from "@/lib/queue-presentation";
-import { isTicketing, type QueueStore } from "@/lib/queues";
+import { QueueChart } from "@/components/queue-chart";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  copy,
+  type Language,
+  queueBand,
+  queueBandLabel,
+  storeName,
+  waitingGroups,
+} from "@/lib/queue-presentation";
+import { isTicketing, type QueueHistoryPoint, type QueueStore } from "@/lib/queues";
 import { ticketCopy } from "@/lib/ticket-copy";
 
 type StoreSheetProps = {
   language: Language;
   onClose: () => void;
+  points?: QueueHistoryPoint[];
   store: QueueStore;
 };
 
-export function StoreSheet({ language, onClose, store }: StoreSheetProps) {
+// The band badge takes its tint and text from the band tokens, not the Badge palette, so it
+// matches the tiles and rows exactly.
+const bandBadgeStyle = { backgroundColor: "var(--band-tint)", color: "var(--band-text)" };
+
+export function StoreSheet({ language, onClose, points = [], store }: StoreSheetProps) {
   const text = copy[language];
-  const storeName = language === "en" ? store.nameEn || store.name : store.name;
+  const name = storeName(store, language);
+  const band = queueBand(store);
+  const bandLabel = queueBandLabel(store, language);
 
   return (
     <>
@@ -22,73 +40,81 @@ export function StoreSheet({ language, onClose, store }: StoreSheetProps) {
         tabIndex={-1}
         type="button"
       />
-      <aside aria-label={storeName} className="store-sheet">
+      <aside aria-label={name} className="store-sheet" data-band={band}>
         <div className="sheet-handle" />
         <div className="sheet-heading">
           <div>
-            <p>{store.area}</p>
-            <h1>{storeName}</h1>
+            <p className="caption">{store.area}</p>
+            <h1>{name}</h1>
           </div>
-          <button aria-label={text.close} className="close-sheet" onClick={onClose} type="button">
-            {text.close}
-          </button>
+          <Button aria-label={text.close} onClick={onClose} size="icon" variant="ghost">
+            <X size={16} />
+          </Button>
         </div>
 
-        <div className="store-status">
-          <span>{store.storeStatus === "OPEN" ? text.open : text.closed}</span>
-          <span>{isTicketing(store) ? text.ticketing : text.ticketingPaused}</span>
-          {queueBandLabel(store, language) ? (
-            <span className={`status-dot status-dot-${queueBand(store)}`}>
-              {queueBandLabel(store, language)}
-            </span>
+        <div className="sheet-badges">
+          <Badge color="gray">{store.storeStatus === "OPEN" ? text.open : text.closed}</Badge>
+          <Badge color="gray">{isTicketing(store) ? text.ticketing : text.ticketingPaused}</Badge>
+          {bandLabel ? (
+            <Badge style={bandBadgeStyle}>
+              <i className="band-dot mr-1.5 inline-block" />
+              {bandLabel}
+            </Badge>
           ) : null}
         </div>
 
-        {!isTicketing(store) ? (
-          <p className="ticketing-notice">{text.ticketingPausedNotice}</p>
+        {!isTicketing(store) ? <p className="sheet-notice">{text.ticketingPausedNotice}</p> : null}
+
+        <div className="sheet-figures">
+          <div>
+            <div className="sheet-wait">
+              <strong className="figure-xl">{store.wait}</strong>
+              <span>{text.minutes}</span>
+            </div>
+            <p className="caption">{text.officialWait}</p>
+          </div>
+          <div className="sheet-groups">
+            <div>
+              <strong className="figure-m">{waitingGroups(store)}</strong> {text.groups}
+            </div>
+            <p className="caption">{text.waitingGroups}</p>
+          </div>
+        </div>
+
+        {points.length > 0 ? (
+          <QueueChart
+            label={text.history}
+            latestWait={store.wait}
+            locale={language}
+            points={points}
+            valueLabel={text.minutes}
+          />
         ) : null}
 
-        <div className="wait-stat">
-          <span>{text.waitingGroups}</span>
-          <strong className={`count-${queueBand(store)}`}>{store.wait}</strong>
-          <small>{text.groups}</small>
-        </div>
-
-        <div className="sheet-grid">
-          <div>
-            <p>{text.address}</p>
-            <span>{store.address}</span>
-          </div>
-          <div>
-            <p>{text.calledTickets}</p>
-            <span>{store.storeQueue.join(", ") || "—"}</span>
-          </div>
-        </div>
-
-        <section className="breakdown">
-          <p>{text.queueBreakdown}</p>
-          <table>
-            <thead>
-              <tr>
-                <th>{text.table}</th>
-                <th>{text.counter}</th>
-                <th>{text.pair}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>{store.waitingGroupTable}</td>
-                <td>{store.waitingGroupCounter}</td>
-                <td>{store.waitingGroupPair}</td>
-              </tr>
-            </tbody>
-          </table>
+        <section className="sheet-section">
+          <p className="caption">{text.calledTickets}</p>
+          {store.storeQueue.length > 0 ? (
+            <div className="ticket-chips">
+              {store.storeQueue.map((ticket) => (
+                <span className="chip" key={ticket}>
+                  {ticket}
+                </span>
+              ))}
+            </div>
+          ) : (
+            <p>{text.noCalledTickets}</p>
+          )}
         </section>
 
-        <Link className="ticket-track-link" href={`/tickets?storeId=${store.id}`}>
-          {ticketCopy[language].link}
-        </Link>
-        <footer>{text.dataSource}</footer>
+        <section className="sheet-section">
+          <p className="caption">{text.address}</p>
+          <p>{store.address}</p>
+        </section>
+
+        <Button asChild className="sheet-action h-11">
+          <Link href={`/tickets?storeId=${store.id}`}>{ticketCopy[language].link}</Link>
+        </Button>
+        <p className="caption sheet-footer">{text.dataSource}</p>
       </aside>
     </>
   );

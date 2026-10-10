@@ -1,6 +1,9 @@
 "use client";
 
+import { ChartColumn, LayoutGrid, Map as MapIcon, RefreshCw, Ticket } from "lucide-react";
 import Link from "next/link";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { Button } from "@/components/ui/button";
 import { copy, type Language } from "@/lib/queue-presentation";
 
 export type AppNavigationProps = {
@@ -10,6 +13,40 @@ export type AppNavigationProps = {
   onLanguageChange: (language: Language) => void;
   onRefresh: () => void;
 };
+
+const destinations = [
+  { href: "/", icon: LayoutGrid, page: "grid" },
+  { href: "/map", icon: MapIcon, page: "map" },
+  { href: "/tickets", icon: Ticket, page: "tickets" },
+] as const;
+
+type DestinationsProps = Pick<AppNavigationProps, "activePage" | "language"> & {
+  iconSize: number;
+};
+
+// Stats stays unavailable, with its "Coming soon" hint, until the Stats page is built.
+function Destinations({ activePage, iconSize, language }: DestinationsProps) {
+  const text = copy[language];
+
+  return (
+    <>
+      {destinations.map(({ href, icon: Icon, page }) => (
+        <Link aria-current={activePage === page ? "page" : undefined} href={href} key={page}>
+          <span>
+            <Icon size={iconSize} strokeWidth={1.75} />
+          </span>
+          <span>{text[page]}</span>
+        </Link>
+      ))}
+      <span aria-disabled="true" title={text.comingSoon}>
+        <span>
+          <ChartColumn size={iconSize} strokeWidth={1.75} />
+        </span>
+        <span>{text.stats}</span>
+      </span>
+    </>
+  );
+}
 
 export function AppNavigation({
   activePage,
@@ -21,28 +58,15 @@ export function AppNavigation({
   const text = copy[language];
 
   return (
-    <nav aria-label={text.navigation} className="app-navigation">
-      <div className="app-navigation-links">
-        <Link aria-current={activePage === "grid" ? "page" : undefined} href="/">
-          {text.grid}
-        </Link>
-        <Link aria-current={activePage === "map" ? "page" : undefined} href="/map">
-          {text.map}
-        </Link>
-        <Link aria-current={activePage === "tickets" ? "page" : undefined} href="/tickets">
-          {text.tickets}
-        </Link>
-        <span className="stats-link">
-          <button aria-describedby="stats-coming-soon" aria-disabled="true" type="button">
-            {text.stats}
-          </button>
-          <span id="stats-coming-soon" role="tooltip">
-            {text.comingSoon}
-          </span>
-        </span>
+    <header className="topbar">
+      <div className="topbar-left">
+        <span className="topbar-title">{text.mapLabel}</span>
+        <nav aria-label={text.navigation} className="nav-tabs">
+          <Destinations activePage={activePage} iconSize={16} language={language} />
+        </nav>
       </div>
-      <div className="app-navigation-actions">
-        <fieldset aria-label={text.language} className="language-toggle">
+      <div className="topbar-actions">
+        <fieldset aria-label={text.language} className="segmented">
           <button
             aria-pressed={language === "zh-HK"}
             onClick={() => onLanguageChange("zh-HK")}
@@ -58,16 +82,39 @@ export function AppNavigation({
             EN
           </button>
         </fieldset>
-        <button
-          aria-busy={isRefreshing}
-          className="refresh-control"
-          disabled={isRefreshing}
+        <ThemeToggle darkLabel={text.darkMode} lightLabel={text.lightMode} />
+        <Button
+          className="only-wide"
+          leadingIcon={RefreshCw}
+          loading={isRefreshing}
           onClick={onRefresh}
-          type="button"
+          size="compact"
+          variant="secondary"
         >
           {text.refresh}
-        </button>
+        </Button>
+        <Button
+          aria-label={text.refresh}
+          className="only-narrow"
+          loading={isRefreshing}
+          onClick={onRefresh}
+          size="icon"
+          variant="ghost"
+        >
+          <RefreshCw size={16} />
+        </Button>
       </div>
+    </header>
+  );
+}
+
+export function BottomNavigation({
+  activePage,
+  language,
+}: Pick<AppNavigationProps, "activePage" | "language">) {
+  return (
+    <nav aria-label={copy[language].navigation} className="bottom-nav">
+      <Destinations activePage={activePage} iconSize={20} language={language} />
     </nav>
   );
 }

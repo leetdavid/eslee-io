@@ -1,5 +1,9 @@
 import type { ReactNode } from "react";
-import { AppNavigation, type AppNavigationProps } from "@/components/app-navigation";
+import {
+  AppNavigation,
+  type AppNavigationProps,
+  BottomNavigation,
+} from "@/components/app-navigation";
 import { copy } from "@/lib/queue-presentation";
 
 type AppShellProps = AppNavigationProps & {
@@ -18,6 +22,7 @@ export function AppShell({ children, ...navigation }: AppShellProps) {
       <main className={`app-content ${navigation.activePage}-page`} id="main-content" tabIndex={-1}>
         {children}
       </main>
+      <BottomNavigation activePage={navigation.activePage} language={navigation.language} />
     </div>
   );
 }

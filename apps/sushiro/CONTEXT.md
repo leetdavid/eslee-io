@@ -22,6 +22,10 @@ _Avoid_: same-day queue planning, live queue status
 A prediction, shown as a duration range, of the time from taking a Sushiro ticket until that ticket is called. It does not include any delay between being called and being seated.
 _Avoid_: time until seated, observed waiting duration
 
+**Official wait**:
+Sushiro's own estimate, in minutes, of how long a ticket taken now will wait at a branch. The queue source supplies it in five-minute steps, and it is the headline figure for a branch. It is shown as supplied, without a cap.
+_Avoid_: waiting groups, estimated wait, queue-now estimate
+
 **Overall branch estimate**:
 An estimated wait for a branch without selecting a particular seating category.
 _Avoid_: seating-specific estimate, Hong Kong-wide wait estimate
@@ -69,15 +73,15 @@ A fixed bottom sheet containing the selected store's API-backed queue statistics
 _Avoid_: card, popup
 
 **Waiting groups**:
-The number of groups currently waiting at a store. It is a count of groups, not an estimated waiting duration.
-_Avoid_: wait time, minutes waiting
+The number of groups currently waiting at a store. It is a count of groups, not an estimated waiting duration, and is shown beside the official wait as a secondary figure.
+_Avoid_: wait time, minutes waiting, official wait
 
 **Called ticket numbers**:
 The upstream `storeQueue` values: ticket numbers currently being called at a store. The detail sheet shows them as a compact comma-separated row, or an em dash when none are supplied.
 _Avoid_: queue number, ticket queue
 
 **Seating breakdown**:
-The selected store's table in the detail sheet, showing the upstream `waitingGroupTable`, `waitingGroupCounter`, and `waitingGroupPair` counts. It is not displayed on the map.
+The selected store's table in the detail sheet, showing the upstream `waitingGroupTable`, `waitingGroupCounter`, and `waitingGroupPair` counts. It is not displayed on the map. Version 2 drops it from the detail sheet because the three counts always equal waiting groups.
 _Avoid_: map queue categories, wait-time detail
 
 **Refresh cycle**:
@@ -99,7 +103,7 @@ A time-stamped record of the collected queue data for every store, used for hist
 _Avoid_: chart cache, database row
 
 **Queue band**:
-The colour and label assigned from a store's waiting-group count: no queue (0), short (1-10), moderate (11-30), or long (31+). The count colour moves from green through yellow to red as urgency increases; names remain monochrome. A closed store or one not issuing tickets is always muted.
+The colour and label assigned from a store's official wait in minutes: no queue (0), short (5-10), moderate (15-30), or long (35 and over). The count colour moves from green through yellow to red as urgency increases; names remain monochrome. A closed store or one not issuing tickets is always muted.
 _Avoid_: wait time category, queue severity
 
 **Basemap**:
@@ -115,11 +119,11 @@ The default Home view: a curated geographic grid of Sushiro locations. It is dis
 _Avoid_: table view, store list
 
 **Grid queue card**:
-A selectable grid-home representation of one store that shows its localized name, current waiting groups, called ticket numbers, and a comparable queue trend. Selecting it opens the store detail sheet.
+A selectable grid-home tile for one store, showing its localized name and official wait at every width. Selecting it opens the store detail sheet, which holds the waiting groups, called ticket numbers, and trend.
 _Avoid_: marker, popup card
 
 **Grid chart window**:
-The trailing 6-hour period plotted behind every grid queue card. It incorporates each newly captured Queue snapshot on its next request. All cards use a shared zero-based vertical scale, based on the largest plotted waiting-group count, so their area charts can be compared accurately. Each chart has a solid queue-band-coloured line and a fill that fades to transparent at the baseline.
+The trailing 6-hour period plotted beside each branch in the Home queueing list and in the store detail sheet. It incorporates each newly captured Queue snapshot on its next request. Each plot is zero-based and scaled to that branch. Each chart has a solid queue-band-coloured line and a fill that fades to transparent at the baseline.
 _Avoid_: per-card scale, relative chart
 
 **Grid language**:
@@ -130,8 +134,12 @@ _Avoid_: English-only grid, translated store name
 A grid queue card for a closed store or a store not issuing tickets. It remains in its geographic cell with the muted treatment, even when the upstream source reports a nonzero waiting-group count.
 _Avoid_: colour by inactive wait, hidden inactive store
 
+**Territory band**:
+A labelled group of rows in the Grid Home grid, shown at every width: New Territories, Kowloon with Tseung Kwan O at its east edge, or Hong Kong Island below a Victoria Harbour divider. Labels follow the visitor's language.
+_Avoid_: region section, district group
+
 **Mobile grid**:
-The complete six-column geographic grid scaled to fit the phone viewport. Its locations are never reordered or replaced by a list at narrow widths.
+The complete six-column geographic grid scaled to fit the phone viewport. Its locations are never reordered or replaced by a list at narrow widths. Each tile is simplified to the store's localized name and official wait. It carries the same territory bands as the wide grid.
 _Avoid_: mobile list, reflowed geography
 
 **Grid history-loading state**:
@@ -142,12 +150,24 @@ _Avoid_: blocked grid, cached chart
 The intentionally blank trend area on a grid queue card with no 6-hour snapshots. It contains no explanatory copy so the current queue information remains the visual priority.
 _Avoid_: no-history label, chart error
 
+**No-queue list**:
+The Home list of open, ticket-issuing stores whose official wait is zero, in name order. It is hidden when every store has a wait.
+_Avoid_: walk-in list, empty branches
+
+**Queueing list**:
+The Home list of open, ticket-issuing stores with an official wait, shortest wait first, each with its waiting groups and trend.
+_Avoid_: ranking, leaderboard
+
 **App navigation**:
-The compact persistent strip that links to Grid Home and Map, contains an unavailable Stats item with a translated “Coming soon” tooltip, and provides the shared language switcher and manual refresh action.
-_Avoid_: map-only controls, active Stats page
+The persistent navigation that links to Grid Home, Map, My tickets, and Stats, and provides the shared language switcher, theme toggle, and manual refresh action. It is a top bar on wide screens and a bottom bar on phones.
+_Avoid_: map-only controls
+
+**Theme toggle**:
+The control at the top right of the app navigation that switches the interface between light and dark.
+_Avoid_: mode switch, dark mode setting
 
 **Grid home header**:
-The Grid Home top area, containing only app navigation and its shared controls. It deliberately does not repeat the Map view's network total or active-store count.
+The Grid Home top area, containing app navigation, its shared controls, and the network total with its active-store count.
 _Avoid_: grid telemetry, home summary
 
 **Grid queue colour**:
@@ -155,7 +175,7 @@ The pale full-card surface tint assigned from a grid queue card's queue band. It
 _Avoid_: saturated card, colour-only information
 
 **Grid called tickets**:
-The upstream called ticket numbers shown at the bottom of a grid queue card. The seating breakdown remains available only in the store detail sheet.
+The upstream called ticket numbers for a store. Version 2 shows them in the store detail sheet, not on grid tiles.
 _Avoid_: card seating breakdown, queue-category values
 
 **Network total**:
@@ -173,8 +193,8 @@ _Avoid_: locale menu, language settings
 ## Presentation
 
 **Visual system**:
-An extremely minimal, Vercel-inspired interface using high-contrast black and white for the basemap and chrome, flat surfaces, fine borders, compact system typography, and no decorative effects. Queue counts alone use the semantic urgency scale.
-_Avoid_: branded Sushiro styling, decorative interface
+The version 2 interface language: Fluid Functionalism in its neutral form, with grey layered surfaces, hairline shadows, rounded corners, and spring motion. Queue bands are the only colour.
+_Avoid_: branded Sushiro styling, accent colour, flat black-and-white interface
 
 **Attribution**:
 The compact statement that this is an unofficial viewer using Sushiro Hong Kong data, shown in the store detail sheet.

@@ -24,12 +24,7 @@ export function QueueAreaChart({ end, maximumWait, points, start }: QueueAreaCha
   });
 
   return (
-    <svg
-      aria-hidden="true"
-      className="grid-card-chart"
-      preserveAspectRatio="none"
-      viewBox="0 -2 100 104"
-    >
+    <svg aria-hidden="true" className="sparkline" preserveAspectRatio="none" viewBox="0 -2 100 104">
       <QueueChartSeries baseline={100} coordinates={coordinates} left={0} right={100} />
     </svg>
   );
