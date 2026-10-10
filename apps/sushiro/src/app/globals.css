@@ -2088,6 +2088,153 @@ button.chip:hover {
   }
 }
 
+/* Branch picker: a search field over branches grouped by territory. A popover on wide screens,
+   a bottom sheet on phones. */
+.picker-popover {
+  padding: 8px;
+  width: 316px;
+}
+
+.picker {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.picker-search {
+  align-items: center;
+  background: var(--surface-2);
+  border-radius: var(--r-item);
+  box-shadow: var(--shadow-2);
+  color: var(--muted-foreground);
+  display: flex;
+  flex: none;
+  gap: 8px;
+  height: 36px;
+  padding: 0 10px;
+}
+
+.picker-search:focus-within {
+  box-shadow:
+    var(--shadow-2),
+    0 0 0 1px var(--background),
+    0 0 0 2px var(--focus-ring);
+}
+
+.picker-search input {
+  background: none;
+  border: 0;
+  color: var(--foreground);
+  flex: 1;
+  font: inherit;
+  min-width: 0;
+  outline: none;
+}
+
+.picker-search input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.picker-list {
+  margin-top: 6px;
+  max-height: 336px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.picker-group,
+.picker-note {
+  color: var(--muted-foreground);
+  font-size: var(--fs-caption);
+  line-height: var(--lh-caption);
+  margin: 0;
+  padding: 10px 8px 4px;
+}
+
+.picker-count {
+  box-shadow: 0 -1px 0 var(--border);
+  margin-top: 6px;
+  padding: 8px 8px 2px;
+}
+
+.picker-option {
+  align-items: center;
+  border-radius: var(--r-item);
+  display: flex;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 8px;
+  text-align: left;
+  width: 100%;
+}
+
+.picker-option:hover {
+  background: var(--hover);
+}
+
+.picker-option > span:first-of-type {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.picker-option[aria-pressed="true"] > span:first-of-type {
+  font-weight: 550;
+}
+
+.picker-wait {
+  color: var(--muted-foreground);
+  flex: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.picker-star {
+  color: var(--muted-foreground);
+  flex: none;
+}
+
+.picker-star[data-saved] {
+  color: var(--foreground);
+}
+
+.picker-sheet {
+  background: var(--surface-3);
+  border-radius: var(--r-sheet) var(--r-sheet) 0 0;
+  bottom: 0;
+  box-shadow: var(--shadow-5);
+  display: flex;
+  flex-direction: column;
+  left: 0;
+  max-height: 80dvh;
+  padding: 8px 12px calc(12px + env(safe-area-inset-bottom));
+  position: fixed;
+  right: 0;
+  z-index: 70;
+}
+
+.picker-sheet .picker-list {
+  max-height: none;
+}
+
+.picker-sheet .picker-option {
+  min-height: 44px;
+}
+
+.picker-sheet .picker-search {
+  height: 44px;
+}
+
+/* 16px text keeps phones from zooming in on the field. */
+.picker-sheet .picker-search input {
+  font-size: 16px;
+}
+
+.picker-trigger {
+  display: inline-flex;
+}
+
 /* Calendar: the shadcn date picker in the v2 tokens. Days are 36px, or 44px on phones. */
 .date-trigger {
   font-variant-numeric: tabular-nums;

@@ -78,3 +78,19 @@ export const storeGridBands = bandRows.map(({ band, from, to }) => ({
 export const storeGridNames: string[] = storeGrid.flatMap((row) =>
   row.flatMap((name) => (name ? [name] : [])),
 );
+
+function normalizedName(name: string) {
+  return name.trim().replaceAll(/\s+/g, " ").toLocaleLowerCase();
+}
+
+const bandByName = new Map(
+  storeGridBands.flatMap(({ band, cells }) =>
+    cells.flatMap(({ name }) => (name ? [[normalizedName(name), band] as const] : [])),
+  ),
+);
+
+// The territory band a branch sits in on the grid, from its English name. Null for a branch
+// that has not been placed yet.
+export function territoryBandOf(nameEn: string): TerritoryBand | null {
+  return bandByName.get(normalizedName(nameEn)) ?? null;
+}

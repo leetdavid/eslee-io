@@ -1,8 +1,9 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { AppShell } from "@/components/app-shell";
+import { BranchPicker } from "@/components/branch-picker";
 import { DatePicker } from "@/components/date-picker";
 import { useLanguage } from "@/components/language-provider";
 import { QueueAreaChart } from "@/components/queue-area-chart";
@@ -11,7 +12,7 @@ import { StatsBranchDay } from "@/components/stats-branch-day";
 import { StatsChart } from "@/components/stats-chart";
 import { Button } from "@/components/ui/button";
 import { copy, fill, type Language, waitBand } from "@/lib/queue-presentation";
-import type { QueueHistory } from "@/lib/queues";
+import type { QueueHistory, QueueSnapshot } from "@/lib/queues";
 import { useSharedJson } from "@/lib/shared-json";
 import { dailyStats, hongKongDate, hongKongDayRange, patternStats, shiftDate } from "@/lib/stats";
 import { statsCopy } from "@/lib/stats-copy";
@@ -47,6 +48,8 @@ export function StatsView({ initialBranch, initialDate, initialView }: StatsView
     maxAgeMs: 5 * 60_000,
   });
   const history = resource.data;
+  // The live feed supplies the branch list for the picker.
+  const feed = useSharedJson<QueueSnapshot>("/api/queues", { maxAgeMs: 60_000 });
   // One branch's last 30 days at half-hour detail, for its own Daily history.
   const branchResource = useSharedJson<QueueHistory>(
     branchId ? `/api/queues/charts?storeId=${branchId}&hours=720&issuing=1` : null,
@@ -209,7 +212,19 @@ export function StatsView({ initialBranch, initialDate, initialView }: StatsView
               >
                 {selectedName}
               </Button>
-            ) : null}
+            ) : (
+              <BranchPicker
+                language={language}
+                onChoose={(store) => setBranchId(store?.id ?? null)}
+                selectedId={branchId}
+                stores={feed.data?.stores ?? []}
+                trigger={
+                  <Button className="branch-trigger" trailingIcon={ChevronDown} variant="secondary">
+                    {text.allBranches}
+                  </Button>
+                }
+              />
+            )}
           </div>
         </div>
 
