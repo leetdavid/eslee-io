@@ -1,12 +1,20 @@
 "use client";
 
-import { Check } from "lucide-react";
+import { Bell, Check } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import type { Language } from "@/lib/queue-presentation";
+import { fill, type Language } from "@/lib/queue-presentation";
 import type { QueueStore } from "@/lib/queues";
+import {
+  type AlertPermission,
+  enableNotifications,
+  notificationPermission,
+  showTicketAlert,
+  useTicketAlert,
+} from "@/lib/ticket-alerts";
 import { ticketCopy } from "@/lib/ticket-copy";
+import { nearCalledNumbers, ticketProgress } from "@/lib/ticket-progress";
 import { fromHongKongInput, hongKongInput, type TicketReport } from "@/lib/ticket-reports";
 
 export function TicketReportCard({
@@ -48,6 +56,10 @@ export function TicketReportCard({
     elapsed >= 1440 ||
     hongKongInput(new Date(now)).slice(0, 10) !==
       hongKongInput(new Date(report.takenAt)).slice(0, 10);
+  const isWaiting = !report.calledAt && !report.leftAt && !expired;
+  // How close the ticket is, from the numbers the branch is calling now.
+  const progress =
+    isWaiting && store ? ticketProgress(report.ticketNumber, store.storeQueue) : null;
   const state = report.calledAt
     ? "confirmed"
     : report.leftAt
@@ -56,7 +68,51 @@ export function TicketReportCard({
         ? "seen"
         : expired
           ? "expired"
-          : "waiting";
+          : (progress?.state ?? "waiting");
+  const isClose = state === "near" || state === "due";
+  const storeLabel = language === "en" ? report.storeNameEn || report.storeName : report.storeName;
+  const alert = useTicketAlert(report.id);
+  const [permission, setPermission] = useState<AlertPermission | null>(null);
+  // The alert still to show: nearly called, then once more when the number comes up.
+  const alertKind =
+    alert.isOn && progress && progress.state !== "waiting" && !alert.fired.includes(progress.state)
+      ? progress.state
+      : null;
+  const alertValues = {
+    count: progress?.ahead ?? 0,
+    latest: progress?.latest ?? "",
+    number: report.ticketNumber,
+    store: storeLabel,
+  };
+  const alertTitle = fill(
+    alertKind === "due" ? text.notifyDueTitle : text.notifyNearTitle,
+    alertValues,
+  );
+  const alertBody = fill(
+    alertKind === "due" ? text.notifyDueBody : text.notifyNearBody,
+    alertValues,
+  );
+  const { isOn: alertIsOn, markFired, setOn: setAlertOn } = alert;
+
+  useEffect(() => {
+    if (alertIsOn) {
+      setPermission(notificationPermission());
+    }
+  }, [alertIsOn]);
+  useEffect(() => {
+    if (alertKind) {
+      markFired(alertKind);
+      void showTicketAlert(alertTitle, alertBody, `ticket-${report.id}`);
+    }
+  }, [alertBody, alertKind, alertTitle, markFired, report.id]);
+
+  async function toggleAlert() {
+    setAlertOn(!alertIsOn);
+
+    if (!alertIsOn) {
+      setPermission(await enableNotifications());
+    }
+  }
 
   async function update(action: "called" | "leave", value = "") {
     const calledAt = fromHongKongInput(value);
@@ -92,21 +148,27 @@ export function TicketReportCard({
   }
 
   return (
-    <article className="ticket-report" aria-labelledby={`ticket-${report.id}`}>
+    <article
+      aria-labelledby={`ticket-${report.id}`}
+      className="ticket-report"
+      data-close={isClose || undefined}
+    >
       <div className="ticket-report-heading">
         <div>
-          <h3 id={`ticket-${report.id}`}>
-            {language === "en" ? report.storeNameEn || report.storeName : report.storeName}
-          </h3>
+          <h3 id={`ticket-${report.id}`}>{storeLabel}</h3>
           <p className="ticket-number">
             <span>{text.number}</span>
             {report.ticketNumber}
           </p>
         </div>
-        <Badge>
-          {state === "confirmed" ? <Check className="mr-1 inline-block" size={12} /> : null}
-          {text[state]}
-        </Badge>
+        {isClose ? (
+          <span className="ticket-close-badge">{text[state]}</span>
+        ) : (
+          <Badge>
+            {state === "confirmed" ? <Check className="mr-1 inline-block" size={12} /> : null}
+            {text[state]}
+          </Badge>
+        )}
       </div>
       <dl className="ticket-times">
         <div>
@@ -130,21 +192,60 @@ export function TicketReportCard({
           </div>
         ) : null}
       </dl>
-      {!report.calledAt && !report.leftAt && !expired ? (
-        <p className="ticket-live-numbers">
-          <span>{text.feed}</span>
-          {store && store.storeQueue.length > 0 ? (
-            <span className="ticket-chips">
-              {store.storeQueue.map((ticket) => (
-                <span className="chip" key={ticket}>
-                  {ticket}
-                </span>
-              ))}
-            </span>
-          ) : (
-            <strong>{store ? text.noCalls : text.feedUnavailable}</strong>
-          )}
-        </p>
+      {isWaiting ? (
+        <div className="ticket-live">
+          <p className="ticket-live-numbers">
+            <span>{text.feed}</span>
+            {store && store.storeQueue.length > 0 ? (
+              <span className="ticket-chips">
+                {store.storeQueue.map((ticket) => (
+                  <span className="chip" key={ticket}>
+                    {ticket}
+                  </span>
+                ))}
+              </span>
+            ) : (
+              <strong>{store ? text.noCalls : text.feedUnavailable}</strong>
+            )}
+          </p>
+          {progress && progress.ahead !== null ? (
+            <p aria-live="polite" className="ticket-to-go">
+              <span>{text.toGoLabel}</span>
+              <strong>
+                {progress.ahead === 0
+                  ? text.anyMoment
+                  : fill(text.toGoValue, { count: progress.ahead })}
+              </strong>
+            </p>
+          ) : null}
+        </div>
+      ) : null}
+      {isWaiting ? (
+        <div className="ticket-alert">
+          <Bell aria-hidden="true" size={16} />
+          <p>
+            {alertIsOn
+              ? state === "due"
+                ? text.alertDueNote
+                : state === "near"
+                  ? text.alertNearNote
+                  : fill(text.alertOnNote, { count: nearCalledNumbers })
+              : text.alertOff}
+            {alertIsOn ? (
+              <span className="caption">
+                {permission && permission !== "granted" ? text.alertPageOnly : text.alertKeepOpen}
+              </span>
+            ) : null}
+          </p>
+          <Button
+            aria-pressed={alertIsOn}
+            onClick={() => void toggleAlert()}
+            size="compact"
+            variant={alertIsOn ? "primary" : "secondary"}
+          >
+            {alertIsOn ? text.alertIsOn : text.alertTurnOn}
+          </Button>
+        </div>
       ) : null}
       {report.firstSeenCalledAt ? (
         <p className="ticket-sighting">

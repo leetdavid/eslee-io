@@ -1203,6 +1203,7 @@ button.chip:hover {
 
 .ticket-number > span,
 .ticket-times dt,
+.ticket-to-go > span,
 .ticket-live-numbers > span {
   color: var(--muted-foreground);
   display: block;
@@ -1223,8 +1224,74 @@ button.chip:hover {
   margin: 2px 0 0;
 }
 
-.ticket-live-numbers {
+/* The numbers being called, beside how many are still to go before this ticket. */
+.ticket-live {
+  align-items: start;
+  display: grid;
+  gap: 12px 16px;
+  grid-template-columns: minmax(0, 1fr) auto;
   margin: 14px 0 0;
+}
+
+.ticket-live-numbers,
+.ticket-to-go {
+  margin: 0;
+}
+
+.ticket-to-go > strong {
+  display: block;
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  line-height: 28px;
+  margin-top: 6px;
+}
+
+.ticket-alert {
+  align-items: center;
+  background: var(--surface-2);
+  border-radius: var(--r-item);
+  box-shadow: var(--shadow-1);
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+  min-height: 44px;
+  padding: 6px 6px 6px 12px;
+}
+
+.ticket-alert > svg {
+  flex: none;
+}
+
+.ticket-alert > p {
+  flex: 1;
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  margin: 0;
+  min-width: 0;
+}
+
+.ticket-alert .caption {
+  color: var(--muted-foreground);
+  display: block;
+}
+
+/* A ticket that is nearly called, or up, carries the foreground ring. */
+.ticket-report[data-close] {
+  box-shadow:
+    var(--shadow-2),
+    inset 0 0 0 1.5px var(--foreground);
+}
+
+.ticket-close-badge {
+  background: var(--foreground);
+  border-radius: 6px;
+  color: var(--background);
+  font-size: var(--fs-caption);
+  font-weight: 500;
+  line-height: 22px;
+  padding: 0 7px;
+  white-space: nowrap;
 }
 
 .ticket-live-numbers > .ticket-chips,
