@@ -32,6 +32,20 @@ Matching uses branch, Hong Kong date and the normalized complete ticket number. 
 
 The page checks once per minute while open. Matching is also hooked into the existing queue-snapshot collector for background checks. Its Railway configuration takes a snapshot every minute between 10:00 and 22:00 in Hong Kong, and every five minutes otherwise. Exact matches may be missed between captures, which is why user-reported calls remain useful.
 
+## Ticket alerts
+
+A waiting ticket can alert its owner twice: when the branch is calling within ten numbers of it, and when its number is up. `src/lib/ticket-progress.ts` decides both from the called numbers.
+
+Turning alerts on asks for notification permission and subscribes the browser to web push. The subscription is stored in `sushiro_ticket_alert`, one row per ticket report. After each snapshot the collector checks every stored ticket against the fresh feed and pushes the alert it is owed. The service worker `public/sw.js` shows it, so it arrives with the page closed or the phone locked. It can be up to a minute behind the branch.
+
+- A browser that cannot take a push keeps the earlier behaviour: the open My tickets page shows the alert. A ticket the server pushes is left to the server, so it never alerts twice.
+- An iPhone only takes a push from a site added to its Home Screen. In a browser tab the card explains the step. `src/app/manifest.ts` and the icons exist for this.
+- An alert is marked sent only after the push service accepts it. A failed push is tried again on the next snapshot, and a subscription the push service reports as gone is deleted.
+- The server only posts to the push services of Chrome, Firefox, Safari and Edge, so a made-up subscription cannot point it at another host.
+- Rows are deleted when alerts are turned off, and a day after they were made.
+
+`SUSHIRO_VAPID_PRIVATE_KEY` signs the pushes. The public key browsers subscribe with is worked out from it. Without the variable the server stores no subscriptions and alerts stay on the open page.
+
 ## Ownership and retries
 
 An opaque, HttpOnly, SameSite cookie identifies the browser session. Only its SHA-256 hash is stored with the report. API responses omit the ownership hash. Updates require the same browser session and same-origin requests.
@@ -44,6 +58,8 @@ Human reports are self-reported observations, not independently verified ground 
 
 `packages/db/drizzle/0006_sushiro_ticket_reports.sql` creates the report table and indexes. It was generated with Drizzle and applied using `pnpm -F @eslee/db db:migrate`.
 
+Sushiro's own database is migrated from `apps/sushiro/drizzle`, which CI applies before each deployment. `0001_ticket_alert.sql` there creates `sushiro_ticket_alert`.
+
 ## Verification
 
 - Targeted tests cover timestamp bounds, Hong Kong date conversion, complete-number matching, session cookies and same-origin checks.
@@ -52,3 +68,4 @@ Human reports are self-reported observations, not independently verified ground 
 - A second isolated browser could neither list nor update the first browser's report.
 - A database-backed reconciliation check recorded an exact feed sighting without changing the user-reported call time. Repeating it left the first sighting unchanged.
 - Temporary browser test reports were removed after verification.
+- For ticket alerts, database tests cover both alerts going out once, ownership, retries, a subscription that is gone, and the one-day clean-up. A local headless Chrome subscribed through its real push service and showed both pushed alerts. No real phone was used, so iPhone delivery from the Home Screen is unverified.

@@ -50,6 +50,8 @@ Repository secrets in `leetdavid/eslee-io`:
 
 GitHub supplies `github.token` for repository-state checks. No production database URL needs to be duplicated in GitHub secrets. Connection strings and generated passwords are masked before use in Actions. Rotate the Vercel token by updating `SUSHIRO_VERCEL_TOKEN` before its chosen expiration date.
 
+`SUSHIRO_VAPID_PRIVATE_KEY` is a sensitive Production variable on the Vercel project, set by hand and not by CI. It signs the web pushes for ticket alerts. Without it alerts only work while My tickets is open. To replace it, run `pnpm --filter @eslee/sushiro exec web-push generate-vapid-keys`, store the private key with `vercel env add SUSHIRO_VAPID_PRIVATE_KEY production --sensitive --force`, and redeploy. Browsers subscribe again the next time alerts are turned on.
+
 The deployment workflow pins Vercel CLI 58.9.5 and Railway CLI 5.47.1. Dependencies install from the frozen PNPM lockfile. Service/project IDs are centralized in `scripts/deployment-tools.ts`; backup reconciliation discovers volume IDs dynamically.
 
 ## Operations

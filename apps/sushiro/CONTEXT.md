@@ -103,7 +103,7 @@ A tracked ticket is nearly called when the highest number its branch is calling 
 _Avoid_: next in line, position in queue
 
 **Ticket alert**:
-A notification a visitor turns on for one tracked ticket. It goes out once when the ticket is nearly called and once when it is up. It needs My tickets to stay open, and it is remembered on the device.
+A notification a visitor turns on for one tracked ticket. It goes out once when the ticket is nearly called and once when it is up. Where the browser can take a web push, the server sends it after each look at the feed, so it reaches a locked phone or a closed page. Elsewhere the open My tickets page shows it. An iPhone only takes a push from the site added to its Home Screen.
 _Avoid_: push notification, reminder
 
 **Stale notice**:
