@@ -1,3 +1,4 @@
+import { shiftDate } from "@/lib/stats";
 import {
   type UsualSlot,
   type UsualStore,
@@ -19,6 +20,19 @@ export type PlanDomain = { end: number; start: number };
 const fallbackDomain: PlanDomain = { end: 21 * 60, start: 11 * 60 };
 // Where the time ruler opens when "now" is outside ticketing hours or another day is chosen.
 const dinnerMinute = 18 * 60;
+
+// How many days from today a plan is for. A weekday means the next time it comes round, today
+// included. `weekOn` is the date picked as today's weekday a week on. It counts only while that
+// date is still seven days off, so a plan saved for next Sunday reads as today once that Sunday
+// comes.
+export function planOffset(
+  weekday: number | null,
+  weekOn: string | null,
+  today: { date: string; weekday: number },
+) {
+  const offset = weekday === null ? 0 : (weekday - today.weekday + 7) % 7;
+  return offset === 0 && weekOn === shiftDate(today.date, 7) ? 7 : offset;
+}
 
 // A time of day as HH:MM. Minutes past midnight wrap into the next day.
 export function clockLabel(minute: number) {

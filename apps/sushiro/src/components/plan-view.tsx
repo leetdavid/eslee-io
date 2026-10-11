@@ -17,6 +17,7 @@ import {
   openingMinute,
   type PlanMode,
   planDomain,
+  planOffset,
   rankBranches,
   rankForEating,
 } from "@/lib/plan";
@@ -24,6 +25,7 @@ import { planCopy } from "@/lib/plan-copy";
 import { copy, fill, shortStoreName, waitBand } from "@/lib/queue-presentation";
 import type { QueueSnapshot } from "@/lib/queues";
 import { useSharedJson } from "@/lib/shared-json";
+import { shiftDate } from "@/lib/stats";
 import { statsCopy } from "@/lib/stats-copy";
 import { type TerritoryBand, territoryBandOf } from "@/lib/store-grid";
 import { hongKongClock, type UsualResponse, type UsualSlot, usualStepMinutes } from "@/lib/usual";
@@ -31,6 +33,8 @@ import { hongKongClock, type UsualResponse, type UsualSlot, usualStepMinutes } f
 type PlanViewProps = {
   initialMinute: number | null;
   initialMode: PlanMode;
+  // The date meant when today's weekday a week on was chosen.
+  initialWeekOn: string | null;
   initialWeekday: number | null;
 };
 
@@ -41,13 +45,19 @@ const territories: TerritoryBand[] = ["newTerritories", "kowloon", "hongKongIsla
 // the rest of the day.
 const maximumChartTop = 240;
 
-export function PlanView({ initialMinute, initialMode, initialWeekday }: PlanViewProps) {
+export function PlanView({
+  initialMinute,
+  initialMode,
+  initialWeekOn,
+  initialWeekday,
+}: PlanViewProps) {
   const { language, setLanguage } = useLanguage();
   const feed = useSharedJson<QueueSnapshot>("/api/queues", { maxAgeMs: 60_000, pollMs: 60_000 });
   const { ids: savedIds, toggle: toggleSaved } = useMyBranches();
   // The clock is read after mount, so the server and the first paint agree.
   const [clock, setClock] = useState<ReturnType<typeof hongKongClock> | null>(null);
   const [chosenWeekday, setChosenWeekday] = useState(initialWeekday);
+  const [chosenWeekOn, setChosenWeekOn] = useState(initialWeekOn);
   const [chosenMinute, setChosenMinute] = useState(initialMinute);
   // Whether the chosen time is when the ticket is taken or when the meal should start.
   const [mode, setMode] = useState(initialMode);
@@ -65,7 +75,9 @@ export function PlanView({ initialMinute, initialMode, initialWeekday }: PlanVie
   }, []);
 
   const weekday = chosenWeekday ?? clock?.weekday ?? null;
-  const isToday = clock !== null && weekday === clock.weekday;
+  // Days from today to the chosen day. Seven is today's weekday a week on.
+  const offset = clock ? planOffset(chosenWeekday, chosenWeekOn, clock) : null;
+  const isToday = clock !== null && offset === 0;
   // Today's usual waits follow the kind of day it is, so a public holiday plans like a Sunday.
   const usual = useSharedJson<UsualResponse>(
     weekday === null ? null : `/api/queues/usual?weekday=${isToday ? clock.dayType : weekday}`,
@@ -85,6 +97,7 @@ export function PlanView({ initialMinute, initialMode, initialWeekday }: PlanVie
 
     const parts = [
       chosenWeekday === null ? null : `day=${chosenWeekday}`,
+      chosenWeekOn === null ? null : `next=${chosenWeekOn}`,
       chosenMinute === null ? null : `time=${clockLabel(chosenMinute)}`,
       mode === "eat" ? "mode=eat" : null,
     ].filter(Boolean);
@@ -94,7 +107,7 @@ export function PlanView({ initialMinute, initialMode, initialWeekday }: PlanVie
       "",
       parts.length > 0 ? `/plan?${parts.join("&")}` : "/plan",
     );
-  }, [chosenMinute, chosenWeekday, initialMode, mode]);
+  }, [chosenMinute, chosenWeekOn, chosenWeekday, initialMode, mode]);
 
   const text = copy[language];
   const plan = planCopy[language];
@@ -133,7 +146,13 @@ export function PlanView({ initialMinute, initialMode, initialWeekday }: PlanVie
   const status =
     feed.data && usual.data ? "ready" : feed.error || usual.error ? "error" : "loading";
   const step = (change: number) => setChosenMinute(minute + change);
-  const days = Array.from({ length: 7 }, (_, index) => ((clock?.weekday ?? 0) + index) % 7);
+  // Today, the six days after it, then today's weekday again a week on. That last one is the
+  // only way to plan a time that has already passed today.
+  const days = Array.from({ length: 8 }, (_, index) => ((clock?.weekday ?? 0) + index) % 7);
+  const chooseDay = (day: number, index: number) => {
+    setChosenWeekday(day);
+    setChosenWeekOn(clock && index === 7 ? shiftDate(clock.date, 7) : null);
+  };
   const refresh = () => {
     feed.refresh();
     usual.refresh();
@@ -202,16 +221,18 @@ export function PlanView({ initialMinute, initialMode, initialWeekday }: PlanVie
 
         <div className="plan-controls">
           <fieldset aria-label={plan.title} className="segmented segmented-large plan-days">
-            {days.map((day) => (
+            {days.map((day, index) => (
               <button
-                aria-pressed={day === weekday}
-                key={day}
-                onClick={() => setChosenWeekday(day)}
+                aria-pressed={index === offset}
+                key={index === 7 ? "next" : day}
+                onClick={() => chooseDay(day, index)}
                 type="button"
               >
-                {clock && day === clock.weekday
-                  ? fill(plan.todayChip, { day: stats.weekdaysNarrow[day] ?? "" })
-                  : stats.weekdaysNarrow[day]}
+                {clock && index === 0
+                  ? plan.todayChip
+                  : index === 7
+                    ? fill(plan.nextChip, { day: stats.weekdaysNarrow[day] ?? "" })
+                    : stats.weekdaysNarrow[day]}
               </button>
             ))}
           </fieldset>

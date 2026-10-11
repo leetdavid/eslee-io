@@ -2843,8 +2843,9 @@ button.chip:hover {
     display: flex;
   }
 
+  /* Chips take the width of their label and share what is left, so the long last chip fits. */
   .plan-days > button {
-    flex: 1;
+    flex: 1 1 auto;
     padding: 0 4px;
   }
 

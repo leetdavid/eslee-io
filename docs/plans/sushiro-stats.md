@@ -47,6 +47,7 @@ A subsequent rolling comparison uses ten next-day folds and 23,558 proxy outcome
 - Stats tables read as lists on phones, and the loading, load error, stale, all-closed and nothing-saved states are designed and built.
 - The owner found a usual range of "0 to 135 min" useless. The cause was one public holiday among five quiet days, with every snapshot pooled. Each day now counts once and the usual range is the middle half of days. On eight branches this cut the median width from 35 to 15 minutes. Charts keep the quiet and busy days as a lighter band.
 - Plan a meal can be asked by eating time as well as ticket time.
+- On a Sunday night the owner could not plan lunch for the next Sunday, because Sunday could only mean today. The day strip now has eight days: today, the six after it, and today's weekday a week on. The link stores the date that last day means, so it reads as today once that date comes.
 - My tickets can alert when a ticket is within ten numbers, and again when it is up. At first the alert needed the page open. The owner then asked for it to reach a locked phone, so the collector now sends it as a web push. An iPhone only receives it from the site added to its Home Screen, which is why the site has a manifest and an icon.
 - Still undecided: whether today's remaining slots should be adjusted by live conditions. The drawings show today's line beside the usual range and do not blend them.
 

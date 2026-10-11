@@ -32,13 +32,15 @@ function quantile(sorted: number[], share: number) {
   return low + (high - low) * (index - lower);
 }
 
-// The Hong Kong time of day in minutes since midnight, the weekday with Monday as 0, and the
-// kind of day for usual waits, where a public holiday counts as a Sunday.
+// The Hong Kong date, the time of day in minutes since midnight, the weekday with Monday as 0,
+// and the kind of day for usual waits, where a public holiday counts as a Sunday.
 export function hongKongClock(at: Date) {
   const local = new Date(at.valueOf() + hongKongOffset);
+  const date = local.toISOString().slice(0, 10);
 
   return {
-    dayType: dayType(local.toISOString().slice(0, 10)),
+    date,
+    dayType: dayType(date),
     minute: local.getUTCHours() * 60 + local.getUTCMinutes(),
     weekday: (local.getUTCDay() + 6) % 7,
   };

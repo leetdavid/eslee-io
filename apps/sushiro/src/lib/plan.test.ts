@@ -6,6 +6,7 @@ import {
   parseClock,
   planAnswer,
   planDomain,
+  planOffset,
   rankBranches,
   rankForEating,
   shorterNearby,
@@ -35,6 +36,32 @@ describe("clock helpers", () => {
     expect(parseClock("25:00")).toBeNull();
     expect(parseClock("5pm")).toBeNull();
     expect(parseClock(null)).toBeNull();
+  });
+});
+
+describe("planOffset", () => {
+  // Sunday 11 October 2026. Monday is weekday 0.
+  const sunday = { date: "2026-10-11", weekday: 6 };
+
+  it("reads a weekday as the next time it comes round, today included", () => {
+    expect(planOffset(null, null, sunday)).toBe(0);
+    expect(planOffset(6, null, sunday)).toBe(0);
+    expect(planOffset(0, null, sunday)).toBe(1);
+    expect(planOffset(5, null, sunday)).toBe(6);
+  });
+
+  it("reads today's weekday as a week on while its date is seven days off", () => {
+    expect(planOffset(6, "2026-10-18", sunday)).toBe(7);
+    // A link saved without the weekday still means the week after.
+    expect(planOffset(null, "2026-10-18", sunday)).toBe(7);
+  });
+
+  it("drops the week once the days move on, so the plan follows its date", () => {
+    // Past midnight the same Sunday is six days off.
+    expect(planOffset(6, "2026-10-18", { date: "2026-10-12", weekday: 0 })).toBe(6);
+    // On the Sunday itself it is today.
+    expect(planOffset(6, "2026-10-18", { date: "2026-10-18", weekday: 6 })).toBe(0);
+    expect(planOffset(6, "not a date", sunday)).toBe(0);
   });
 });
 

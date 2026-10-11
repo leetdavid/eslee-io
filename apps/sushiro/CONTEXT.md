@@ -51,7 +51,7 @@ A diner's report of when their ticket was actually called, which can be entered 
 _Avoid_: feed sighting, seating confirmation
 
 **Plan a meal page**:
-A dedicated page that helps diners choose when to take a ticket and where. The visitor picks a weekday and a time on the time ruler. The time is either a ticket time or an eating time. For a ticket time each branch answers with its usual wait for a ticket taken then and the time that ticket would be called. For an eating time each branch answers with the ticket to take. My branches lead the page, each with a chart of its day. Every branch is ranked underneath, with no branch selection needed.
+A dedicated page that helps diners choose when to take a ticket and where. The visitor picks a day and a time on the time ruler. The day is today, one of the six days after it, or today's weekday a week on. That last day is how to plan a time that has already passed today, such as lunch next Sunday on a Sunday night. The time is either a ticket time or an eating time. For a ticket time each branch answers with its usual wait for a ticket taken then and the time that ticket would be called. For an eating time each branch answers with the ticket to take. My branches lead the page, each with a chart of its day. Every branch is ranked underneath, with no branch selection needed.
 _Avoid_: Stats page, store detail sheet
 
 **Time ruler**:

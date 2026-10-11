@@ -5,12 +5,14 @@ describe("hongKongClock", () => {
   it("reads the Hong Kong time of day and weekday, Monday first", () => {
     // Saturday 10 October 2026, 17:30 in Hong Kong.
     expect(hongKongClock(new Date("2026-10-10T09:30:00Z"))).toEqual({
+      date: "2026-10-10",
       dayType: 5,
       minute: 1050,
       weekday: 5,
     });
     // 23:30 UTC on Sunday is already Monday morning in Hong Kong.
     expect(hongKongClock(new Date("2026-10-11T23:30:00Z"))).toMatchObject({
+      date: "2026-10-12",
       minute: 450,
       weekday: 0,
     });
