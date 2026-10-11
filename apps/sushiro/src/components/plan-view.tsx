@@ -53,6 +53,8 @@ export function PlanView({ initialMinute, initialMode, initialWeekday }: PlanVie
   const [mode, setMode] = useState(initialMode);
   const [territory, setTerritory] = useState<TerritoryBand | null>(null);
   const [showAll, setShowAll] = useState(false);
+  // Whether any branch was saved when a picker opened, or null while none is open.
+  const [hadMine, setHadMine] = useState<boolean | null>(null);
 
   useEffect(() => {
     const read = () => setClock(hongKongClock(new Date()));
@@ -104,6 +106,9 @@ export function PlanView({ initialMinute, initialMode, initialWeekday }: PlanVie
   const mine = stores
     .filter(({ id }) => savedIds.includes(id))
     .map((store) => ({ slots: slotsByStore.get(store.id) ?? [], store }));
+  // The Add branch button sits in the empty card or beside the list. Its place holds still while
+  // its picker is open, so starring a first branch or unstarring the last does not close it.
+  const hasMine = hadMine ?? mine.length > 0;
   const isEating = mode === "eat";
   // By eating time, only branches whose ticket can still be called by then are ranked.
   const ranking = isEating
@@ -136,6 +141,7 @@ export function PlanView({ initialMinute, initialMode, initialWeekday }: PlanVie
   const addBranch = (size: "compact" | "default") => (
     <BranchPicker
       language={language}
+      onOpenChange={(open) => setHadMine(open ? mine.length > 0 : null)}
       onToggleSaved={toggleSaved}
       savedIds={savedIds}
       stores={stores}
@@ -262,9 +268,7 @@ export function PlanView({ initialMinute, initialMode, initialWeekday }: PlanVie
                       {plan.keyWide}
                     </span>
                   </p>
-                  {mine.length > 0 ? (
-                    <div className="plan-add-wide">{addBranch("compact")}</div>
-                  ) : null}
+                  {hasMine ? <div className="plan-add-wide">{addBranch("compact")}</div> : null}
                 </div>
               </div>
               {mine.length > 0 ? (
@@ -294,7 +298,8 @@ export function PlanView({ initialMinute, initialMode, initialWeekday }: PlanVie
                     ))}
                   </ul>
                 </>
-              ) : (
+              ) : null}
+              {hasMine ? null : (
                 <div className="plan-empty-card">
                   <Star aria-hidden="true" size={20} />
                   <p>{plan.emptyMine}</p>
@@ -302,9 +307,7 @@ export function PlanView({ initialMinute, initialMode, initialWeekday }: PlanVie
                 </div>
               )}
               {/* On phones the button sits under the cards, full width. */}
-              {mine.length > 0 ? (
-                <div className="plan-add-narrow">{addBranch("default")}</div>
-              ) : null}
+              {hasMine ? <div className="plan-add-narrow">{addBranch("default")}</div> : null}
             </section>
 
             <section aria-labelledby="plan-all" className="plan-card">
