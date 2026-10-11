@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, Check } from "lucide-react";
+import { Bell, Check, Share } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,13 +8,17 @@ import { fill, type Language } from "@/lib/queue-presentation";
 import type { QueueStore } from "@/lib/queues";
 import {
   type AlertPermission,
+  disablePush,
   enableNotifications,
+  enablePush,
+  needsHomeScreen,
   notificationPermission,
   showTicketAlert,
   useTicketAlert,
 } from "@/lib/ticket-alerts";
 import { ticketCopy } from "@/lib/ticket-copy";
 import { nearCalledNumbers, ticketProgress } from "@/lib/ticket-progress";
+import { alertOwed, ticketAlertMessage } from "@/lib/ticket-push";
 import { fromHongKongInput, hongKongInput, type TicketReport } from "@/lib/ticket-reports";
 
 export function TicketReportCard({
@@ -23,12 +27,20 @@ export function TicketReportCard({
   now,
   store,
   onUpdate,
+  pushKey,
+  hasPush,
+  onPushChange,
 }: {
   report: TicketReport;
   language: Language;
   now: number;
   store?: QueueStore;
   onUpdate: (report: TicketReport) => void;
+  // The key to subscribe to pushed alerts with, or null where the server cannot push.
+  pushKey: string | null;
+  // Whether the server pushes this ticket's alerts, so they arrive with the page closed.
+  hasPush: boolean;
+  onPushChange: (on: boolean) => void;
 }) {
   const text = ticketCopy[language];
   const [editing, setEditing] = useState(false);
@@ -73,44 +85,62 @@ export function TicketReportCard({
   const storeLabel = language === "en" ? report.storeNameEn || report.storeName : report.storeName;
   const alert = useTicketAlert(report.id);
   const [permission, setPermission] = useState<AlertPermission | null>(null);
-  // The alert still to show: nearly called, then once more when the number comes up.
+  const [homeScreenHint, setHomeScreenHint] = useState(false);
+  // True while turning alerts on, until it is known whether the server will push them.
+  const [connecting, setConnecting] = useState(false);
+  // The alert this page still has to show: nearly called, then once more when the number comes
+  // up. A ticket the server pushes is left to the server, so it never alerts twice.
   const alertKind =
-    alert.isOn && progress && progress.state !== "waiting" && !alert.fired.includes(progress.state)
-      ? progress.state
+    alert.isOn && progress && !hasPush && !connecting
+      ? alertOwed(progress.state, {
+          due: alert.fired.includes("due"),
+          near: alert.fired.includes("near"),
+        })
       : null;
-  const alertValues = {
+  const alertMessage = ticketAlertMessage(alertKind ?? "near", language, {
     count: progress?.ahead ?? 0,
     latest: progress?.latest ?? "",
     number: report.ticketNumber,
     store: storeLabel,
-  };
-  const alertTitle = fill(
-    alertKind === "due" ? text.notifyDueTitle : text.notifyNearTitle,
-    alertValues,
-  );
-  const alertBody = fill(
-    alertKind === "due" ? text.notifyDueBody : text.notifyNearBody,
-    alertValues,
-  );
+  });
   const { isOn: alertIsOn, markFired, setOn: setAlertOn } = alert;
 
   useEffect(() => {
     if (alertIsOn) {
       setPermission(notificationPermission());
+      setHomeScreenHint(needsHomeScreen());
     }
   }, [alertIsOn]);
   useEffect(() => {
     if (alertKind) {
       markFired(alertKind);
-      void showTicketAlert(alertTitle, alertBody, `ticket-${report.id}`);
+      void showTicketAlert(alertMessage.title, alertMessage.body, report.id, alertKind);
     }
-  }, [alertBody, alertKind, alertTitle, markFired, report.id]);
+  }, [alertKind, alertMessage.body, alertMessage.title, markFired, report.id]);
 
   async function toggleAlert() {
     setAlertOn(!alertIsOn);
 
-    if (!alertIsOn) {
-      setPermission(await enableNotifications());
+    if (alertIsOn) {
+      if (hasPush) {
+        onPushChange(false);
+        void disablePush(report.id);
+      }
+
+      return;
+    }
+
+    setConnecting(true);
+
+    try {
+      const allowed = await enableNotifications();
+      setPermission(allowed);
+
+      if (allowed === "granted" && pushKey && (await enablePush(report.id, pushKey, language))) {
+        onPushChange(true);
+      }
+    } finally {
+      setConnecting(false);
     }
   }
 
@@ -233,7 +263,11 @@ export function TicketReportCard({
               : text.alertOff}
             {alertIsOn ? (
               <span className="caption">
-                {permission && permission !== "granted" ? text.alertPageOnly : text.alertKeepOpen}
+                {hasPush
+                  ? text.alertPushOn
+                  : permission === "blocked"
+                    ? text.alertPageOnly
+                    : text.alertKeepOpen}
               </span>
             ) : null}
           </p>
@@ -246,6 +280,16 @@ export function TicketReportCard({
             {alertIsOn ? text.alertIsOn : text.alertTurnOn}
           </Button>
         </div>
+      ) : null}
+      {isWaiting && alertIsOn && homeScreenHint ? (
+        <p className="ticket-alert-hint">
+          <Share aria-hidden="true" size={16} />
+          <span>
+            <strong>{text.alertHomeScreenLead}</strong>
+            {language === "en" ? " " : ""}
+            {text.alertHomeScreen}
+          </span>
+        </p>
       ) : null}
       {report.firstSeenCalledAt ? (
         <p className="ticket-sighting">

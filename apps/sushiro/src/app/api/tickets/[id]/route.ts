@@ -1,7 +1,7 @@
 import { sushiroTicketReport as reports } from "@eslee/db/schema";
 import { and, eq, isNull } from "drizzle-orm";
 import { type NextRequest, NextResponse } from "next/server";
-import { eventTime } from "@/lib/ticket-reports";
+import { eventTime, isTicketReportId } from "@/lib/ticket-reports";
 import {
   privateTicketResponse,
   sameOrigin,
@@ -13,7 +13,7 @@ export async function PATCH(request: NextRequest, context: { params: Promise<{ i
   if (!sameOrigin(request)) return NextResponse.json({ error: "origin" }, { status: 403 });
   const { id } = await context.params;
   const owner = ticketOwner(request);
-  if (owner.fresh || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+  if (owner.fresh || !isTicketReportId(id)) {
     return NextResponse.json({ error: "missing" }, { status: 404 });
   }
   const body: unknown = await request.json().catch(() => null);

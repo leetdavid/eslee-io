@@ -37,7 +37,8 @@
     "postgres": "catalog:",
     "react": "catalog:react19",
     "react-day-picker": "^10.0.2",
-    "react-dom": "catalog:react19"
+    "react-dom": "catalog:react19",
+    "web-push": "^3.6.7"
   },
   "devDependencies": {
     "@eslee/tsconfig": "workspace:*",
@@ -48,6 +49,7 @@
     "@types/node": "catalog:node",
     "@types/react": "catalog:react19",
     "@types/react-dom": "catalog:react19",
+    "@types/web-push": "^3.6.4",
     "dotenv-cli": "catalog:",
     "drizzle-kit": "catalog:",
     "tailwindcss": "catalog:",

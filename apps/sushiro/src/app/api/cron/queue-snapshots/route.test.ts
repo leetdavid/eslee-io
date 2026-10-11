@@ -7,6 +7,7 @@ const mocks = vi.hoisted(() => ({
   storedHours: vi.fn(),
   invalidate: vi.fn(),
   reconcile: vi.fn(),
+  sendAlerts: vi.fn(),
 }));
 
 vi.mock("@/lib/db", () => ({
@@ -19,6 +20,7 @@ vi.mock("@/lib/queue-cache", () => ({
   getQueues: mocks.getQueues,
   invalidateGridChartHistory: mocks.invalidate,
 }));
+vi.mock("@/lib/ticket-push.server", () => ({ sendTicketAlerts: mocks.sendAlerts }));
 vi.mock("@/lib/ticket-reports.server", () => ({ reconcileTicketReports: mocks.reconcile }));
 
 function request(authorized = true) {
@@ -79,6 +81,19 @@ describe("queue snapshot collection", () => {
     );
     expect(mocks.invalidate).not.toHaveBeenCalled();
     expect(mocks.reconcile).not.toHaveBeenCalled();
+    expect(mocks.sendAlerts).not.toHaveBeenCalled();
+  });
+
+  it("sends ticket alerts from the snapshot it saved, and keeps the snapshot if they fail", async () => {
+    mocks.sendAlerts.mockRejectedValue(new Error("Push service unavailable"));
+
+    const response = await GET(request());
+
+    expect(response.status).toBe(200);
+    expect(mocks.sendAlerts).toHaveBeenCalledWith(
+      [{ id: 1, wait: 3, storeQueue: [123] }],
+      expect.any(Date),
+    );
   });
 
   it("does not mark a saved snapshot as failed when the optional store-hours read fails", async () => {

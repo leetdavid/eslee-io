@@ -2,6 +2,7 @@ import { sushiroTicketReport as reports } from "@eslee/db/schema";
 import { and, eq } from "drizzle-orm";
 import { type NextRequest, NextResponse } from "next/server";
 import { getQueues } from "@/lib/queue-cache";
+import { ownTicketPushes, pushKeys } from "@/lib/ticket-push.server";
 import { parseTicketReport } from "@/lib/ticket-reports";
 import {
   ownTicketReports,
@@ -25,6 +26,9 @@ export async function GET(request: NextRequest) {
         reports: owner.fresh ? [] : await ownTicketReports(owner.hash),
         stores: snapshot?.stores ?? [],
         feedAvailable: snapshot !== null,
+        // The key a browser subscribes to pushed alerts with, and the tickets that have them on.
+        pushKey: pushKeys()?.publicKey ?? null,
+        pushAlerts: owner.fresh ? [] : await ownTicketPushes(owner.hash),
       }),
       owner,
     );

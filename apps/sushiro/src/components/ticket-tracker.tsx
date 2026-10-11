@@ -14,7 +14,15 @@ import {
   type TicketReport,
 } from "@/lib/ticket-reports";
 
-type TicketData = { reports: TicketReport[]; stores: QueueStore[]; feedAvailable: boolean };
+type TicketData = {
+  reports: TicketReport[];
+  stores: QueueStore[];
+  feedAvailable: boolean;
+  // The key to subscribe to pushed alerts with, or null where the server cannot push.
+  pushKey: string | null;
+  // The tickets whose alerts the server pushes.
+  pushAlerts: string[];
+};
 
 export function TicketTracker({ initialStoreId }: { initialStoreId: string }) {
   const { language, setLanguage } = useLanguage();
@@ -82,6 +90,21 @@ export function TicketTracker({ initialStoreId }: { initialStoreId: string }) {
         : current,
     );
     setNow(Date.now());
+  }
+
+  function setPushAlert(id: string, on: boolean) {
+    mutationVersion.current++;
+    setData((current) =>
+      current
+        ? {
+            ...current,
+            pushAlerts: [
+              ...current.pushAlerts.filter((other) => other !== id),
+              ...(on ? [id] : []),
+            ],
+          }
+        : current,
+    );
   }
 
   async function submit(fields: FormData) {
@@ -298,6 +321,9 @@ export function TicketTracker({ initialStoreId }: { initialStoreId: string }) {
                     loadError ? undefined : data.stores.find(({ id }) => id === report.storeId)
                   }
                   onUpdate={updateReport}
+                  pushKey={data.pushKey}
+                  hasPush={data.pushAlerts.includes(report.id)}
+                  onPushChange={(on) => setPushAlert(report.id, on)}
                 />
               ))}
             </section>

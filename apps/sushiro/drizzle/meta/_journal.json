@@ -8,6 +8,13 @@
       "when": 1789895303066,
       "tag": "0000_burly_thena",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791684842042,
+      "tag": "0001_ticket_alert",
+      "breakpoints": true
     }
   ]
 }

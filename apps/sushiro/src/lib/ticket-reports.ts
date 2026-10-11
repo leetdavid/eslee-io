@@ -20,6 +20,10 @@ export type TicketErrors = Partial<
   Record<"storeId" | "ticketNumber" | "takenAt" | "calledAt", string>
 >;
 
+export function isTicketReportId(value: string) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+}
+
 export function ticketKey(value: unknown): string | null {
   if (typeof value !== "string" && typeof value !== "number") return null;
   const match = /^(\d{1,6})(?:-(\d{1,2}))?$/.exec(String(value).trim());

@@ -1276,6 +1276,27 @@ button.chip:hover {
   display: block;
 }
 
+/* How to get alerts on a locked iPhone. Its text lines up with the alert row above it. */
+.ticket-alert-hint {
+  align-items: flex-start;
+  color: var(--muted-foreground);
+  display: flex;
+  font-size: var(--fs-caption);
+  gap: 10px;
+  line-height: var(--lh-caption);
+  margin: 10px 0 0;
+  padding: 0 6px 0 12px;
+}
+
+.ticket-alert-hint > svg {
+  flex: none;
+}
+
+.ticket-alert-hint strong {
+  color: var(--foreground);
+  font-weight: 550;
+}
+
 /* A ticket that is nearly called, or up, carries the foreground ring. */
 .ticket-report[data-close] {
   box-shadow:
