@@ -67,7 +67,7 @@ A time within an hour of the chosen ticket time whose usual wait is at least 30%
 _Avoid_: best time, recommendation
 
 **Branch picker**:
-A searchable list of branches grouped by territory. It chooses one branch on Stats, and stars several for My branches on Plan a meal. It is a popover on wide screens and a bottom sheet on phones.
+A searchable list of branches grouped by territory. It chooses one branch on Stats, and stars several for My branches on Plan a meal. It is a popover on wide screens and a bottom sheet on phones. The sheet has two heights: it opens over six tenths of the screen, drags up to full height and down to close, and goes to full height when the search field is tapped so the matches stay above the keyboard.
 _Avoid_: dropdown, select box
 
 **Typical week**:
