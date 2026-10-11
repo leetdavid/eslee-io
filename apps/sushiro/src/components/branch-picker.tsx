@@ -1,7 +1,9 @@
 "use client";
 
+import { Drawer } from "@base-ui/react/drawer";
 import { Check, Search, Star } from "lucide-react";
-import { type ReactElement, useEffect, useState } from "react";
+import { type ReactElement, useEffect, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useIsNarrow } from "@/lib/media";
 import { copy, fill, type Language, queueBand, storeName } from "@/lib/queue-presentation";
@@ -12,6 +14,7 @@ type BranchPickerProps = {
   language: Language;
   // Called with the chosen branch, or null for all branches. Choosing closes the picker.
   onChoose?: (store: QueueStore | null) => void;
+  onOpenChange?: (open: boolean) => void;
   // Called when a branch's star is toggled. The picker stays open so several can be starred.
   onToggleSaved?: (storeId: number) => void;
   savedIds?: number[];
@@ -22,12 +25,18 @@ type BranchPickerProps = {
 };
 
 const territoryOrder: TerritoryBand[] = ["newTerritories", "kowloon", "hongKongIsland"];
+// On phones the sheet opens over this share of the screen and drags up to all of it. Its height
+// never follows the number of matches, so typing cannot shrink it behind the keyboard.
+const restingHeight = 0.6;
+const sheetHeights = [restingHeight, 1];
 
 // A searchable list of branches by territory. It chooses one branch (Stats) or stars several
-// (My branches). It is a popover on wide screens and a bottom sheet on phones.
+// (My branches). It is a popover on wide screens and a bottom sheet on phones, which drags up to
+// full height and down to close.
 export function BranchPicker({
   language,
   onChoose,
+  onOpenChange,
   onToggleSaved,
   savedIds = [],
   selectedId = null,
@@ -36,6 +45,9 @@ export function BranchPicker({
 }: BranchPickerProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [sheetHeight, setSheetHeight] = useState<Drawer.Root.SnapPoint | null>(restingHeight);
+  const sheet = useRef<HTMLDivElement>(null);
+  const searchField = useRef<HTMLInputElement>(null);
   const isNarrow = useIsNarrow();
   const text = copy[language];
   const saving = Boolean(onToggleSaved);
@@ -70,41 +82,57 @@ export function BranchPicker({
     }
   }, [open]);
 
-  useEffect(() => {
-    if (!(open && isNarrow)) {
-      return;
+  function changeOpen(next: boolean) {
+    if (next) {
+      setSheetHeight(restingHeight);
     }
 
-    function closeOnEscape(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        setOpen(false);
-      }
-    }
+    setOpen(next);
+    onOpenChange?.(next);
+  }
 
-    window.addEventListener("keydown", closeOnEscape);
-    return () => window.removeEventListener("keydown", closeOnEscape);
-  }, [isNarrow, open]);
+  function changeSheetHeight(height: Drawer.Root.SnapPoint | null) {
+    setSheetHeight(height);
+
+    // Dragging the sheet down from full height puts the keyboard away with it.
+    if (height !== 1) {
+      searchField.current?.blur();
+    }
+  }
 
   function choose(store: QueueStore | null) {
     onChoose?.(store);
-    setOpen(false);
+    changeOpen(false);
   }
 
+  // In the sheet the list is the drawer's content, so a drag on it scrolls before it closes.
+  const List = isNarrow ? Drawer.Content : "div";
   const list = (
     <div className="picker">
-      <label className="picker-search">
-        <Search aria-hidden="true" size={16} />
-        <input
-          aria-label={text.findBranch}
-          // biome-ignore lint/a11y/noAutofocus: the picker opens for typing a branch name, and only on wide screens where no keyboard slides up.
-          autoFocus={!isNarrow}
-          onChange={(event) => setSearch(event.target.value)}
-          placeholder={text.findBranch}
-          type="search"
-          value={search}
-        />
-      </label>
-      <div className="picker-list">
+      <div className="picker-find">
+        {/* A touch on the field is for typing, so it never starts a drag of the sheet. */}
+        <label className="picker-search" data-base-ui-swipe-ignore="">
+          <Search aria-hidden="true" size={16} />
+          <input
+            aria-label={text.findBranch}
+            // biome-ignore lint/a11y/noAutofocus: the picker opens for typing a branch name, and only on wide screens where no keyboard slides up.
+            autoFocus={!isNarrow}
+            onChange={(event) => setSearch(event.target.value)}
+            // The keyboard takes the lower half of a phone, so the sheet goes to full height.
+            onFocus={() => setSheetHeight(1)}
+            placeholder={text.findBranch}
+            ref={searchField}
+            type="search"
+            value={search}
+          />
+        </label>
+        {isNarrow ? (
+          <Button asChild className="h-11" variant="ghost">
+            <Drawer.Close>{saving ? text.done : text.close}</Drawer.Close>
+          </Button>
+        ) : null}
+      </div>
+      <List className="picker-list">
         {!saving && !term ? (
           <button
             aria-pressed={selectedId === null}
@@ -152,7 +180,7 @@ export function BranchPicker({
           </section>
         ))}
         {groups.length === 0 ? <p className="picker-note">{text.noBranchMatch}</p> : null}
-      </div>
+      </List>
       {term && groups.length > 0 ? (
         <p className="picker-note picker-count">
           {fill(text.branchesMatch, { count: matches.length, total: stores.length })}
@@ -163,42 +191,46 @@ export function BranchPicker({
 
   if (isNarrow) {
     return (
-      <>
-        <PickerTrigger onOpen={() => setOpen(true)} trigger={trigger} />
-        {open ? (
-          <>
-            <button
-              aria-label={text.close}
-              className="sheet-backdrop"
-              onClick={() => setOpen(false)}
-              tabIndex={-1}
-              type="button"
-            />
-            <aside aria-label={text.chooseBranch} className="picker-sheet">
-              <div className="sheet-handle" />
-              {list}
-            </aside>
-          </>
-        ) : null}
-      </>
+      <Drawer.Root
+        onOpenChange={changeOpen}
+        onSnapPointChange={changeSheetHeight}
+        open={open}
+        snapPoint={sheetHeight}
+        snapPoints={sheetHeights}
+        // One drag moves one stop: full to part height, then part height to closed.
+        snapToSequentialPoints
+      >
+        <Drawer.Trigger render={trigger} />
+        {/* Keeps the sheet and its list clear of the on-screen keyboard. */}
+        <Drawer.VirtualKeyboardProvider>
+          <Drawer.Portal>
+            <Drawer.Backdrop className="drawer-backdrop" />
+            <Drawer.Viewport className="drawer-viewport">
+              <Drawer.Popup
+                aria-label={text.chooseBranch}
+                className="picker-sheet"
+                // Focus goes to the sheet, not the search field, so no keyboard slides up yet.
+                initialFocus={sheet}
+                ref={sheet}
+              >
+                <div className="sheet-grip">
+                  <div className="sheet-handle" />
+                </div>
+                {list}
+              </Drawer.Popup>
+            </Drawer.Viewport>
+          </Drawer.Portal>
+        </Drawer.VirtualKeyboardProvider>
+      </Drawer.Root>
     );
   }
 
   return (
-    <Popover onOpenChange={setOpen} open={open}>
+    <Popover onOpenChange={changeOpen} open={open}>
       <PopoverTrigger render={trigger} />
       <PopoverContent align="end" className="picker-popover">
         {list}
       </PopoverContent>
     </Popover>
-  );
-}
-
-// On phones the trigger opens the bottom sheet directly.
-function PickerTrigger({ onOpen, trigger }: { onOpen: () => void; trigger: ReactElement }) {
-  return (
-    <span className="picker-trigger" onClickCapture={onOpen}>
-      {trigger}
-    </span>
   );
 }

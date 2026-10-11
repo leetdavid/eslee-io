@@ -22,7 +22,7 @@
     "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
-    "@base-ui/react": "^1.2.0",
+    "@base-ui/react": "^1.9.0",
     "@eslee/db": "workspace:*",
     "@radix-ui/react-slot": "^1.4.0",
     "class-variance-authority": "^0.7.1",

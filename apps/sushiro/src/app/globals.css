@@ -3185,6 +3185,14 @@ button.chip:hover {
   min-height: 0;
 }
 
+/* The search field, with the sheet's close button beside it on phones. */
+.picker-find {
+  align-items: center;
+  display: flex;
+  flex: none;
+  gap: 4px;
+}
+
 .picker-search {
   align-items: center;
   background: var(--surface-2);
@@ -3192,9 +3200,10 @@ button.chip:hover {
   box-shadow: var(--shadow-2);
   color: var(--muted-foreground);
   display: flex;
-  flex: none;
+  flex: 1;
   gap: 8px;
   height: 36px;
+  min-width: 0;
   padding: 0 10px;
 }
 
@@ -3283,23 +3292,120 @@ button.chip:hover {
   color: var(--foreground);
 }
 
-.picker-sheet {
-  background: var(--surface-3);
-  border-radius: var(--r-sheet) var(--r-sheet) 0 0;
-  bottom: 0;
-  box-shadow: var(--shadow-5);
-  display: flex;
-  flex-direction: column;
-  left: 0;
-  max-height: 80dvh;
-  padding: 8px 12px calc(12px + env(safe-area-inset-bottom));
+/* The phone picker is a bottom sheet on the Base UI drawer. It is always full height and slides
+   down by its snap offset, so it rests at part height and drags up to all of it. */
+.drawer-backdrop {
+  background: var(--scrim);
+  inset: 0;
+  min-height: 100dvh;
   position: fixed;
-  right: 0;
+  transition: opacity 300ms cubic-bezier(0.32, 0.72, 0, 1);
   z-index: 70;
 }
 
+/* iPhone Safari moves fixed layers with its toolbar. An absolute one keeps the page covered. */
+@supports (-webkit-touch-callout: none) {
+  .drawer-backdrop {
+    position: absolute;
+  }
+}
+
+.drawer-backdrop[data-starting-style],
+.drawer-backdrop[data-ending-style] {
+  opacity: 0;
+}
+
+.drawer-viewport {
+  align-items: flex-end;
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  position: fixed;
+  touch-action: none;
+  z-index: 70;
+}
+
+.picker-sheet {
+  /* The strip of page left showing above a full-height sheet. Tapping it closes the sheet. */
+  --top-gap: 24px;
+  background: var(--surface-3);
+  border-radius: var(--r-sheet) var(--r-sheet) 0 0;
+  box-shadow: var(--shadow-5);
+  display: flex;
+  flex-direction: column;
+  height: calc(100dvh - var(--top-gap));
+  outline: 0;
+  /* The bottom padding is the part of the sheet pushed below the screen, so the last rows can
+     still be scrolled into view at part height. */
+  padding: 0 12px max(0px, calc(var(--drawer-snap-point-offset) + var(--drawer-swipe-movement-y)));
+  position: relative;
+  touch-action: none;
+  transform: translateY(calc(var(--drawer-snap-point-offset) + var(--drawer-swipe-movement-y)));
+  transition: transform 300ms cubic-bezier(0.32, 0.72, 0, 1);
+  width: 100%;
+  will-change: transform;
+}
+
+/* Fills the gap under the sheet when it is pulled a little past full height. */
+.picker-sheet::after {
+  background: inherit;
+  content: "";
+  height: 48px;
+  inset-inline: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 100%;
+}
+
+.picker-sheet[data-starting-style],
+.picker-sheet[data-ending-style] {
+  padding-bottom: 0;
+  transform: translateY(100%);
+}
+
+/* A quick flick closes faster than a slow release. */
+.picker-sheet[data-ending-style],
+.drawer-backdrop[data-ending-style] {
+  transition-duration: calc(var(--drawer-swipe-strength, 1) * 240ms);
+}
+
+/* The sheet follows the finger exactly. */
+.picker-sheet[data-swiping] {
+  transition-duration: 0ms;
+  user-select: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .picker-sheet,
+  .drawer-backdrop {
+    transition-duration: 0ms;
+  }
+}
+
+/* The handle sits in a taller strip so a thumb can catch it. */
+.sheet-grip {
+  display: grid;
+  flex: none;
+  height: 28px;
+  place-items: center;
+  touch-action: none;
+}
+
+.sheet-grip .sheet-handle {
+  margin: 0;
+}
+
+/* With a field focused, the list and the match count stop above the on-screen keyboard. */
+.picker-sheet .picker {
+  flex: 1;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom) + var(--drawer-keyboard-inset, 0px));
+}
+
 .picker-sheet .picker-list {
+  flex: 1;
   max-height: none;
+  min-height: 0;
+  touch-action: pan-y;
 }
 
 .picker-sheet .picker-option {
@@ -3313,10 +3419,6 @@ button.chip:hover {
 /* 16px text keeps phones from zooming in on the field. */
 .picker-sheet .picker-search input {
   font-size: 16px;
-}
-
-.picker-trigger {
-  display: inline-flex;
 }
 
 /* Calendar: the shadcn date picker in the v2 tokens. Days are 36px, or 44px on phones. */
