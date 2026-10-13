@@ -131,3 +131,8 @@ Design frames for every site in this monorepo live on one Doop canvas: `_kQrdcpH
 - **One page per site and version:** Give each site, and each design version of that site, its own page on the canvas, named for both (e.g., `sushiro v2`). Never put two sites, or two versions of one site, on the same page.
 - **New version, new page:** Start a redesign on a new page and leave the earlier version's page as it is.
 - **Sushiro v1 has no page:** It was never drawn on Doop, by the owner's decision. Sushiro's pages start at `sushiro v2`; do not backfill v1.
+
+## 7. Commits and Unsure Decisions
+
+- **Commit after changes:** Once a change is made and verified, commit it with the `/commit` skill. The task is finished when every change you made is committed.
+- **Grill when unsure:** When the scope, behavior or approach is unclear, run `/wide-grilling-with-docs` with `/score-out-of-10` before implementing.
