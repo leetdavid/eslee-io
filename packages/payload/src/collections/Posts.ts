@@ -94,7 +94,8 @@ export const Posts: CollectionConfig = {
       unique: true,
       index: true,
       hooks: {
-        beforeValidate: [({ siblingData, value }) => slugify(value || siblingData.title)],
+        // An untitled draft gets null, because the unique index rejects a second "".
+        beforeValidate: [({ siblingData, value }) => slugify(value || siblingData.title) || null],
       },
     },
     {
