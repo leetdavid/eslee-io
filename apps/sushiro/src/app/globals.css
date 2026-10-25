@@ -258,9 +258,11 @@
   }
 }
 
-/* App shell: a top bar everywhere, tabs on wide screens, a bottom bar on phones. */
+/* App shell: a top bar everywhere, tabs on wide screens, a bottom bar on phones. The column is
+   held to the screen width, so a top bar too wide for it cannot widen and shift the page. */
 .app-shell {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto minmax(0, 1fr) auto;
   height: 100dvh;
   overflow: hidden;
@@ -425,7 +427,7 @@
   display: none;
 }
 
-/* When the data last loaded: in the top bar on wide screens, in Home's summary line on phones. */
+/* When the data last loaded: in the top bar on wide screens, in Home's summary line below 1100px. */
 .topbar-updated {
   color: var(--muted-foreground);
   font-variant-numeric: tabular-nums;
@@ -929,6 +931,28 @@ button.chip:hover {
   .home-lists {
     margin-top: 14px;
   }
+
+  /* The full top bar needs about 860px in Chinese and 1010px in English. Below 1100px it takes
+     the phone's icon buttons and leaves the update time to Home's summary line. */
+  .only-wide,
+  .topbar-updated {
+    display: none;
+  }
+
+  .only-narrow {
+    display: inline-flex;
+  }
+
+  .home-updated {
+    display: inline;
+  }
+}
+
+/* Down to the phone layout, such as an open Galaxy Z Fold, the tabs need the title's room too. */
+@media (min-width: 701px) and (max-width: 900px) {
+  .topbar-title {
+    display: none;
+  }
 }
 
 @media (max-width: 700px) {
@@ -942,21 +966,8 @@ button.chip:hover {
     gap: 4px;
   }
 
-  .nav-tabs,
-  .only-wide {
+  .nav-tabs {
     display: none;
-  }
-
-  .only-narrow {
-    display: inline-flex;
-  }
-
-  .topbar-updated {
-    display: none;
-  }
-
-  .home-updated {
-    display: inline;
   }
 
   .bottom-nav {
