@@ -287,5 +287,294 @@
         }
       }
     ]
+  },
+  "nigeria-unified": {
+    "center": [8, 9.3],
+    "radius": 9,
+    "marks": [
+      {
+        "type": "area",
+        "countries": ["566"],
+        "label": {
+          "text": "NIGERIA",
+          "at": [8, 9.6]
+        }
+      }
+    ]
+  },
+  "malaysia": {
+    "center": [109, 3.8],
+    "radius": 9.5,
+    "marks": [
+      {
+        "type": "area",
+        "countries": ["458"],
+        "label": {
+          "text": "MALAYSIA",
+          "at": [109.5, 4.6]
+        }
+      }
+    ]
+  },
+  "tanzania": {
+    "center": [35, -6.4],
+    "radius": 9,
+    "marks": [
+      {
+        "type": "area",
+        "countries": ["834"],
+        "label": {
+          "text": "TANZANIA",
+          "at": [34.8, -6]
+        }
+      }
+    ]
+  },
+  "australian-antarctic-territory": {
+    "center": [100, -76],
+    "radius": 22,
+    "marks": [
+      {
+        "type": "area",
+        "outline": [
+          [45, -60],
+          [48, -60],
+          [51, -60],
+          [54, -60],
+          [57, -60],
+          [60, -60],
+          [63, -60],
+          [66, -60],
+          [69, -60],
+          [72, -60],
+          [75, -60],
+          [78, -60],
+          [81, -60],
+          [84, -60],
+          [87, -60],
+          [90, -60],
+          [93, -60],
+          [96, -60],
+          [99, -60],
+          [102, -60],
+          [105, -60],
+          [108, -60],
+          [111, -60],
+          [114, -60],
+          [117, -60],
+          [120, -60],
+          [123, -60],
+          [126, -60],
+          [129, -60],
+          [132, -60],
+          [135, -60],
+          [136, -60],
+          [136, -89.5],
+          [136, -89.5],
+          [133, -89.5],
+          [130, -89.5],
+          [127, -89.5],
+          [124, -89.5],
+          [121, -89.5],
+          [118, -89.5],
+          [115, -89.5],
+          [112, -89.5],
+          [109, -89.5],
+          [106, -89.5],
+          [103, -89.5],
+          [100, -89.5],
+          [97, -89.5],
+          [94, -89.5],
+          [91, -89.5],
+          [88, -89.5],
+          [85, -89.5],
+          [82, -89.5],
+          [79, -89.5],
+          [76, -89.5],
+          [73, -89.5],
+          [70, -89.5],
+          [67, -89.5],
+          [64, -89.5],
+          [61, -89.5],
+          [58, -89.5],
+          [55, -89.5],
+          [52, -89.5],
+          [49, -89.5],
+          [46, -89.5],
+          [45, -89.5]
+        ],
+        "clipTo": ["010"],
+        "label": {
+          "text": "AUSTRALIAN ANTARCTIC",
+          "at": [100, -76]
+        }
+      },
+      {
+        "type": "area",
+        "outline": [
+          [142, -60],
+          [145, -60],
+          [148, -60],
+          [151, -60],
+          [154, -60],
+          [157, -60],
+          [160, -60],
+          [160, -89.5],
+          [160, -89.5],
+          [157, -89.5],
+          [154, -89.5],
+          [151, -89.5],
+          [148, -89.5],
+          [145, -89.5],
+          [142, -89.5]
+        ],
+        "clipTo": ["010"]
+      }
+    ]
+  },
+  "name-iran": {
+    "center": [53.7, 32.4],
+    "radius": 11,
+    "marks": [
+      {
+        "type": "area",
+        "countries": ["364"],
+        "label": {
+          "text": "IRAN",
+          "at": [54.5, 32.6]
+        }
+      }
+    ]
+  },
+  "libya-independent": {
+    "center": [17.5, 27],
+    "radius": 12,
+    "marks": [
+      {
+        "type": "area",
+        "countries": ["434"],
+        "label": {
+          "text": "LIBYA",
+          "at": [17.5, 27.5]
+        }
+      }
+    ]
+  },
+  "mali": {
+    "center": [-4, 16.5],
+    "radius": 11,
+    "marks": [
+      {
+        "type": "area",
+        "countries": ["466"],
+        "label": {
+          "text": "MALI",
+          "at": [-1.5, 18.5]
+        }
+      },
+      {
+        "type": "city",
+        "at": [-8, 12.65],
+        "name": "Bamako"
+      }
+    ]
+  },
+  "french-madagascar": {
+    "center": [46.8, -19],
+    "radius": 9,
+    "marks": [
+      {
+        "type": "area",
+        "countries": ["450"],
+        "label": {
+          "text": "MADAGASCAR (FR.)",
+          "at": [46.5, -19.5]
+        }
+      }
+    ]
+  },
+  "belgian-congo": {
+    "center": [23.5, -3],
+    "radius": 14,
+    "marks": [
+      {
+        "type": "area",
+        "countries": ["180"],
+        "label": {
+          "text": "BELGIAN CONGO",
+          "at": [23.5, -2.5]
+        }
+      }
+    ]
+  },
+  "french-equatorial-africa": {
+    "center": [17.5, 9],
+    "radius": 16,
+    "marks": [
+      {
+        "type": "area",
+        "countries": ["266", "178", "140", "148"],
+        "label": {
+          "text": "FR. EQUATORIAL AFRICA",
+          "at": [18, 10.5]
+        }
+      }
+    ]
+  },
+  "ghana": {
+    "center": [-1.2, 7.9],
+    "radius": 5,
+    "marks": [
+      {
+        "type": "area",
+        "countries": ["288"],
+        "label": {
+          "text": "GHANA",
+          "at": [-1.2, 8.2]
+        }
+      }
+    ]
+  },
+  "guinea": {
+    "center": [-11, 10.4],
+    "radius": 5,
+    "marks": [
+      {
+        "type": "area",
+        "countries": ["324"],
+        "label": {
+          "text": "GUINEA",
+          "at": [-10.6, 10.9]
+        }
+      }
+    ]
+  },
+  "italian-somaliland": {
+    "center": [46.3, 5.4],
+    "radius": 8.5,
+    "marks": [
+      {
+        "type": "area",
+        "countries": ["706"],
+        "label": {
+          "text": "ITALIAN SOMALILAND",
+          "at": [45.4, 4.6]
+        }
+      }
+    ]
+  },
+  "kremenchuk-reservoir": {
+    "center": [32.9, 49.3],
+    "radius": 1.2,
+    "marks": [
+      {
+        "type": "water",
+        "lakes": ["Kremenchuk Reservoir"],
+        "label": {
+          "text": "KREMENCHUG RES.",
+          "at": [32.9, 49.75]
+        }
+      }
+    ]
   }
 }

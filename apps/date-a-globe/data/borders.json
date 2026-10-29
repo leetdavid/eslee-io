@@ -1,4 +1,112 @@
 {
+  "Afghanistan / Iran": {
+    "spans": [
+      {
+        "from": "1905",
+        "until": null
+      }
+    ],
+    "note": "Persia–Afghanistan line, settled by the McMahon award of 1905."
+  },
+  "Afghanistan / Pakistan": {
+    "spans": [
+      {
+        "from": "1893",
+        "until": null
+      }
+    ],
+    "note": "The Durand Line, British India's border with Afghanistan from 1893."
+  },
+  "Afghanistan / Turkmenistan": {
+    "spans": [
+      {
+        "from": "1887",
+        "until": null
+      }
+    ],
+    "note": "The Russo-Afghan line of 1887."
+  },
+  "Algeria / Mauritania": {
+    "spans": [
+      {
+        "from": "1962-07",
+        "until": null
+      }
+    ],
+    "note": "International once Algeria became independent; colonial maps drew it loosely."
+  },
+  "Algeria / Niger": {
+    "spans": [
+      {
+        "from": "1962-07",
+        "until": null
+      }
+    ],
+    "note": "International once Algeria became independent."
+  },
+  "Algeria / Tunisia": {
+    "spans": [
+      {
+        "from": "1970-01",
+        "until": null
+      }
+    ],
+    "note": "The southern end was disputed until the 1970 agreement."
+  },
+  "Angola / Congo": {
+    "spans": [
+      {
+        "from": "1886",
+        "until": null
+      }
+    ],
+    "note": "Cabinda against French Congo, Franco-Portuguese convention of 1886."
+  },
+  "Angola / Dem. Rep. Congo": {
+    "spans": [
+      {
+        "from": "1927",
+        "until": null
+      }
+    ],
+    "note": "Settled once the Dilolo exchange of 1927 took effect."
+  },
+  "Angola / Namibia": {
+    "spans": [
+      {
+        "from": "1926",
+        "until": null
+      }
+    ],
+    "note": "Final after the 1926 Kunene adjustment."
+  },
+  "Angola / Zambia": {
+    "spans": [
+      {
+        "from": "1905",
+        "until": null
+      }
+    ],
+    "note": "The Barotse boundary award of 1905."
+  },
+  "Armenia / Azerbaijan": {
+    "spans": [
+      {
+        "from": "1991-12",
+        "until": null
+      }
+    ],
+    "note": "A Soviet republic line until the Soviet Union ended."
+  },
+  "Armenia / Turkey": {
+    "spans": [
+      {
+        "from": "1921-10",
+        "until": null
+      }
+    ],
+    "note": "The Treaty of Kars, 1921."
+  },
   "Austria / Czechia": {
     "spans": [
       {
@@ -77,6 +185,33 @@
     ],
     "note": "Vorarlberg and Tyrol against Switzerland since 1815."
   },
+  "Azerbaijan / Georgia": {
+    "spans": [
+      {
+        "from": "1991-12",
+        "until": null
+      }
+    ],
+    "note": "A Soviet republic line until the Soviet Union ended."
+  },
+  "Azerbaijan / Russia": {
+    "spans": [
+      {
+        "from": "1991-12",
+        "until": null
+      }
+    ],
+    "note": "A Soviet republic line until the Soviet Union ended."
+  },
+  "Azerbaijan / Turkey": {
+    "spans": [
+      {
+        "from": "1932",
+        "until": null
+      }
+    ],
+    "note": "Turkey's short border with Nakhchivan came with the 1932 Turkey–Iran exchange."
+  },
   "Belgium / France": {
     "spans": [
       {
@@ -117,6 +252,244 @@
     ],
     "note": "Treaty of London, 1839."
   },
+  "Benin / Burkina Faso": {
+    "spans": [
+      {
+        "from": "1947-09",
+        "until": null
+      }
+    ],
+    "note": "Upper Volta was split up 1932–47; this line dates from its return."
+  },
+  "Benin / Niger": {
+    "spans": [
+      {
+        "from": "1922",
+        "until": null
+      }
+    ],
+    "note": "Dahomey against the colony of Niger, along the Niger river."
+  },
+  "Benin / Nigeria": {
+    "spans": [
+      {
+        "from": "1906",
+        "until": null
+      }
+    ],
+    "note": "Anglo-French convention of 1906."
+  },
+  "Benin / Togo": {
+    "spans": [
+      {
+        "from": "1897",
+        "until": null
+      }
+    ],
+    "note": "Dahomey against German Togo, 1897; the same line under French Togo."
+  },
+  "Bhutan / India": {
+    "spans": [
+      {
+        "from": "1865",
+        "until": null
+      }
+    ],
+    "note": "Bhutan against British India after the Duars War of 1865."
+  },
+  "Bulgaria / Greece": {
+    "spans": [
+      {
+        "from": "1923-07",
+        "until": null
+      }
+    ],
+    "note": "Fixed once Western Thrace was Greek, confirmed at Lausanne in 1923."
+  },
+  "Bulgaria / Turkey": {
+    "spans": [
+      {
+        "from": "1923-07",
+        "until": null
+      }
+    ],
+    "note": "The Thracian line as confirmed at Lausanne in 1923."
+  },
+  "Burkina Faso / Côte d'Ivoire": {
+    "spans": [
+      {
+        "from": "1947-09",
+        "until": null
+      }
+    ],
+    "note": "Upper Volta was split up 1932–47; this line dates from its return."
+  },
+  "Burkina Faso / Ghana": {
+    "spans": [
+      {
+        "from": "1898",
+        "until": null
+      }
+    ],
+    "note": "The Gold Coast's northern boundary, Anglo-French convention of 1898."
+  },
+  "Burkina Faso / Mali": {
+    "spans": [
+      {
+        "from": "1947-09",
+        "until": null
+      }
+    ],
+    "note": "Upper Volta was split up 1932–47; this line dates from its return."
+  },
+  "Burkina Faso / Niger": {
+    "spans": [
+      {
+        "from": "1947-09",
+        "until": null
+      }
+    ],
+    "note": "Upper Volta was split up 1932–47; this line dates from its return."
+  },
+  "Burkina Faso / Togo": {
+    "spans": [
+      {
+        "from": "1947-09",
+        "until": null
+      }
+    ],
+    "note": "Upper Volta was split up 1932–47; this line dates from its return."
+  },
+  "Burundi / Dem. Rep. Congo": {
+    "spans": [
+      {
+        "from": "1910",
+        "until": null
+      }
+    ],
+    "note": "The Rusizi and Lake Tanganyika, German–Belgian agreement of 1910."
+  },
+  "Burundi / Rwanda": {
+    "spans": [
+      {
+        "from": "1962-07",
+        "until": null
+      }
+    ],
+    "note": "Inside Ruanda-Urundi until independence."
+  },
+  "Burundi / Tanzania": {
+    "spans": [
+      {
+        "from": "1924",
+        "until": null
+      }
+    ],
+    "note": "Ruanda-Urundi against Tanganyika after the 1923–24 adjustments."
+  },
+  "Cambodia / Laos": {
+    "spans": [
+      {
+        "from": "1954-07",
+        "until": null
+      }
+    ],
+    "note": "Inside French Indochina until 1954."
+  },
+  "Cambodia / Thailand": {
+    "spans": [
+      {
+        "from": "1907",
+        "until": "1941-05"
+      },
+      {
+        "from": "1946-11",
+        "until": null
+      }
+    ],
+    "note": "The 1907 Franco-Siamese line; Thailand held the west 1941–46."
+  },
+  "Cambodia / Vietnam": {
+    "spans": [
+      {
+        "from": "1954-07",
+        "until": null
+      }
+    ],
+    "note": "Inside French Indochina until 1954."
+  },
+  "Cameroon / Central African Rep.": {
+    "spans": [
+      {
+        "from": "1920",
+        "until": null
+      }
+    ],
+    "note": "Restored after the 1911–19 German Neukamerun cession."
+  },
+  "Cameroon / Chad": {
+    "spans": [
+      {
+        "from": "1920",
+        "until": null
+      }
+    ],
+    "note": "Restored after the 1911–19 German Neukamerun cession."
+  },
+  "Cameroon / Congo": {
+    "spans": [
+      {
+        "from": "1920",
+        "until": null
+      }
+    ],
+    "note": "Restored after the 1911–19 German Neukamerun cession."
+  },
+  "Cameroon / Eq. Guinea": {
+    "spans": [
+      {
+        "from": "1900",
+        "until": null
+      }
+    ],
+    "note": "Rio Muni's northern line, 1900."
+  },
+  "Cameroon / Gabon": {
+    "spans": [
+      {
+        "from": "1920",
+        "until": null
+      }
+    ],
+    "note": "Restored after the 1911–19 German Neukamerun cession."
+  },
+  "Cameroon / Nigeria": {
+    "spans": [
+      {
+        "from": "1961-10",
+        "until": null
+      }
+    ],
+    "note": "Set by the 1961 Cameroons plebiscites."
+  },
+  "Central African Rep. / Chad": {
+    "spans": [
+      {
+        "from": "1960-08",
+        "until": null
+      }
+    ],
+    "note": "Inside French Equatorial Africa until independence; drawn loosely before."
+  },
+  "Central African Rep. / Congo": {
+    "spans": [
+      {
+        "from": "1960-08",
+        "until": null
+      }
+    ],
+    "note": "Inside French Equatorial Africa until independence; drawn loosely before."
+  },
   "Central African Rep. / Dem. Rep. Congo": {
     "spans": [
       {
@@ -125,6 +498,60 @@
       }
     ],
     "note": "The Ubangi and Mbomu rivers, set between French Congo and the Congo Free State in 1887."
+  },
+  "Central African Rep. / S. Sudan": {
+    "spans": [
+      {
+        "from": "1924",
+        "until": null
+      }
+    ],
+    "note": "Ubangi-Shari against the Sudan, demarcated by 1924."
+  },
+  "Central African Rep. / Sudan": {
+    "spans": [
+      {
+        "from": "1924",
+        "until": null
+      }
+    ],
+    "note": "Ubangi-Shari against the Sudan, demarcated by 1924."
+  },
+  "Chad / Sudan": {
+    "spans": [
+      {
+        "from": "1924",
+        "until": null
+      }
+    ],
+    "note": "Wadai against Darfur, agreed 1919 and demarcated by 1924."
+  },
+  "China / Laos": {
+    "spans": [
+      {
+        "from": "1895",
+        "until": null
+      }
+    ],
+    "note": "French Indochina against China, convention of 1895."
+  },
+  "China / North Korea": {
+    "spans": [
+      {
+        "from": "1909",
+        "until": null
+      }
+    ],
+    "note": "The Yalu and Tumen, settled with the Gando convention of 1909."
+  },
+  "Congo / Gabon": {
+    "spans": [
+      {
+        "from": "1946",
+        "until": null
+      }
+    ],
+    "note": "Final when the Haut-Ogooué went back to Gabon in 1946."
   },
   "Czechia / Germany": {
     "spans": [
@@ -147,6 +574,78 @@
       }
     ],
     "note": "Czechoslovakia against Poland once Silesia became Polish in 1945."
+  },
+  "Côte d'Ivoire / Ghana": {
+    "spans": [
+      {
+        "from": "1905",
+        "until": null
+      }
+    ],
+    "note": "Gold Coast against Ivory Coast, Anglo-French agreement of 1905."
+  },
+  "Côte d'Ivoire / Liberia": {
+    "spans": [
+      {
+        "from": "1911",
+        "until": null
+      }
+    ],
+    "note": "Franco-Liberian agreements, final in 1911."
+  },
+  "Côte d'Ivoire / Mali": {
+    "spans": [
+      {
+        "from": "1947-09",
+        "until": null
+      }
+    ],
+    "note": "Redrawn when Upper Volta was split up in 1932 and put back in 1947."
+  },
+  "Dem. Rep. Congo / Rwanda": {
+    "spans": [
+      {
+        "from": "1910",
+        "until": null
+      }
+    ],
+    "note": "Lake Kivu line, German–Belgian agreement of 1910."
+  },
+  "Dem. Rep. Congo / S. Sudan": {
+    "spans": [
+      {
+        "from": "1910-06",
+        "until": null
+      }
+    ],
+    "note": "Settled once the Lado Enclave went to the Sudan in 1910."
+  },
+  "Dem. Rep. Congo / Tanzania": {
+    "spans": [
+      {
+        "from": "1910",
+        "until": null
+      }
+    ],
+    "note": "Lake Tanganyika, German–Belgian agreement of 1910."
+  },
+  "Dem. Rep. Congo / Uganda": {
+    "spans": [
+      {
+        "from": "1915",
+        "until": null
+      }
+    ],
+    "note": "Settled by the 1910–15 Anglo-Belgian adjustments."
+  },
+  "Dem. Rep. Congo / Zambia": {
+    "spans": [
+      {
+        "from": "1894",
+        "until": null
+      }
+    ],
+    "note": "Congo Free State against British Central Africa, 1894."
   },
   "Denmark / Germany": {
     "spans": [
@@ -175,6 +674,24 @@
     ],
     "note": "French and British Somaliland, Anglo-French agreement of 1888."
   },
+  "Egypt / Sudan": {
+    "spans": [
+      {
+        "from": "1899",
+        "until": null
+      }
+    ],
+    "note": "The 22nd parallel of the 1899 condominium agreement."
+  },
+  "Eq. Guinea / Gabon": {
+    "spans": [
+      {
+        "from": "1900",
+        "until": null
+      }
+    ],
+    "note": "Rio Muni against French Congo, Franco-Spanish treaty of 1900."
+  },
   "Ethiopia / Somaliland": {
     "spans": [
       {
@@ -183,6 +700,24 @@
       }
     ],
     "note": "British Somaliland and Ethiopia, Anglo-Ethiopian treaty of 1897."
+  },
+  "Finland / Norway": {
+    "spans": [
+      {
+        "from": "1826",
+        "until": null
+      }
+    ],
+    "note": "The 1826 Norway–Russia line, Finland's from 1917."
+  },
+  "Finland / Sweden": {
+    "spans": [
+      {
+        "from": "1809",
+        "until": null
+      }
+    ],
+    "note": "The Torne river line, from 1809."
   },
   "France / Germany": {
     "spans": [
@@ -218,6 +753,15 @@
       }
     ],
     "note": "Complete once Savoy went to France in 1860."
+  },
+  "Gambia / Senegal": {
+    "spans": [
+      {
+        "from": "1889",
+        "until": null
+      }
+    ],
+    "note": "Anglo-French agreement of 1889."
   },
   "Germany / Luxembourg": {
     "spans": [
@@ -263,6 +807,118 @@
     ],
     "note": "The Rhine and Lake Constance line, unchanged since 1815."
   },
+  "Ghana / Togo": {
+    "spans": [
+      {
+        "from": "1920",
+        "until": null
+      }
+    ],
+    "note": "The British and French Togoland line of 1919–20, Ghana's since 1957."
+  },
+  "Greece / Turkey": {
+    "spans": [
+      {
+        "from": "1923-07",
+        "until": null
+      }
+    ],
+    "note": "The Evros line, Treaty of Lausanne, 1923."
+  },
+  "Guinea / Guinea-Bissau": {
+    "spans": [
+      {
+        "from": "1886",
+        "until": null
+      }
+    ],
+    "note": "Franco-Portuguese convention of 1886."
+  },
+  "Guinea / Liberia": {
+    "spans": [
+      {
+        "from": "1911",
+        "until": null
+      }
+    ],
+    "note": "Franco-Liberian agreements, final in 1911."
+  },
+  "Guinea / Sierra Leone": {
+    "spans": [
+      {
+        "from": "1895",
+        "until": null
+      }
+    ],
+    "note": "Anglo-French agreement of 1895."
+  },
+  "Guinea-Bissau / Senegal": {
+    "spans": [
+      {
+        "from": "1886",
+        "until": null
+      }
+    ],
+    "note": "Franco-Portuguese convention of 1886."
+  },
+  "India / Nepal": {
+    "spans": [
+      {
+        "from": "1860",
+        "until": null
+      }
+    ],
+    "note": "Nepal against British India, final with the 1860 return of the Terai."
+  },
+  "Iran / Pakistan": {
+    "spans": [
+      {
+        "from": "1896",
+        "until": null
+      }
+    ],
+    "note": "Persia against British Baluchistan, demarcated by 1896."
+  },
+  "Iraq / Kuwait": {
+    "spans": [
+      {
+        "from": "1923",
+        "until": "1990-08"
+      },
+      {
+        "from": "1991-02",
+        "until": null
+      }
+    ],
+    "note": "Agreed in 1923; erased during the 1990–91 annexation."
+  },
+  "Iraq / Syria": {
+    "spans": [
+      {
+        "from": "1932",
+        "until": null
+      }
+    ],
+    "note": "Fixed by the League of Nations in 1932."
+  },
+  "Iraq / Turkey": {
+    "spans": [
+      {
+        "from": "1926-06",
+        "until": null
+      }
+    ],
+    "note": "Treaty of Ankara, 1926."
+  },
+  "Italy / San Marino": {
+    "spans": [
+      {
+        "from": "1700",
+        "until": null
+      }
+    ],
+    "note": "San Marino's border, unchanged for centuries."
+  },
   "Italy / Switzerland": {
     "spans": [
       {
@@ -272,6 +928,100 @@
     ],
     "note": "Ticino and Graubünden against Lombardy and Piedmont, then Italy."
   },
+  "Kazakhstan / Turkmenistan": {
+    "spans": [
+      {
+        "from": "1991-12",
+        "until": null
+      }
+    ],
+    "note": "A Soviet republic line until the Soviet Union ended."
+  },
+  "Kazakhstan / Uzbekistan": {
+    "spans": [
+      {
+        "from": "1991-12",
+        "until": null
+      }
+    ],
+    "note": "A Soviet republic line until the Soviet Union ended."
+  },
+  "Kenya / Somalia": {
+    "spans": [
+      {
+        "from": "1925-07",
+        "until": null
+      }
+    ],
+    "note": "Jubaland went from Kenya to Italian Somaliland in 1925."
+  },
+  "Kenya / Tanzania": {
+    "spans": [
+      {
+        "from": "1890",
+        "until": null
+      }
+    ],
+    "note": "Anglo-German agreements of 1886–90."
+  },
+  "Kenya / Uganda": {
+    "spans": [
+      {
+        "from": "1926",
+        "until": null
+      }
+    ],
+    "note": "Final after Uganda's Rudolf Province went to Kenya in 1926."
+  },
+  "Kuwait / Saudi Arabia": {
+    "spans": [
+      {
+        "from": "1969",
+        "until": null
+      }
+    ],
+    "note": "The Neutral Zone was divided in 1969."
+  },
+  "Laos / Myanmar": {
+    "spans": [
+      {
+        "from": "1896",
+        "until": null
+      }
+    ],
+    "note": "The Mekong, Anglo-French declaration of 1896."
+  },
+  "Laos / Thailand": {
+    "spans": [
+      {
+        "from": "1907",
+        "until": "1941-05"
+      },
+      {
+        "from": "1946-11",
+        "until": null
+      }
+    ],
+    "note": "The Mekong and the 1904–07 lines; Thailand held the west bank 1941–46."
+  },
+  "Lesotho / South Africa": {
+    "spans": [
+      {
+        "from": "1869",
+        "until": null
+      }
+    ],
+    "note": "Basutoland's border, Treaty of Aliwal North, 1869."
+  },
+  "Liberia / Sierra Leone": {
+    "spans": [
+      {
+        "from": "1911",
+        "until": null
+      }
+    ],
+    "note": "Anglo-Liberian agreement of 1911."
+  },
   "Liechtenstein / Switzerland": {
     "spans": [
       {
@@ -280,5 +1030,248 @@
       }
     ],
     "note": "The Rhine, unchanged."
+  },
+  "Malawi / Mozambique": {
+    "spans": [
+      {
+        "from": "1891",
+        "until": null
+      }
+    ],
+    "note": "Anglo-Portuguese treaty of 1891."
+  },
+  "Malawi / Tanzania": {
+    "spans": [
+      {
+        "from": "1890",
+        "until": null
+      }
+    ],
+    "note": "Anglo-German agreement of 1890."
+  },
+  "Malawi / Zambia": {
+    "spans": [
+      {
+        "from": "1891",
+        "until": null
+      }
+    ],
+    "note": "Nyasaland against North-Eastern Rhodesia, 1891."
+  },
+  "Mali / Mauritania": {
+    "spans": [
+      {
+        "from": "1944",
+        "until": null
+      }
+    ],
+    "note": "The Hodh went from French Sudan to Mauritania in 1944."
+  },
+  "Mali / Niger": {
+    "spans": [
+      {
+        "from": "1947-09",
+        "until": null
+      }
+    ],
+    "note": "Redrawn when Upper Volta was split up in 1932 and put back in 1947."
+  },
+  "Mauritania / Senegal": {
+    "spans": [
+      {
+        "from": "1920",
+        "until": null
+      }
+    ],
+    "note": "The Senegal river, from Mauritania's founding as a colony."
+  },
+  "Mauritania / W. Sahara": {
+    "spans": [
+      {
+        "from": "1912",
+        "until": null
+      }
+    ],
+    "note": "Franco-Spanish conventions, final in 1912."
+  },
+  "Mozambique / South Africa": {
+    "spans": [
+      {
+        "from": "1875",
+        "until": null
+      }
+    ],
+    "note": "Delagoa Bay award of 1875 and the earlier Transvaal line."
+  },
+  "Mozambique / Zambia": {
+    "spans": [
+      {
+        "from": "1891",
+        "until": null
+      }
+    ],
+    "note": "Anglo-Portuguese treaty of 1891."
+  },
+  "Mozambique / Zimbabwe": {
+    "spans": [
+      {
+        "from": "1891",
+        "until": null
+      }
+    ],
+    "note": "Anglo-Portuguese treaty of 1891."
+  },
+  "Mozambique / eSwatini": {
+    "spans": [
+      {
+        "from": "1888",
+        "until": null
+      }
+    ],
+    "note": "Swaziland against Portuguese East Africa, 1888."
+  },
+  "Myanmar / Thailand": {
+    "spans": [
+      {
+        "from": "1868",
+        "until": null
+      }
+    ],
+    "note": "Burma against Siam, settled by 1868."
+  },
+  "Namibia / South Africa": {
+    "spans": [
+      {
+        "from": "1890",
+        "until": null
+      }
+    ],
+    "note": "The Orange river, Anglo-German agreement of 1890."
+  },
+  "Namibia / Zambia": {
+    "spans": [
+      {
+        "from": "1890",
+        "until": null
+      }
+    ],
+    "note": "The Caprivi Strip, Anglo-German agreement of 1890."
+  },
+  "Niger / Nigeria": {
+    "spans": [
+      {
+        "from": "1906",
+        "until": null
+      }
+    ],
+    "note": "Anglo-French convention of 1906."
+  },
+  "Norway / Sweden": {
+    "spans": [
+      {
+        "from": "1815",
+        "until": null
+      }
+    ],
+    "note": "Drawn between the two kingdoms throughout their union."
+  },
+  "Rwanda / Tanzania": {
+    "spans": [
+      {
+        "from": "1924",
+        "until": null
+      }
+    ],
+    "note": "Ruanda-Urundi against Tanganyika after the 1923–24 adjustments."
+  },
+  "Rwanda / Uganda": {
+    "spans": [
+      {
+        "from": "1910",
+        "until": null
+      }
+    ],
+    "note": "Anglo-German agreement of 1910."
+  },
+  "S. Sudan / Sudan": {
+    "spans": [
+      {
+        "from": "2011-07",
+        "until": null
+      }
+    ],
+    "note": "South Sudan's independence."
+  },
+  "S. Sudan / Uganda": {
+    "spans": [
+      {
+        "from": "1914",
+        "until": null
+      }
+    ],
+    "note": "Sudan–Uganda adjustment of 1914."
+  },
+  "South Africa / Zimbabwe": {
+    "spans": [
+      {
+        "from": "1891",
+        "until": null
+      }
+    ],
+    "note": "The Limpopo."
+  },
+  "South Africa / eSwatini": {
+    "spans": [
+      {
+        "from": "1894",
+        "until": null
+      }
+    ],
+    "note": "Swaziland's border with the Transvaal, 1894."
+  },
+  "Syria / Turkey": {
+    "spans": [
+      {
+        "from": "1939-06",
+        "until": null
+      }
+    ],
+    "note": "Final when Hatay joined Turkey in 1939."
+  },
+  "Tanzania / Uganda": {
+    "spans": [
+      {
+        "from": "1890",
+        "until": null
+      }
+    ],
+    "note": "Anglo-German agreement of 1890."
+  },
+  "Tanzania / Zambia": {
+    "spans": [
+      {
+        "from": "1890",
+        "until": null
+      }
+    ],
+    "note": "Anglo-German agreement of 1890."
+  },
+  "Turkmenistan / Uzbekistan": {
+    "spans": [
+      {
+        "from": "1991-12",
+        "until": null
+      }
+    ],
+    "note": "A Soviet republic line until the Soviet Union ended."
+  },
+  "Zambia / Zimbabwe": {
+    "spans": [
+      {
+        "from": "1891",
+        "until": null
+      }
+    ],
+    "note": "The Zambezi, between the Rhodesias."
   }
 }
