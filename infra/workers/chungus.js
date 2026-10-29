@@ -10,6 +10,13 @@ export default {
     const headers = new Headers(request.headers);
     headers.delete("host");
 
+    // Cyrus checks webhook sources against GitHub's and Linear's IP allowlists using the leftmost
+    // X-Forwarded-For entry. Funnel appends this Worker's egress IP, so lead with the real client.
+    const clientIp = request.headers.get("cf-connecting-ip");
+    if (clientIp) {
+      headers.set("x-forwarded-for", clientIp);
+    }
+
     return fetch(url, {
       method: request.method,
       headers,
