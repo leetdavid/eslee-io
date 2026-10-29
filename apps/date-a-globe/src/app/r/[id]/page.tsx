@@ -3,9 +3,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Certificate, type Pin } from "@/components/certificate";
 import { CloseIcon } from "@/components/icons";
-import { AnotherGlobe, PrintedYear, ShareButton } from "@/components/result-actions";
+import { AnotherGlobe, KeepGoing, PrintedYear, ShareButton } from "@/components/result-actions";
 import { Trail } from "@/components/scales";
-import { dateLabel, monthLabel, yearOf } from "@/engine";
+import { dateLabel, KEEP_GOING, monthLabel, yearOf } from "@/engine";
+import { currentEvents } from "@/server/events";
 import { alsoNew, resultFor } from "@/server/results";
 
 export const dynamic = "force-dynamic";
@@ -48,6 +49,14 @@ export default async function ResultPage({ params }: Params) {
       : [];
   });
   const skipped = turns.filter((t) => t.answer === "cant").length;
+  // Keep going is offered while a question could still narrow the range (a trial question alone doesn't).
+  const { engine } = await currentEvents();
+  const known = turns.filter((t) => engine.knows(t.eventId));
+  const more = engine.next(setup, known, {
+    answers: known.filter((t) => t.answer !== "cant").length + KEEP_GOING.answers,
+    narrowing: KEEP_GOING.narrowing,
+  });
+  const canGoOn = more.type === "ask" && more.reason !== "trial";
   const title = (eventId: string) => events.get(eventId)?.title ?? "An event we no longer ask";
   const shown = (eventId: string, turn: number) =>
     turns[turn]?.answer === "yes"
@@ -78,7 +87,7 @@ export default async function ResultPage({ params }: Params) {
         <div className="qn">
           <b>Dated</b>
           <span>
-            {turns.length} questions{skipped ? ` · ${skipped} can't see` : ""}
+            {turns.length} questions{skipped ? ` · ${skipped} can't tell` : ""}
             {result.setAside.length ? ` · ${result.setAside.length} set aside` : ""}
           </span>
         </div>
@@ -90,6 +99,8 @@ export default async function ResultPage({ params }: Params) {
       <p className="text-center text-[13px] text-muted">
         Most likely month: <b className="font-semibold text-ink">{monthLabel(result.mostLikely)}</b>
       </p>
+
+      {canGoOn && <KeepGoing id={play.id} label={result.label} answers={turns.length} />}
 
       {result.hinge && (
         <section className="tile flex items-center gap-3">

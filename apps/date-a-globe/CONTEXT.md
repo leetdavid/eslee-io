@@ -28,9 +28,9 @@ _Avoid_: exploration event
 The yes/no prompt an event becomes when asked, such as "Is there a country called Botswana?". Yes always means the feature is shown.
 _Avoid_: clue, test
 
-**Can't see**:
-The answer for a feature the player can't find or read on their globe. It removes no years, and it tells the engine that area may be off the globe.
-_Avoid_: skip, unknown
+**Can't tell**:
+The answer when the part of the globe a question asks about is cut off or too small to read. A feature that's simply not there is a No. It removes no years, and on a world map or part of the world it tells the engine that area may be off the map. Shown as "can't" on the trail.
+_Avoid_: can't see (the old label, which read like No), skip, unknown
 
 **Misread**:
 An answer that disagrees with the globe's true printing date. The engine expects a few and absorbs them.
@@ -47,6 +47,10 @@ _Avoid_: map age, delay
 **Range**:
 The stretch of time the result says the globe was most likely printed in, the shortest one holding 90% of the likelihood. Its ends are given to the month only where the answers can tell months apart; otherwise to the year.
 _Avoid_: window, estimate, confidence interval
+
+**Keep going**:
+Carrying on a finished game from its reveal, for the player only, with up to ten more answers while a question could still narrow the range by a month. It saves a new result, so a shared link never changes.
+_Avoid_: continue, extend, more questions
 
 **Most likely month**:
 The single month with the highest likelihood, shown beneath the range.

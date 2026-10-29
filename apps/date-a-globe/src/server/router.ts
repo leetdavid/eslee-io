@@ -72,13 +72,15 @@ const eventId = z.object({ id: z.string().max(80) });
 
 export const appRouter = t.router({
   savePlay: t.procedure
-    .input(z.object({ setup: setupSchema, turns: turnsSchema }))
+    .input(
+      z.object({ setup: setupSchema, turns: turnsSchema, from: z.string().max(12).optional() }),
+    )
     .mutation(({ input, ctx }) =>
       guarded(async () => {
         const db = await getDatabase();
         await charge(db, "play", ctx.ip);
         const { engine, events } = await currentEvents();
-        const play = await savePlay(db, engine, events, input.setup, input.turns);
+        const play = await savePlay(db, engine, events, input.setup, input.turns, input.from);
         return { id: play.id };
       }),
     ),

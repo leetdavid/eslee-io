@@ -10,6 +10,7 @@ import {
   type Answer,
   createEngine,
   type Engine,
+  KEEP_GOING,
   MAX_ANSWERS,
   type Next,
   type Setup,
@@ -26,9 +27,18 @@ const EARLY_OUT_AFTER = 5;
 interface Props {
   /** Reopen a saved game to ask one of its answers again. */
   recheck?: { id: string; turn: number };
+  /** Keep going: reopen a saved game and ask more questions after its last answer. */
+  more?: string;
 }
 
-export function Game({ recheck }: Props) {
+/** Where Keep going picked the game up, and how much further it may go. */
+interface Going {
+  start: number;
+  answers: number;
+  narrowing: number;
+}
+
+export function Game({ recheck, more }: Props) {
   const router = useRouter();
   const [events, setEvents] = useState<GameEvent[] | null>(null);
   const [failed, setFailed] = useState<string | null>(null);
@@ -36,6 +46,7 @@ export function Game({ recheck }: Props) {
   const [turns, setTurns] = useState<Turn[]>([]);
   // A re-check asks this event first, whatever the engine would pick.
   const [forced, setForced] = useState<string | null>(null);
+  const [going, setGoing] = useState<Going | null>(null);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -59,6 +70,24 @@ export function Game({ recheck }: Props) {
       .catch(() => setFailed("That game couldn't be opened."));
   }, [recheck]);
 
+  useEffect(() => {
+    if (!more) return;
+    api.play
+      .query({ id: more })
+      .then((saved) => {
+        if (!saved) return setFailed("That game couldn't be opened.");
+        const answered = saved.turns.filter((t) => t.answer !== "cant").length;
+        setSetup(saved.setup);
+        setTurns(saved.turns);
+        setGoing({
+          start: saved.turns.length,
+          answers: answered + KEEP_GOING.answers,
+          narrowing: KEEP_GOING.narrowing,
+        });
+      })
+      .catch(() => setFailed("That game couldn't be opened."));
+  }, [more]);
+
   const engine = useMemo(
     () => (events ? createEngine(events, { now: new Date() }) : null),
     [events],
@@ -69,15 +98,18 @@ export function Game({ recheck }: Props) {
     if (!engine || !setup) return null;
     if (forced && !turns.some((t) => t.eventId === forced))
       return { type: "ask", eventId: forced, reason: "hinge" };
-    return engine.next(setup, turns);
-  }, [engine, setup, turns, forced]);
+    if (more && !going) return null;
+    return engine.next(setup, turns, going ?? undefined);
+  }, [engine, setup, turns, forced, more, going]);
 
   const finish = useCallback(
     async (final: Turn[]) => {
       if (!setup || saving) return;
       setSaving(true);
       try {
-        const { id } = await api.savePlay.mutate({ setup, turns: final });
+        // A game picked up from a saved one names it, so its trial answers aren't counted twice.
+        const from = more ?? recheck?.id;
+        const { id } = await api.savePlay.mutate({ setup, turns: final, from });
         rememberPlay(id);
         router.push(`/r/${id}`);
       } catch (error) {
@@ -90,12 +122,15 @@ export function Game({ recheck }: Props) {
         );
       }
     },
-    [router, saving, setup],
+    [router, saving, setup, more, recheck],
   );
 
   useEffect(() => {
-    if (next?.type === "done" && turns.length > 0) void finish(turns);
-  }, [next, turns, finish]);
+    if (next?.type !== "done" || turns.length === 0) return;
+    // Nothing left to ask before any new answer: the saved result stands.
+    if (more && going && turns.length === going.start) router.replace(`/r/${more}`);
+    else void finish(turns);
+  }, [next, turns, finish, more, going, router]);
 
   if (failed)
     return (
@@ -106,8 +141,8 @@ export function Game({ recheck }: Props) {
         </button>
       </main>
     );
-  if (!setup) return <SetupScreen onStart={setSetup} />;
-  if (!engine || !next || next.type === "done" || saving)
+  if (!setup && !recheck && !more) return <SetupScreen onStart={setSetup} />;
+  if (!setup || !engine || !next || next.type === "done" || saving)
     return (
       <main className="app items-center justify-center">
         <p className="text-[15px] text-muted">
@@ -126,6 +161,8 @@ export function Game({ recheck }: Props) {
       turns={turns}
       next={next}
       event={event}
+      going={going !== null}
+      canUndo={turns.length > (going?.start ?? 0)}
       onAnswer={(answer) =>
         setTurns((ts) => [...ts, { eventId: event.id, answer, reason: next.reason }])
       }
@@ -142,6 +179,9 @@ interface QuestionProps {
   turns: Turn[];
   next: Extract<Next, { type: "ask" }>;
   event: GameEvent;
+  /** Asked after Keep going on the reveal. */
+  going: boolean;
+  canUndo: boolean;
   onAnswer: (a: Answer) => void;
   onUndo: () => void;
   onFinish: () => void;
@@ -154,6 +194,8 @@ function Question({
   turns,
   next,
   event,
+  going,
+  canUndo,
   onAnswer,
   onUndo,
   onFinish,
@@ -203,18 +245,24 @@ function Question({
         <div className="qn" aria-live="polite">
           <b>Question {n}</b>
           <span>
-            {next.reason === "settle"
-              ? "one extra to settle a clash"
-              : next.reason === "hinge"
-                ? "checking one answer"
-                : `about ${toGo} to go`}
+            {next.reason === "settle" ? (
+              "one extra to settle a clash"
+            ) : next.reason === "hinge" ? (
+              "checking one answer"
+            ) : going ? (
+              <>
+                <em>Keeping going</em> · stop any time
+              </>
+            ) : (
+              `about ${toGo} to go`
+            )}
           </span>
         </div>
         <button
           type="button"
           className="ib"
           aria-label="Undo the last answer"
-          disabled={turns.length === 0}
+          disabled={!canUndo}
           onClick={onUndo}
         >
           <UndoIcon />
@@ -291,11 +339,11 @@ function Question({
         </button>
         <button type="button" className="cantsee" onClick={() => onAnswer("cant")}>
           <EyeOffIcon />
-          Can&apos;t see it<span>no years lost</span>
+          Can&apos;t tell<span>map cut off or unreadable here</span>
         </button>
-        {counted >= EARLY_OUT_AFTER && (
+        {(going || counted >= EARLY_OUT_AFTER) && (
           <button type="button" className="earlyout" onClick={onFinish}>
-            Show my answer now
+            {going ? "Stop and show my answer" : "Show my answer now"}
           </button>
         )}
       </div>

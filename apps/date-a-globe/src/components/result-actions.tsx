@@ -97,6 +97,28 @@ export function PrintedYear({ id, saved }: { id: string; saved: number | null })
   );
 }
 
+/** For the player only: carry on from the reveal with more questions, offered while one could still narrow the range. */
+export function KeepGoing({ id, label, answers }: { id: string; label: string; answers: number }) {
+  const [mine, setMine] = useState(false);
+  useEffect(() => setMine(isMyPlay(id)), [id]);
+  if (!mine) return null;
+  return (
+    <section className="tile">
+      <div className="eyebrow">Want it closer?</div>
+      <p className="mt-[5px] mb-3 text-[#3e3b35] text-[14px] leading-[1.4]">
+        More questions can narrow <b className="font-semibold text-ink">{label}</b>. Your {answers}{" "}
+        answers stay, and you can stop whenever you like.
+      </p>
+      <Link href={`/play?more=${id}`} className="cta h-[52px] text-[16.5px]">
+        <span>Keep going</span>
+        <i>
+          <ArrowIcon />
+        </i>
+      </Link>
+    </section>
+  );
+}
+
 export function AnotherGlobe() {
   return (
     <Link href="/play" className="secondary">

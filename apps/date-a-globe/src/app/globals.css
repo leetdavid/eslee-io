@@ -105,6 +105,11 @@
     font-size: 12px;
     color: #6e6a62;
   }
+  .qn em {
+    font-style: normal;
+    font-weight: 500;
+    color: var(--ink);
+  }
 
   .brand {
     display: inline-flex;

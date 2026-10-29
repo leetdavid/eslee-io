@@ -156,7 +156,7 @@ export function SetupScreen({ onStart }: { onStart: (setup: Setup) => void }) {
           </div>
           <p className="tile mt-4 text-[12.5px] text-muted leading-[1.42]">
             <b className="font-semibold text-ink">Only part of a region on your map?</b> Pick it
-            anyway. If a question asks about something off the edge, tap Can&apos;t see it and
+            anyway. If a question asks about something off the edge, tap Can&apos;t tell and
             we&apos;ll stop asking about that area.
           </p>
         </>

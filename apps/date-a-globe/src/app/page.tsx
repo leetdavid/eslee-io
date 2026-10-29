@@ -83,7 +83,7 @@ export default function StartPage() {
       </h1>
       <p className="mt-3 text-[16px] text-muted leading-[1.42]">
         Answer <b className="text-ink">yes</b>, <b className="text-ink">no</b> or{" "}
-        <b className="text-ink">can&apos;t see</b>. When the years run out, your answer arrives in
+        <b className="text-ink">can&apos;t tell</b>. When the years run out, your answer arrives in
         the style of your globe&apos;s own era.
       </p>
 
@@ -160,7 +160,7 @@ export default function StartPage() {
           ],
           [
             "Answer",
-            "Yes if your globe shows it, no if it doesn't, can't see if it's too small or off the edge. A misread or two is fine; the questions check each other.",
+            "Yes if your globe shows it, no if it isn't there, can't tell if that part is cut off or too small to read. A misread or two is fine; the questions check each other.",
           ],
           [
             "Narrow",

@@ -84,6 +84,28 @@ describe("plays", () => {
     expect(loaded?.result.window.to).toBeGreaterThanOrEqual(monthOf(1960));
   });
 
+  it("doesn't count a trial answer twice when a game is picked up again", async () => {
+    const trialId = "holy-roman-empire";
+    await db.update(DateAGlobeEvent).set({ status: "trial" }).where(eq(DateAGlobeEvent.id, trialId));
+    const events = await askedEvents(db);
+    const engine = createEngine(events, { now: NOW });
+    const setup = { kind: "globe", regions: [] } as const;
+    const turns: Turn[] = [
+      { eventId: "soviet-union", answer: "yes" },
+      { eventId: "two-germanys", answer: "yes" },
+      { eventId: trialId, answer: "no", reason: "trial" },
+    ];
+    const answersOf = async () =>
+      (await db.select().from(DateAGlobeEvent).where(eq(DateAGlobeEvent.id, trialId)))[0]
+        ?.trialAnswers;
+    const first = await savePlay(db, engine, events, setup, turns);
+    expect(await answersOf()).toBe(1);
+    const more: Turn[] = [...turns, { eventId: "botswana", answer: "no" }];
+    await savePlay(db, engine, events, setup, more, first.id);
+    expect(await answersOf()).toBe(1);
+    await db.update(DateAGlobeEvent).set({ status: "live" }).where(eq(DateAGlobeEvent.id, trialId));
+  });
+
   it("ends a trial after 50 answers, live at 80% agreement and back in the queue below it", async () => {
     const [a, b] = (await askedEvents(db)).slice(0, 2);
     if (!a || !b) throw new Error("no events");

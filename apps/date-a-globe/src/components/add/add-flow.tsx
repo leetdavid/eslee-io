@@ -471,7 +471,7 @@ function StepWhere({
         ))}
       </div>
       <p className="mt-2 text-[12px] text-faint">
-        This tells us how often people will answer can&apos;t see.
+        This tells us how often people will answer can&apos;t tell.
       </p>
       <Next label="Next: when was it on maps?" disabled={!d.region} onClick={onNext} />
     </>

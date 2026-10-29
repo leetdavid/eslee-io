@@ -40,7 +40,8 @@ const newId = () => randomBytes(8).toString("base64url").slice(0, 10);
 
 /**
  * Saves a finished game. The result is worked out again here rather than taken from the browser,
- * and each trial answer is compared with it.
+ * and each trial answer is compared with it. A game picked up from a saved one (`from`, after Keep going
+ * or a re-check) doesn't count the trial answers that game already counted.
  */
 export async function savePlay(
   db: Database,
@@ -48,6 +49,7 @@ export async function savePlay(
   events: GameEvent[],
   setup: Setup,
   submitted: Turn[],
+  from?: string,
 ): Promise<SavedPlay> {
   const turns = submitted.filter((t) => engine.knows(t.eventId));
   const result = engine.result(turns);
@@ -58,8 +60,10 @@ export async function savePlay(
     .returning({ createdAt: DateAGlobePlay.createdAt });
 
   const trialIds = new Set(events.filter((e) => e.trial).map((e) => e.id));
+  const earlier = from ? await loadPlay(db, from) : null;
+  const counted = new Set(earlier?.turns.map((t) => t.eventId));
   for (const t of turns) {
-    if (!trialIds.has(t.eventId) || t.answer === "cant") continue;
+    if (!trialIds.has(t.eventId) || t.answer === "cant" || counted.has(t.eventId)) continue;
     const p = engine.expected(turns, t.eventId);
     // Answers the result can't call either way say nothing about the event.
     if (p > 0.35 && p < 0.65) continue;

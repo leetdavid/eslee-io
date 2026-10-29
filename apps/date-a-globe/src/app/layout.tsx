@@ -46,7 +46,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(site),
   title: { default: "Date a Globe", template: "%s · Date a Globe" },
   description:
-    "Answer yes, no or can't see about what your globe shows, and find out when it was printed.",
+    "Answer yes, no or can't tell about what your globe shows, and find out when it was printed.",
   openGraph: { siteName: "Date a Globe", type: "website" },
 };
 
