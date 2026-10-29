@@ -1,0 +1,284 @@
+{
+  "Austria / Czechia": {
+    "spans": [
+      {
+        "from": "1815",
+        "until": "1938-10"
+      },
+      {
+        "from": "1945-05",
+        "until": null
+      }
+    ],
+    "note": "Bohemia and Moravia against Austria; inside Germany from the Munich Agreement to 1945."
+  },
+  "Austria / Germany": {
+    "spans": [
+      {
+        "from": "1816",
+        "until": "1938-03"
+      },
+      {
+        "from": "1945-05",
+        "until": null
+      }
+    ],
+    "note": "Austria against Bavaria since Salzburg went to Austria in 1816; gone during the Anschluss."
+  },
+  "Austria / Italy": {
+    "spans": [
+      {
+        "from": "1920-07",
+        "until": "1938-03"
+      },
+      {
+        "from": "1945-05",
+        "until": null
+      }
+    ],
+    "note": "Saint-Germain line through the Tyrol, from 1920."
+  },
+  "Austria / Liechtenstein": {
+    "spans": [
+      {
+        "from": "1815",
+        "until": "1938-03"
+      },
+      {
+        "from": "1945-05",
+        "until": null
+      }
+    ],
+    "note": "Liechtenstein against Austria; Germany during the Anschluss."
+  },
+  "Austria / Slovakia": {
+    "spans": [
+      {
+        "from": "1920-07",
+        "until": "1938-03"
+      },
+      {
+        "from": "1945-05",
+        "until": null
+      }
+    ],
+    "note": "Austria against Czechoslovakia along the Morava, from the 1920 treaties."
+  },
+  "Austria / Switzerland": {
+    "spans": [
+      {
+        "from": "1815",
+        "until": "1938-03"
+      },
+      {
+        "from": "1945-05",
+        "until": null
+      }
+    ],
+    "note": "Vorarlberg and Tyrol against Switzerland since 1815."
+  },
+  "Belgium / France": {
+    "spans": [
+      {
+        "from": "1815",
+        "until": null
+      }
+    ],
+    "note": "The 1815 Netherlands–France line, Belgium–France from 1830."
+  },
+  "Belgium / Germany": {
+    "spans": [
+      {
+        "from": "1920-01",
+        "until": "1940-05"
+      },
+      {
+        "from": "1944-09",
+        "until": null
+      }
+    ],
+    "note": "Eupen-Malmedy went to Belgium in 1920; annexed by Germany 1940–44."
+  },
+  "Belgium / Luxembourg": {
+    "spans": [
+      {
+        "from": "1839-04",
+        "until": null
+      }
+    ],
+    "note": "Treaty of London, 1839."
+  },
+  "Belgium / Netherlands": {
+    "spans": [
+      {
+        "from": "1839-04",
+        "until": null
+      }
+    ],
+    "note": "Treaty of London, 1839."
+  },
+  "Central African Rep. / Dem. Rep. Congo": {
+    "spans": [
+      {
+        "from": "1887",
+        "until": null
+      }
+    ],
+    "note": "The Ubangi and Mbomu rivers, set between French Congo and the Congo Free State in 1887."
+  },
+  "Czechia / Germany": {
+    "spans": [
+      {
+        "from": "1815",
+        "until": "1938-10"
+      },
+      {
+        "from": "1945-05",
+        "until": null
+      }
+    ],
+    "note": "The Bohemian border with Saxony and Bavaria; the Sudetenland was German 1938–45."
+  },
+  "Czechia / Poland": {
+    "spans": [
+      {
+        "from": "1945-05",
+        "until": null
+      }
+    ],
+    "note": "Czechoslovakia against Poland once Silesia became Polish in 1945."
+  },
+  "Denmark / Germany": {
+    "spans": [
+      {
+        "from": "1920-06",
+        "until": null
+      }
+    ],
+    "note": "Schleswig plebiscite line, 1920."
+  },
+  "Djibouti / Ethiopia": {
+    "spans": [
+      {
+        "from": "1897",
+        "until": null
+      }
+    ],
+    "note": "French Somaliland and Ethiopia, Franco-Ethiopian treaty of 1897."
+  },
+  "Djibouti / Somaliland": {
+    "spans": [
+      {
+        "from": "1888",
+        "until": null
+      }
+    ],
+    "note": "French and British Somaliland, Anglo-French agreement of 1888."
+  },
+  "Ethiopia / Somaliland": {
+    "spans": [
+      {
+        "from": "1897",
+        "until": null
+      }
+    ],
+    "note": "British Somaliland and Ethiopia, Anglo-Ethiopian treaty of 1897."
+  },
+  "France / Germany": {
+    "spans": [
+      {
+        "from": "1815",
+        "until": "1871-05"
+      },
+      {
+        "from": "1918-11",
+        "until": "1940-06"
+      },
+      {
+        "from": "1944-11",
+        "until": null
+      }
+    ],
+    "note": "The Rhine and Lorraine line; moved west while Alsace-Lorraine was German (1871–1918, 1940–44)."
+  },
+  "France / Luxembourg": {
+    "spans": [
+      {
+        "from": "1839-04",
+        "until": null
+      }
+    ],
+    "note": "Luxembourg against France since the 1839 settlement."
+  },
+  "France / Switzerland": {
+    "spans": [
+      {
+        "from": "1860-04",
+        "until": null
+      }
+    ],
+    "note": "Complete once Savoy went to France in 1860."
+  },
+  "Germany / Luxembourg": {
+    "spans": [
+      {
+        "from": "1839-04",
+        "until": "1940-08"
+      },
+      {
+        "from": "1944-09",
+        "until": null
+      }
+    ],
+    "note": "Luxembourg against Prussia, then Germany; annexed 1940–44."
+  },
+  "Germany / Netherlands": {
+    "spans": [
+      {
+        "from": "1815",
+        "until": "1940-05"
+      },
+      {
+        "from": "1945-05",
+        "until": null
+      }
+    ],
+    "note": "The 1815 line; small post-war rectifications don't show at this scale."
+  },
+  "Germany / Poland": {
+    "spans": [
+      {
+        "from": "1945-08",
+        "until": null
+      }
+    ],
+    "note": "The Oder–Neisse line, from Potsdam in 1945."
+  },
+  "Germany / Switzerland": {
+    "spans": [
+      {
+        "from": "1815",
+        "until": null
+      }
+    ],
+    "note": "The Rhine and Lake Constance line, unchanged since 1815."
+  },
+  "Italy / Switzerland": {
+    "spans": [
+      {
+        "from": "1815",
+        "until": null
+      }
+    ],
+    "note": "Ticino and Graubünden against Lombardy and Piedmont, then Italy."
+  },
+  "Liechtenstein / Switzerland": {
+    "spans": [
+      {
+        "from": "1815",
+        "until": null
+      }
+    ],
+    "note": "The Rhine, unchanged."
+  }
+}

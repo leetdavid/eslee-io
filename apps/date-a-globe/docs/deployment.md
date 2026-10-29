@@ -61,10 +61,13 @@ The migration runner takes an advisory lock and is safe to rerun. Never push a s
 
 ## Plates
 
-Plates are built offline from Natural Earth and committed to `public/plates/`:
+Plates are built offline from Natural Earth and committed to `public/plates/`. The owner reviews every plate on Doop first, and only a source with an `approved` date in `data/plate-sources.json` reaches the game:
 
 ```sh
-pnpm --filter @eslee/date-a-globe plates:build [event ids]
+pnpm --filter @eslee/date-a-globe plates:build --review [event ids]   # into .cache/plates-review/ for Doop
+pnpm --filter @eslee/date-a-globe plates:build [event ids]            # approved plates into public/plates/
 ```
 
-Events without a built plate show today's map around the place with a ring on it, until someone authors a plate source in `data/plate-sources.json`.
+A plate draws one of today's borders only if `data/borders.json` says it stood through every span its question asks about; a border missing from that table is never drawn. The build prints the borders it kept and hid for each plate, for the review board.
+
+Events without an approved plate show today's map around the place with a ring on it.

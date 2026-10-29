@@ -9,6 +9,8 @@ export interface Label {
 
 /** How an event's plate is authored: where to look, how far in, and what to mark. */
 export interface PlateSource {
+  /** The day the owner approved this plate on Doop. Only approved plates reach the game. */
+  approved?: string;
   center: LonLat;
   /** Lens radius in degrees of arc. */
   radius: number;

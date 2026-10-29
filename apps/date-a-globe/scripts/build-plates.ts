@@ -1,5 +1,6 @@
 // Turns authored plate sources (data/plate-sources.json) into finished plates (public/plates/<event id>.json):
 // the marks' geometry resolved from Natural Earth, plus the base map around each magnifier.
+// Only approved plates go to public/; `--review` builds any plate into .cache/plates-review/ for review on Doop.
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { geoArea, geoCentroid, geoCircle, geoDistance } from "d3-geo";
@@ -14,7 +15,9 @@ import type {
 } from "geojson";
 import polygonClipping, { type Geom } from "polygon-clipping";
 import { merge, mesh } from "topojson-client";
-import type { GeometryCollection, Topology } from "topojson-specification";
+import type { GeometryCollection, GeometryObject, Topology } from "topojson-specification";
+import { currentMonth, parseDate } from "../src/engine/months";
+import type { Span } from "../src/engine/types";
 import type { Label, LensBase, LonLat, Mark, Plate, PlateSource } from "../src/plates/types";
 
 const require = createRequire(import.meta.url);
@@ -50,6 +53,36 @@ const seas = await ne<Area>("ne_10m_geography_marine_polys");
 type Res = "10m" | "50m";
 const countriesOf = (res: Res) =>
   atlas[res].objects.countries as GeometryCollection<{ name: string }>;
+
+// When each of today's borders was on maps, keyed by the two Natural Earth names in order ("Egypt / Sudan").
+// A plate draws one of today's borders only if it stood through every span its question asks about;
+// a border missing from data/borders.json is never drawn.
+const borderDates = read<Record<string, { spans: Span[]; note: string }>>(
+  new URL("data/borders.json", root).pathname,
+);
+const eventSpans = new Map(
+  read<{ id: string; spans: Span[] }[]>(new URL("data/events.json", root).pathname).map((e) => [
+    e.id,
+    e.spans,
+  ]),
+);
+const nameOf = (g: GeometryObject) => String((g.properties as { name?: string } | undefined)?.name);
+const pairKey = (a: GeometryObject, b: GeometryObject) => [nameOf(a), nameOf(b)].sort().join(" / ");
+const NOW = currentMonth(new Date());
+const monthsOf = (s: Span) => ({
+  from: parseDate(s.from).month,
+  to: s.until ? parseDate(s.until).month : NOW,
+});
+function stoodThrough(key: string, asked: Span[]) {
+  const dates = borderDates[key];
+  if (!dates) return false;
+  return asked.every((span) => {
+    const a = monthsOf(span);
+    // Nothing before 1805 is asked, so a span that starts earlier only needs the border from 1805.
+    const from = Math.max(0, a.from);
+    return dates.spans.some((d) => monthsOf(d).from <= from && monthsOf(d).to >= a.to);
+  });
+}
 let tolerance = 0.01;
 type XY = [number, number];
 // GeoJSON types a position as number[]; read one as x, y.
@@ -206,15 +239,12 @@ function lakeShape(res: Res, names: string[]): Position[][][] {
 }
 
 function build(id: string, src: PlateSource): Plate {
+  const asked = eventSpans.get(id);
+  if (!asked) throw new Error(`${id}: no event with this id in data/events.json`);
   const res: Res = src.radius <= 2.5 ? "10m" : "50m";
   // About half a pixel at the magnifier's scale (98 px across the lens radius).
   tolerance = (0.5 * src.radius) / 98;
   const box = lensBox(src.center, src.radius);
-  const merged = new Set(
-    src.marks.flatMap((m) =>
-      m.type === "area" && m.countries && m.countries.length > 1 ? m.countries : [],
-    ),
-  );
 
   const marks: Mark[] = src.marks.map((m) => {
     if (m.type === "city" || m.type === "label" || m.type === "spot") return m;
@@ -253,15 +283,33 @@ function build(id: string, src: PlateSource): Plate {
   const land = toMulti(
     clipPolys(polysOf(merge(topo, countriesOf(res).geometries as never) as MultiPolygon), box),
   );
-  const borderLines = mesh(
-    topo,
-    countriesOf(res),
-    (a, b) => a !== b && !(merged.has(String(a.id)) && merged.has(String(b.id))),
-  );
-  const borders: MultiLineString = {
-    type: "MultiLineString",
-    coordinates: clipLines(borderLines.coordinates, box).map((l) => simplify(l)),
-  };
+  // Today's borders in view, kept only where they stood through the question's years.
+  // Borders of the event's own area are left to its red outline.
+  const own = new Set(src.marks.flatMap((m) => (m.type === "area" && m.countries) || []));
+  const pairs = new Set<string>();
+  mesh(topo, countriesOf(res), (a, b) => {
+    if (a !== b && !own.has(String(a.id)) && !own.has(String(b.id))) pairs.add(pairKey(a, b));
+    return false;
+  });
+  const kept: string[] = [];
+  const hidden: string[] = [];
+  const borderCoords: Position[][] = [];
+  for (const key of [...pairs].sort()) {
+    const lines = clipLines(
+      mesh(topo, countriesOf(res), (a, b) => a !== b && pairKey(a, b) === key).coordinates,
+      box,
+    );
+    // Only what shows inside the magnifier's circle matters.
+    const near = (p: Position) => (geoDistance(xy(p) as LonLat, src.center) * 180) / Math.PI;
+    if (!lines.some((l) => l.some((p) => near(p) <= src.radius))) continue;
+    if (stoodThrough(key, asked)) {
+      kept.push(key);
+      borderCoords.push(...lines.map((l) => simplify(l)));
+    } else hidden.push(key);
+  }
+  console.log(`${id}: borders kept: ${kept.join(", ") || "none"}`);
+  console.log(`${id}: borders hidden: ${hidden.join(", ") || "none"}`);
+  const borders: MultiLineString = { type: "MultiLineString", coordinates: borderCoords };
   // Reservoirs and the modern Aral Sea would date the base map, so they appear only as an event's own mark.
   const baseLakes = lakes[res].features.filter(
     (f) => f.properties?.featurecla !== "Reservoir" && !/Aral/.test(String(f.properties?.name)),
@@ -362,15 +410,24 @@ function splitBy(path: LonLat[], keep: (p: Position) => boolean): Position[][] {
 const sources = read<Record<string, PlateSource>>(
   new URL("data/plate-sources.json", root).pathname,
 );
-const only = process.argv.slice(2);
-const outDir = new URL("public/plates/", root).pathname;
+const review = process.argv.includes("--review");
+const only = process.argv.slice(2).filter((a) => !a.startsWith("--"));
+const outDir = new URL(review ? ".cache/plates-review/" : "public/plates/", root).pathname;
 if (!existsSync(outDir)) mkdirSync(outDir, { recursive: true });
-// The game reads this list to know which events have a drawn plate; the rest get a ring on the place.
+// The game reads this list to know which events have an approved plate; the rest get a placeholder.
 writeFileSync(
   new URL("src/plates/built.json", root).pathname,
-  `${JSON.stringify(Object.keys(sources).sort())}\n`,
+  `${JSON.stringify(
+    Object.keys(sources)
+      .filter((id) => sources[id]?.approved)
+      .sort(),
+  )}\n`,
 );
 for (const [id, src] of Object.entries(sources)) {
   if (only.length && !only.includes(id)) continue;
+  if (!review && !src.approved) {
+    console.log(`${id}: not approved yet, skipped (build it with --review)`);
+    continue;
+  }
   writeFileSync(`${outDir}${id}.json`, JSON.stringify(build(id, src)));
 }
