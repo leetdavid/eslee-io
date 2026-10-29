@@ -24,6 +24,10 @@ locals {
       name    = "blog.eslee.io"
       content = "869642ca4d27b8f0.vercel-dns-017.com."
     }
+    dateaglobe = {
+      name    = "dateaglobe.eslee.io"
+      content = "2538ddd74f6c3d79.vercel-dns-017.com."
+    }
   }
 }
 

@@ -21,15 +21,11 @@ The game is isolated from the other apps. Do not apply the root `.railway/` conf
 
 The database has daily backups kept for 6 days and weekly backups kept for 27 days, read back after configuration.
 
-## Release gate
+## Domain
 
-Deployment protection is Vercel Authentication on every URL except custom domains, so the production `vercel.app` URL needs a Vercel login. The game goes public only when `dateaglobe.eslee.io` is attached, after the owner approves the plates and reveals on Doop (canvas `atunXH0Vrq`, frames "v3 Plates" and "v3 Reveals").
+Deployment protection is Vercel Authentication on every URL except custom domains, so the `vercel.app` URLs need a Vercel login and `dateaglobe.eslee.io` is public. The owner approved the plates and reveals on Doop (canvas `atunXH0Vrq`, frames "v3 Plates" and "v3 Reveals") on October 30, and the domain was attached that day.
 
-To go public:
-
-1. Add `dateaglobe.eslee.io` to the Vercel project.
-2. In Cloudflare, add a `CNAME` record `dateaglobe` → `cname.vercel-dns.com`, DNS only.
-3. Check that the GitHub OAuth app for production has the callback `https://dateaglobe.eslee.io/api/auth/callback/github`.
+DNS is a Cloudflare `CNAME` record `dateaglobe` → `2538ddd74f6c3d79.vercel-dns-017.com.`, DNS only (not proxied), recorded in `infra/domain.tf`. The production GitHub OAuth app's callback is `https://dateaglobe.eslee.io/api/auth/callback/github`.
 
 ## Secrets and settings
 
