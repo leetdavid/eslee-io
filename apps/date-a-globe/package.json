@@ -1,0 +1,52 @@
+{
+  "name": "@eslee/date-a-globe",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "next build",
+    "dev": "pnpm with-env next dev --turbopack -p 3012",
+    "start": "pnpm with-env next start -p 3012",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "plates:build": "tsx scripts/build-plates.ts",
+    "plates:render": "tsx scripts/render-plates.ts",
+    "db:generate": "pnpm with-env drizzle-kit generate",
+    "db:migrate": "pnpm with-env tsx scripts/migrate.ts",
+    "db:seed": "pnpm with-env tsx scripts/seed.ts",
+    "with-env": "dotenv -e .env.local -e ../../.env.github -e ../../.env.local -e ../../.env --"
+  },
+  "dependencies": {
+    "@eslee/auth": "workspace:*",
+    "@eslee/db": "workspace:*",
+    "d3-geo": "^3.1.1",
+    "drizzle-orm": "catalog:",
+    "next": "catalog:",
+    "postgres": "catalog:",
+    "react": "catalog:react19",
+    "react-dom": "catalog:react19",
+    "server-only": "0.0.1",
+    "topojson-client": "^3.1.0",
+    "world-atlas": "^2.0.2",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8",
+    "@eslee/tsconfig": "workspace:*",
+    "@tailwindcss/postcss": "catalog:",
+    "@types/d3-geo": "^3.1.0",
+    "@types/geojson": "^7946.0.16",
+    "@types/node": "catalog:node",
+    "@types/react": "catalog:react19",
+    "@types/react-dom": "catalog:react19",
+    "@types/topojson-client": "^3.1.5",
+    "@types/topojson-specification": "^1.0.5",
+    "dotenv-cli": "catalog:",
+    "drizzle-kit": "catalog:",
+    "polygon-clipping": "^0.15.7",
+    "tailwindcss": "catalog:",
+    "tsx": "^4.20.6",
+    "typescript": "catalog:",
+    "vitest": "^4.0.0"
+  }
+}
