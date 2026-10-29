@@ -10,6 +10,7 @@ import {
   type Answer,
   createEngine,
   type Engine,
+  MAX_ANSWERS,
   type Next,
   type Setup,
   type Turn,
@@ -160,11 +161,12 @@ function Question({
 }: QuestionProps) {
   const preview = useMemo(() => engine.preview(turns, event.id), [engine, turns, event.id]);
   const counted = turns.filter((t) => t.answer !== "cant" && !byId.get(t.eventId)?.trial).length;
+  const answered = turns.filter((t) => t.answer !== "cant").length;
   const n = turns.length + 1;
   const months = width(preview.current);
   const toGo = Math.max(
     1,
-    Math.min(15 - turns.length, Math.round(Math.log2(Math.max(2, months / 30)) * 1.5) + 1),
+    Math.min(MAX_ANSWERS - answered, Math.round(Math.log2(Math.max(2, months / 30)) * 1.5) + 1),
   );
 
   const fits = useMemo(() => {

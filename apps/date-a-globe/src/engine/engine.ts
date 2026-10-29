@@ -2,7 +2,15 @@ import { CANT_SEE, pYes, shownCurve } from "./model";
 import { currentMonth, type Month, monthLabel, monthName, parseDate, yearOf } from "./months";
 import type { Bound, EngineEvent, Era, Next, Region, Result, Setup, Turn, Window } from "./types";
 
-const MAX_QUESTIONS = 15;
+/** Yes or no answers before the engine stops. Can't-sees don't use them up. */
+export const MAX_ANSWERS = 15;
+/** Can't-sees allowed on top of the answers, so every game ends. */
+const MAX_CANT = 10;
+/** What "Keep going" on the reveal allows: ten more answers, each expected to cut at least a month. */
+export const KEEP_GOING = { answers: 10, narrowing: 1 };
+const MOST_ANSWERS = 45;
+/** The longest a game can get, can't-sees included. */
+export const MAX_TURNS = MOST_ANSWERS + MAX_CANT;
 /** Keep asking while the best question is expected to narrow the range by this many months. */
 const MIN_NARROWING = 3;
 const MASS = 0.9;
@@ -12,6 +20,8 @@ const CLASH = 0.2;
 /** An answer this unlikely given all the others is set aside on the result. */
 const SET_ASIDE = 0.2;
 const MAX_HINGE_CHECKS = 2;
+/** The chance a world map shows an area at all. Many leave out Antarctica; few leave out anything else. */
+const ON_WORLD_MAP: Partial<Record<Region, number>> = { Antarctica: 0.6 };
 
 type Posterior = Float64Array;
 
@@ -90,25 +100,39 @@ export function createEngine(events: EngineEvent[], opts: { now: Date }) {
     return py;
   }
 
-  function visibility(e: EngineEvent, setup: Setup, cantRegions: Set<Region>) {
+  /** Per area: answers given there, and how likely its can't sees were if the area is on the map. */
+  type Tally = Map<Region, { seen: number; cantIfShown: number }>;
+  function visibility(e: EngineEvent, setup: Setup, tally: Tally) {
     if (e.regional && (setup.kind !== "part" || !setup.regions.includes(e.region))) return 0;
     let v = 1 - CANT_SEE[e.size];
+    const area = tally.get(e.region);
     // On part of the world, a can't see suggests that area is off the map, so stop asking about it.
     if (setup.kind === "part")
-      v *= cantRegions.has(e.region) ? 0.05 : setup.regions.includes(e.region) ? 0.9 : 0.2;
+      v *= area && area.cantIfShown < 1 ? 0.05 : setup.regions.includes(e.region) ? 0.9 : 0.2;
+    // A world map may leave an area out. Any answer there shows it's on the map; a can't see on
+    // something usually easy to read makes it likelier the area is missing.
+    if (setup.kind === "world" && !area?.seen) {
+      const prior = ON_WORLD_MAP[e.region] ?? 0.98;
+      const odds = area?.cantIfShown ?? 1;
+      v *= (prior * odds) / (prior * odds + 1 - prior);
+    }
     return v;
   }
 
   function candidates(setup: Setup, turns: Turn[], trial: boolean) {
     const asked = new Set(turns.map((t) => t.eventId));
-    const cantRegions = new Set<Region>();
+    const tally: Tally = new Map();
     for (const t of turns) {
       const e = byId.get(t.eventId);
-      if (e && t.answer === "cant") cantRegions.add(e.region);
+      if (!e) continue;
+      const area = tally.get(e.region) ?? { seen: 0, cantIfShown: 1 };
+      if (t.answer === "cant") area.cantIfShown *= CANT_SEE[e.size];
+      else area.seen++;
+      tally.set(e.region, area);
     }
     return events
       .filter((e) => e.trial === trial && !asked.has(e.id))
-      .map((e) => ({ event: e, visible: visibility(e, setup, cantRegions) }))
+      .map((e) => ({ event: e, visible: visibility(e, setup, tally) }))
       .filter((c) => c.visible > 0);
   }
 
@@ -166,8 +190,18 @@ export function createEngine(events: EngineEvent[], opts: { now: Date }) {
     return best;
   }
 
-  function next(setup: Setup, turns: Turn[]): Next {
-    if (turns.length >= MAX_QUESTIONS) return { type: "done" };
+  /**
+   * The next question, or done. `answers` caps the yes or no answers, and `narrowing` is the fewest months
+   * a question must be expected to cut; Keep going raises the first and lowers the second.
+   */
+  function next(
+    setup: Setup,
+    turns: Turn[],
+    { answers = MAX_ANSWERS, narrowing = MIN_NARROWING } = {},
+  ): Next {
+    const answered = turns.filter((t) => t.answer !== "cant").length;
+    const cap = Math.min(answers, MOST_ANSWERS);
+    if (answered >= cap || turns.length >= cap + MAX_CANT) return { type: "done" };
 
     // A clash: the last counted answer is unlikely given the earlier ones, and nothing has settled it yet.
     const lastIndex = turns.length - 1;
@@ -212,7 +246,7 @@ export function createEngine(events: EngineEvent[], opts: { now: Date }) {
       const bits = score(P, active, c.event.id, c.visible);
       if (!best || bits > best.bits) best = { id: c.event.id, bits };
     }
-    if (best && spread(P) * (1 - 2 ** -best.bits) >= MIN_NARROWING)
+    if (best && spread(P) * (1 - 2 ** -best.bits) >= narrowing)
       return { type: "ask", eventId: best.id, reason: "narrow" };
 
     // Before stopping, check the answer the result hinges on, up to twice.

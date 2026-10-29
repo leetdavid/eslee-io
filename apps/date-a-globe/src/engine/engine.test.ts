@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { createEngine, rangeLabel } from "./engine";
+import { createEngine, KEEP_GOING, rangeLabel } from "./engine";
 import { shownCurve } from "./model";
 import { monthOf, parseDate } from "./months";
 import type { Answer, EngineEvent, Setup, Turn } from "./types";
@@ -110,11 +110,11 @@ describe("engine", () => {
     return { printed, lag: [0, 6, 14, 30][i % 4] ?? 0, seed: 1000 + i };
   });
 
-  it("brackets the printed month for most honest players, in at most 15 questions", () => {
+  it("brackets the printed month for most honest players, in at most 15 answers", () => {
     let right = 0;
     for (const g of globes) {
       const { turns, result } = play(engine, player(g.printed, g.lag, g.seed));
-      expect(turns.length).toBeLessThanOrEqual(15);
+      expect(turns.filter((t) => t.answer !== "cant").length).toBeLessThanOrEqual(15);
       // The range is about the map data on the globe, which may lag the printing a little.
       if (g.printed >= result.window.from && g.printed - g.lag <= result.window.to + 6) right++;
     }
@@ -242,6 +242,87 @@ describe("engine", () => {
       (t) => EVENTS.find((e) => e.id === t.eventId)?.region === "Africa",
     );
     expect(africa.length).toBeLessThanOrEqual(1);
+  });
+
+  it("doesn't let can't sees use up the answers, but still ends", () => {
+    const turns: Turn[] = [];
+    for (;;) {
+      const n = engine.next(GLOBE, turns);
+      if (n.type === "done") break;
+      // Every other question can't be seen.
+      turns.push({
+        eventId: n.eventId,
+        answer: turns.length % 2 ? "cant" : "yes",
+        reason: n.reason,
+      });
+    }
+    expect(turns.filter((t) => t.answer !== "cant").length).toBeLessThanOrEqual(15);
+    expect(turns.length).toBeGreaterThan(15);
+    expect(turns.length).toBeLessThanOrEqual(25);
+  });
+
+  it("asks less about an area of a world map after can't sees there", () => {
+    const world: Setup = { kind: "world", regions: [] };
+    const turns: Turn[] = [];
+    for (;;) {
+      const n = engine.next(world, turns);
+      if (n.type === "done") break;
+      const event = EVENTS.find((e) => e.id === n.eventId) as EngineEvent;
+      // A world map cut off above Antarctica.
+      const answer = event.region === "Antarctica" ? "cant" : player(monthOf(1975), 0, 5)(event);
+      turns.push({ eventId: n.eventId, answer, reason: n.reason });
+    }
+    const antarctic = turns.filter(
+      (t) => EVENTS.find((e) => e.id === t.eventId)?.region === "Antarctica",
+    );
+    expect(antarctic.length).toBeLessThanOrEqual(2);
+  });
+
+  // The owner's first test game: a 1959 world map from oldmapsonline.org, five can't sees, stopped at the cap.
+  const played: [string, Answer][] = [
+    ["nigeria-unified", "yes"],
+    ["malaysia", "cant"],
+    ["tanzania", "no"],
+    ["australian-antarctic-territory", "cant"],
+    ["name-iran", "yes"],
+    ["libya-independent", "yes"],
+    ["mali", "cant"],
+    ["french-madagascar", "cant"],
+    ["belgian-congo", "yes"],
+    ["anglo-egyptian-sudan", "no"],
+    ["french-equatorial-africa", "yes"],
+    ["ghana", "yes"],
+    ["guinea", "yes"],
+    ["italian-somaliland", "yes"],
+    ["kremenchuk-reservoir", "cant"],
+  ];
+
+  it("keeps going after the reveal and narrows a real game", () => {
+    const world: Setup = { kind: "world", regions: [] };
+    const turns: Turn[] = played.map(([eventId, answer]) => ({ eventId, answer }));
+    const before = engine.result(turns);
+    expect(before.label).toBe("Jan 1958 – 1962");
+    const answered = turns.filter((t) => t.answer !== "cant").length;
+    const answer = player(monthOf(1959, 6), 0, 9);
+    let asked = 0;
+    for (;;) {
+      const n = engine.next(world, turns, {
+        answers: answered + KEEP_GOING.answers,
+        narrowing: KEEP_GOING.narrowing,
+      });
+      if (n.type === "done") break;
+      asked++;
+      turns.push({
+        eventId: n.eventId,
+        answer: answer(EVENTS.find((e) => e.id === n.eventId) as EngineEvent),
+        reason: n.reason,
+      });
+    }
+    const after = engine.result(turns);
+    expect(asked).toBeGreaterThan(0);
+    expect(after.window.from).toBeLessThanOrEqual(monthOf(1959, 6));
+    expect(after.window.to).toBeGreaterThanOrEqual(monthOf(1959, 6));
+    expect(after.window.to - after.window.from).toBeLessThan(before.window.to - before.window.from);
   });
 
   it("picks the next question in well under a second", () => {

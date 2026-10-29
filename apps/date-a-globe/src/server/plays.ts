@@ -4,7 +4,7 @@ import { randomBytes } from "node:crypto";
 import { DateAGlobeEvent, DateAGlobePlay } from "@eslee/db/date-a-globe";
 import { and, eq, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
-import { type Engine, REGIONS, type Result, type Setup, type Turn } from "@/engine";
+import { type Engine, MAX_TURNS, REGIONS, type Result, type Setup, type Turn } from "@/engine";
 import type { GameEvent } from "@/lib/events";
 import type { Database } from "@/server/database";
 
@@ -25,7 +25,7 @@ export const turnsSchema = z
     }),
   )
   .min(1)
-  .max(20);
+  .max(MAX_TURNS);
 
 export interface SavedPlay {
   id: string;
