@@ -6,6 +6,8 @@ import type { Label, LonLat, Plate } from "./types";
 export const PLATE_WIDTH = 366;
 export const PLATE_HEIGHT = 250;
 const GLOBE = { cx: 86, cy: 142, r: 76 };
+// A question without an approved plate shows the locator globe alone, larger and centred on the place.
+const LOCATOR = { cx: 183, cy: 125, r: 112 };
 const LENS = { cx: 262, cy: 118, r: 98 };
 // The locator globe turns so the place sits up and to the right, towards the magnifier.
 const GLOBE_OFFSET: LonLat = [28, 6];
@@ -160,5 +162,32 @@ export function renderPlate(
     s += `<text x="${f1(x)}" y="${f1(y + 3)}" text-anchor="middle" font-size="9.5" font-style="italic" letter-spacing=".3" fill="${SEA_TEXT}" ${halo(SEA)}>${escapeText(sea.text)}</text>`;
   }
   s += `</g><circle cx="${LENS.cx}" cy="${LENS.cy}" r="${LENS.r + 2}" fill="none" stroke="${INK}" stroke-width="3"/>`;
+  return `${s}</svg>`;
+}
+
+/** The placeholder for a question whose plate isn't approved yet: coastlines and a ring, so nothing on it can date wrong. */
+export function renderLocator(
+  at: LonLat,
+  globeLand: MultiPolygon,
+  opts: { idPrefix?: string } = {},
+): string {
+  const id = opts.idPrefix ?? "p";
+  const { cx, cy, r } = LOCATOR;
+  const globe = geoOrthographic()
+    .scale(r)
+    .translate([cx, cy])
+    .rotate([-at[0], -at[1]])
+    .clipAngle(90)
+    .precision(0.5);
+  const path = geoPath(globe);
+  const [x, y] = globe(at) ?? [cx, cy];
+  let s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${PLATE_WIDTH} ${PLATE_HEIGHT}" width="${PLATE_WIDTH}" height="${PLATE_HEIGHT}">`;
+  s += `<clipPath id="${id}-g"><circle cx="${cx}" cy="${cy}" r="${r}"/></clipPath>`;
+  s += `<g clip-path="url(#${id}-g)"><rect width="${PLATE_WIDTH}" height="${PLATE_HEIGHT}" fill="${SEA}"/>`;
+  s += `<path d="${path(geoGraticule().step([15, 15])()) ?? ""}" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width=".6"/>`;
+  s += `<path d="${path(globeLand) ?? ""}" fill="${LAND}" stroke="${INK}" stroke-opacity=".55" stroke-width=".7"/></g>`;
+  s += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${INK}" stroke-width="1.6"/>`;
+  s += `<circle cx="${f1(x)}" cy="${f1(y)}" r="16" fill="${RED}" fill-opacity=".12" stroke="${RED}" stroke-width="2.4" stroke-dasharray="5 3"/>`;
+  s += `<circle cx="${f1(x)}" cy="${f1(y)}" r="3.5" fill="${RED}" stroke="#fff" stroke-width="1.4"/>`;
   return `${s}</svg>`;
 }

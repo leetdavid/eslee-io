@@ -1,17 +1,10 @@
 import type { MultiLineString, MultiPolygon } from "geojson";
 import { feature, mesh } from "topojson-client";
 import type { Topology } from "topojson-specification";
-import type { GameEvent } from "@/lib/events";
 import built from "./built.json";
 import type { LensBase, Plate } from "./types";
 
 const BUILT = new Set<string>(built);
-
-/** How far the magnifier looks, in degrees, for an event without a drawn plate. */
-export function lensRadius(event: Pick<GameEvent, "kind" | "size">) {
-  if (event.kind === "city" || event.kind === "rename") return 2.5;
-  return { easy: 9, medium: 5, hard: 2.5 }[event.size];
-}
 
 const firstGeometry = <T>(topology: Topology, name: string) =>
   (feature(topology, topology.objects[name] as never) as unknown as { features: { geometry: T }[] })
@@ -26,10 +19,10 @@ export function globeLand() {
   return globe;
 }
 
-let fallback: Promise<LensBase> | null = null;
-/** Today's land and borders at 1:50m, loaded once, for plates that haven't been built yet. */
-function fallbackBase() {
-  fallback ??= Promise.all([
+let today: Promise<LensBase> | null = null;
+/** Today's land and borders at 1:50m, loaded once, for dragging a pin onto a place when sending in an event. */
+export function todaysMap() {
+  today ??= Promise.all([
     import("world-atlas/land-50m.json"),
     import("world-atlas/countries-50m.json"),
   ]).then(([land, countries]) => {
@@ -42,19 +35,12 @@ function fallbackBase() {
       seas: [],
     };
   });
-  return fallback;
+  return today;
 }
 
-/** The event's drawn plate if it has one, otherwise today's map around the place with a ring on it. */
-export async function plateFor(event: GameEvent): Promise<Plate> {
-  if (BUILT.has(event.id)) {
-    const res = await fetch(`/plates/${event.id}.json`);
-    if (res.ok) return (await res.json()) as Plate;
-  }
-  return {
-    center: [event.lon, event.lat],
-    radius: lensRadius(event),
-    marks: [{ type: "spot", at: [event.lon, event.lat] }],
-    base: await fallbackBase(),
-  };
+/** The event's plate once the owner has approved it on Doop; until then the game shows the locator globe alone. */
+export async function approvedPlate(eventId: string): Promise<Plate | null> {
+  if (!BUILT.has(eventId)) return null;
+  const res = await fetch(`/plates/${eventId}.json`);
+  return res.ok ? ((await res.json()) as Plate) : null;
 }

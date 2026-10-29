@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { GameEvent } from "@/lib/events";
-import { globeLand, plateFor } from "@/plates/load";
+import { globeLand, todaysMap } from "@/plates/load";
 import { PLATE_WIDTH, renderPlate } from "@/plates/render";
 
 const LENS_R = 98;
@@ -29,15 +28,15 @@ export function PinMap({
   useEffect(() => {
     let live = true;
     const frame = requestAnimationFrame(() => {
-      const event = {
-        id: "pin",
-        kind: "country",
-        size: "medium",
-        lat: view.lat,
-        lon: view.lon,
-      } as GameEvent;
-      Promise.all([plateFor(event), globeLand()]).then(([plate, land]) => {
-        if (live) setSvg(renderPlate({ ...plate, radius }, land, { idPrefix: "pin" }));
+      // Today's map is right here: it's for finding the place, not for dating anything.
+      const at: [number, number] = [view.lon, view.lat];
+      Promise.all([todaysMap(), globeLand()]).then(([base, land]) => {
+        if (live)
+          setSvg(
+            renderPlate({ center: at, radius, marks: [{ type: "spot", at }], base }, land, {
+              idPrefix: "pin",
+            }),
+          );
       });
     });
     return () => {

@@ -2,19 +2,29 @@
 
 import { useEffect, useState } from "react";
 import type { GameEvent } from "@/lib/events";
-import { globeLand, plateFor } from "@/plates/load";
-import { renderPlate } from "@/plates/render";
+import { approvedPlate, globeLand } from "@/plates/load";
+import { renderLocator, renderPlate } from "@/plates/render";
 
-/** The question's plate: a locator globe, a zoom cone and the magnifier, drawn in the browser. */
+/**
+ * The question's plate, drawn in the browser: a locator globe, a zoom cone and the magnifier once the owner has
+ * approved it, and the locator globe alone until then.
+ */
 export function PlateView({ event, label }: { event: GameEvent; label?: string }) {
-  const [svg, setSvg] = useState<{ id: string; markup: string } | null>(null);
+  const [svg, setSvg] = useState<{ id: string; markup: string; lens: boolean } | null>(null);
 
   useEffect(() => {
     let live = true;
-    Promise.all([plateFor(event), globeLand()])
+    Promise.all([approvedPlate(event.id), globeLand()])
       .then(([plate, land]) => {
-        if (live)
-          setSvg({ id: event.id, markup: renderPlate(plate, land, { idPrefix: `p-${event.id}` }) });
+        if (!live) return;
+        const idPrefix = `p-${event.id}`;
+        setSvg({
+          id: event.id,
+          markup: plate
+            ? renderPlate(plate, land, { idPrefix })
+            : renderLocator([event.lon, event.lat], land, { idPrefix }),
+          lens: !!plate,
+        });
       })
       .catch(() => {
         if (live) setSvg(null);
@@ -29,7 +39,12 @@ export function PlateView({ event, label }: { event: GameEvent; label?: string }
     <figure
       className={ready ? "plate" : "plate loading"}
       role="img"
-      aria-label={label ?? `A globe turned to ${event.title}, with a magnifier on the place`}
+      aria-label={
+        label ??
+        (ready && !svg.lens
+          ? `A globe turned to ${event.title}, with a ring on the place`
+          : `A globe turned to ${event.title}, with a magnifier on the place`)
+      }
       // The markup comes from our renderer, which escapes every label.
       // biome-ignore lint/security/noDangerouslySetInnerHtml: generated SVG, no user markup
       dangerouslySetInnerHTML={ready ? { __html: svg.markup } : undefined}
