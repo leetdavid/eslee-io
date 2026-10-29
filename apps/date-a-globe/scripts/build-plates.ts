@@ -159,8 +159,22 @@ const toMulti = (polys: Position[][][]): MultiPolygon => ({
       .filter((poly) => poly.length > 0),
   ),
 });
+// A ring that crosses the antimeridian and comes back (Fiji, Chukotka) jumps 360° twice. Clipped flat, it
+// would wrap the world as a thin strip, so its longitudes are unwrapped to run on past ±180 instead.
+// A ring that jumps once goes round a pole (Antarctica) and is right as it is.
+function unwrap(ring: Position[]): Position[] {
+  const jumps = ring.filter((p, i) => i > 0 && Math.abs(xy(p)[0] - pt(ring, i - 1)[0]) > 180).length;
+  if (jumps < 2 || jumps % 2) return ring;
+  let shift = 0;
+  return ring.map((p, i) => {
+    const step = i > 0 ? xy(p)[0] - pt(ring, i - 1)[0] : 0;
+    if (step > 180) shift -= 360;
+    if (step < -180) shift += 360;
+    return [xy(p)[0] + shift, xy(p)[1]];
+  });
+}
 const polysOf = (g: Polygon | MultiPolygon): Position[][][] =>
-  g.type === "Polygon" ? [g.coordinates] : g.coordinates;
+  (g.type === "Polygon" ? [g.coordinates] : g.coordinates).map((poly) => poly.map(unwrap));
 
 function lensBox(center: LonLat, radius: number): Position[][] {
   const reach = Math.min(radius * 1.7, 80);
@@ -421,6 +435,8 @@ writeFileSync(
     Object.keys(sources)
       .filter((id) => sources[id]?.approved)
       .sort(),
+    null,
+    2,
   )}\n`,
 );
 for (const [id, src] of Object.entries(sources)) {
