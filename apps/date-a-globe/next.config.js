@@ -14,7 +14,11 @@ const nextConfig = {
   },
   // Seeding reads the researched events, and the share image reads its fonts and globes.
   outputFileTracingIncludes: {
-    "/r/[id]/opengraph-image": ["./src/app/fonts/**", "./public/eras/*.png", "./public/brand/icon-small.png"],
+    "/r/[id]/opengraph-image": [
+      "./src/app/fonts/**",
+      "./public/eras/*.png",
+      "./public/brand/icon-small.png",
+    ],
   },
   poweredByHeader: false,
   async headers() {
