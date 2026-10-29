@@ -139,7 +139,12 @@ export function renderPlate(
     return `<text x="${f1(x)}" y="${f1(y + 4)}" text-anchor="middle" font-size="11" font-weight="700" letter-spacing="1.6" fill="${RED_INK}" ${halo()}>${escapeText(l.text)}</text>`;
   };
   for (const m of plate.marks) {
-    if (m.type === "city") {
+    if (m.type === "spot") {
+      const [x, y] = at(m.at);
+      s += `<circle cx="${f1(x)}" cy="${f1(y)}" r="20" fill="${RED}" fill-opacity=".12" stroke="${RED}" stroke-width="2.4" stroke-dasharray="5 3"/>`;
+      s += `<circle cx="${f1(x)}" cy="${f1(y)}" r="3.5" fill="${RED}" stroke="#fff" stroke-width="1.4"/>`;
+      placed.push({ x, y, w: 44 });
+    } else if (m.type === "city") {
       const [x, y] = at(m.at);
       const left = m.side === "left";
       placed.push({ x: left ? x - 30 : x + 30, y, w: m.name.length * 7.5 + 12 });

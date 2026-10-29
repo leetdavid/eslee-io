@@ -8,7 +8,7 @@ import { getDatabase } from "@/server/database";
 import { currentEvents, forgetEvents } from "@/server/events";
 import { charge, RateLimitedError } from "@/server/limits";
 import { currentReviewer } from "@/server/maintainers";
-import { confirmPrinted, savePlay, setupSchema, turnsSchema } from "@/server/plays";
+import { confirmPrinted, loadPlay, savePlay, setupSchema, turnsSchema } from "@/server/plays";
 import {
   approve,
   edit,
@@ -82,6 +82,12 @@ export const appRouter = t.router({
         return { id: play.id };
       }),
     ),
+  play: t.procedure.input(z.object({ id: z.string().max(12) })).query(({ input }) =>
+    guarded(async () => {
+      const play = await loadPlay(await getDatabase(), input.id);
+      return play ? { setup: play.setup, turns: play.turns } : null;
+    }),
+  ),
   confirmPrinted: t.procedure
     .input(z.object({ id: z.string().max(12), year: z.number().int().min(1700).max(2100) }))
     .mutation(({ input }) =>

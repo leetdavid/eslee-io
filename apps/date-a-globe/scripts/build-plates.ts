@@ -217,7 +217,7 @@ function build(id: string, src: PlateSource): Plate {
   );
 
   const marks: Mark[] = src.marks.map((m) => {
-    if (m.type === "city" || m.type === "label") return m;
+    if (m.type === "city" || m.type === "label" || m.type === "spot") return m;
     if (m.type === "line") {
       let coords: Position[][] = [m.path];
       if (m.clipTo) {
@@ -365,6 +365,11 @@ const sources = read<Record<string, PlateSource>>(
 const only = process.argv.slice(2);
 const outDir = new URL("public/plates/", root).pathname;
 if (!existsSync(outDir)) mkdirSync(outDir, { recursive: true });
+// The game reads this list to know which events have a drawn plate; the rest get a ring on the place.
+writeFileSync(
+  new URL("src/plates/built.json", root).pathname,
+  `${JSON.stringify(Object.keys(sources).sort())}\n`,
+);
 for (const [id, src] of Object.entries(sources)) {
   if (only.length && !only.includes(id)) continue;
   writeFileSync(`${outDir}${id}.json`, JSON.stringify(build(id, src)));

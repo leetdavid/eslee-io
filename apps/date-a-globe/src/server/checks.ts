@@ -103,8 +103,9 @@ export function compareWithKnown(
       },
       clash: { status: "pass", label: "No clashes", detail: "Same dates as the event we have." },
     };
+  const year = (d: string) => (Number(d.slice(0, 4)) < 1805 ? "before 1805" : d.slice(0, 4));
   const theirLabel = close.event.spans
-    .map((sp) => `${sp.from.slice(0, 4)}–${sp.until?.slice(0, 4) ?? "today"}`)
+    .map((sp) => `${year(sp.from)}–${sp.until ? year(sp.until) : "today"}`)
     .join(", ");
   return {
     duplicate: {
@@ -136,12 +137,15 @@ export async function checkSource(
       (n) => n.trim().length > 2 && lower.includes(n.trim().toLowerCase()),
     );
     const found = years.filter((y) => new RegExp(`\\b${y}\\b`).test(text));
-    let quote: string | null = null;
-    const first = found[0];
-    if (first !== undefined) {
-      const at = text.search(new RegExp(`\\b${first}\\b`));
-      quote = text.slice(Math.max(0, at - 120), at + 120).trim();
-    }
+    // The quote is a real sentence with a year in it, naming the place if one does, not a contents list.
+    const sentences = text
+      .split(/(?<=[.!?])\s+/)
+      .filter((x) => x.split(" ").length >= 6 && x.length < 400 && !/subsection|Toggle/.test(x));
+    const withYear = sentences.filter((x) => found.some((y) => new RegExp(`\\b${y}\\b`).test(x)));
+    const named = withYear.find((x) =>
+      names.some((n) => n.trim().length > 2 && x.toLowerCase().includes(n.trim().toLowerCase())),
+    );
+    const quote = (named ?? withYear[0] ?? null)?.slice(0, 280) ?? null;
     return { url, opens: true, mentions, years, found, quote };
   } catch (err) {
     return {

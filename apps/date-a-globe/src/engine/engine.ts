@@ -69,14 +69,15 @@ export function createEngine(events: EngineEvent[], opts: { now: Date }) {
     return P;
   }
 
-  function windowOf(P: Posterior): Window {
+  /** The shortest stretch of months holding `share` of the likelihood: 90% for the range. */
+  function windowOf(P: Posterior, share = MASS): Window {
     let best = { from: 0, to: N - 1 };
     let mass = 0;
     let a = 0;
     for (let b = 0; b < N; b++) {
       mass += at(P, b);
-      while (mass - at(P, a) >= MASS) mass -= at(P, a++);
-      if (mass >= MASS && b - a < best.to - best.from) best = { from: a, to: b };
+      while (mass - at(P, a) >= share) mass -= at(P, a++);
+      if (mass >= share && b - a < best.to - best.from) best = { from: a, to: b };
     }
     return best;
   }
@@ -241,6 +242,8 @@ export function createEngine(events: EngineEvent[], opts: { now: Date }) {
     const P = posterior(turns);
     return {
       current: windowOf(P),
+      // What the question card calls still possible: everything not yet all but ruled out.
+      possible: windowOf(P, 0.98),
       ifYes: windowOf(apply(P.slice(), eventId, true)),
       ifNo: windowOf(apply(P.slice(), eventId, false)),
     };
