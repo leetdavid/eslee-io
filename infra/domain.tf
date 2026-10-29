@@ -61,17 +61,6 @@ resource "cloudflare_dns_record" "eslee_io_sushiro" {
   proxied = false
 }
 
-# Chungus, the Cyrus agent on the Mac mini, receives webhooks through the cloudflared tunnel
-# "chungus" (run with `cftun run chungus`). Cloudflare only routes proxied CNAMEs into a tunnel.
-resource "cloudflare_dns_record" "eslee_io_chungus" {
-  zone_id = var.cloudflare_zone_id
-  type    = "CNAME"
-  name    = "chungus"
-  content = "962df9f0-9f10-4082-871a-ff92891978b7.cfargotunnel.com"
-  ttl     = 1
-  proxied = true
-}
-
 
 # ? Google site verification
 resource "cloudflare_dns_record" "eslee_io_google_site_verification" {
