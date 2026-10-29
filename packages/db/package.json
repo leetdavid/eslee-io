@@ -23,6 +23,10 @@
     "./jev-mbti": {
       "types": "./dist/schema/jev-mbti.d.ts",
       "default": "./src/schema/jev-mbti.ts"
+    },
+    "./date-a-globe": {
+      "types": "./dist/schema/date-a-globe.d.ts",
+      "default": "./src/schema/date-a-globe.ts"
     }
   },
   "license": "MIT",

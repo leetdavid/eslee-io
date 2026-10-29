@@ -349,7 +349,13 @@ export function createEngine(events: EngineEvent[], opts: { now: Date }) {
     return dates[0] ? { turn: found.turn, eventId: event.id, date: dates[0] } : null;
   }
 
-  return { months: N, next, preview, result, windowOf, posterior };
+  /** P(yes) for an event given the counted answers, used to score trial answers. */
+  const expected = (turns: Turn[], eventId: string) => chanceYes(posterior(turns), eventId);
+
+  /** Whether the engine knows an event; answers about removed events are dropped before scoring. */
+  const knows = (eventId: string) => byId.has(eventId);
+
+  return { months: N, next, preview, result, expected, knows, windowOf, posterior };
 }
 
 export function eraOf(year: number): Era {

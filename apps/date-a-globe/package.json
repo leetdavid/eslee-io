@@ -13,12 +13,15 @@
     "plates:render": "tsx scripts/render-plates.ts",
     "db:generate": "pnpm with-env drizzle-kit generate",
     "db:migrate": "pnpm with-env tsx scripts/migrate.ts",
-    "db:seed": "pnpm with-env tsx scripts/seed.ts",
+    "db:seed": "NODE_OPTIONS=--conditions=react-server pnpm with-env tsx scripts/seed.ts",
     "with-env": "dotenv -e .env.local -e ../../.env.github -e ../../.env.local -e ../../.env --"
   },
   "dependencies": {
     "@eslee/auth": "workspace:*",
     "@eslee/db": "workspace:*",
+    "@trpc/client": "catalog:",
+    "@trpc/server": "catalog:",
+    "better-auth": "catalog:",
     "d3-geo": "^3.1.1",
     "drizzle-orm": "catalog:",
     "next": "catalog:",
