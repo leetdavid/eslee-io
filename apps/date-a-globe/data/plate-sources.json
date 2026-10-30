@@ -591,5 +591,348 @@
         }
       }
     ]
+  },
+  "namibia": {
+    "center": [17.5, -22.5],
+    "radius": 10,
+    "marks": [
+      {
+        "type": "area",
+        "countries": ["516"],
+        "label": {
+          "text": "NAMIBIA",
+          "at": [17.5, -22]
+        }
+      }
+    ]
+  },
+  "canada-dominion": {
+    "center": [-67, 46.5],
+    "radius": 6.5,
+    "marks": [
+      {
+        "type": "area",
+        "provinces": ["Nova Scotia", "New Brunswick"]
+      },
+      {
+        "type": "label",
+        "label": {
+          "text": "DOMINION OF CANADA",
+          "at": [-71.5, 48.4]
+        }
+      }
+    ]
+  },
+  "malagasy-republic": {
+    "center": [46.8, -19],
+    "radius": 9,
+    "marks": [
+      {
+        "type": "area",
+        "countries": ["450"],
+        "label": {
+          "text": "MALAGASY REP.",
+          "at": [46.5, -19.5]
+        }
+      }
+    ]
+  },
+  "manchukuo": {
+    "center": [125, 45],
+    "radius": 12,
+    "marks": [
+      {
+        "type": "area",
+        "clipTo": ["156"],
+        "outline": [
+          [119.75, 39.95],
+          [117.2, 40.65],
+          [116.6, 40.95],
+          [116.3, 41.6],
+          [116.9, 42.4],
+          [117.8, 43.3],
+          [118.9, 44.4],
+          [119.6, 45.4],
+          [119.95, 46.4],
+          [115, 47.6],
+          [115, 54],
+          [135.5, 54],
+          [135.5, 40],
+          [124, 38.5],
+          [121.5, 38.6]
+        ],
+        "label": {
+          "text": "MANCHUKUO",
+          "at": [126, 46]
+        }
+      }
+    ]
+  },
+  "italian-libya": {
+    "center": [17.5, 27],
+    "radius": 12,
+    "marks": [
+      {
+        "type": "area",
+        "countries": ["434"],
+        "label": {
+          "text": "ITALIAN LIBYA",
+          "at": [17.5, 27.5]
+        }
+      }
+    ]
+  },
+  "german-east-africa": {
+    "center": [34.5, -6],
+    "radius": 9,
+    "marks": [
+      {
+        "type": "area",
+        "countries": ["834", "646", "108"],
+        "label": {
+          "text": "GERMAN EAST AFRICA",
+          "at": [34.3, -6]
+        },
+        "without": [
+          [[39.15, -6.5], [39.65, -6.5], [39.65, -5.7], [39.15, -5.7]],
+          [[39.5, -5.5], [39.9, -5.5], [39.9, -4.85], [39.5, -4.85]]
+        ]
+      }
+    ]
+  },
+  "mozambique-independent": {
+    "center": [35, -18],
+    "radius": 11,
+    "marks": [
+      {
+        "type": "area",
+        "countries": ["508"],
+        "label": {
+          "text": "MOZAMBIQUE",
+          "at": [36.5, -15.5]
+        }
+      }
+    ]
+  },
+  "egypt-labelled-uar": {
+    "center": [30, 26.8],
+    "radius": 9,
+    "marks": [
+      {
+        "type": "area",
+        "countries": ["818"],
+        "label": {
+          "text": "UNITED ARAB REP.",
+          "at": [29.5, 26.6]
+        }
+      }
+    ]
+  },
+  "tajik-ssr": {
+    "center": [71, 38.8],
+    "radius": 5,
+    "marks": [
+      {
+        "type": "area",
+        "countries": ["762"],
+        "label": {
+          "text": "TAJIK S.S.R.",
+          "at": [71.5, 38.6]
+        }
+      }
+    ]
+  },
+  "angola-independent": {
+    "center": [17.8, -12],
+    "radius": 10,
+    "marks": [
+      {
+        "type": "area",
+        "countries": ["024"],
+        "label": {
+          "text": "ANGOLA",
+          "at": [17.8, -12.3]
+        }
+      }
+    ]
+  },
+  "french-indochina": {
+    "center": [105.5, 15.5],
+    "radius": 10,
+    "marks": [
+      {
+        "type": "area",
+        "countries": ["704", "418", "116"],
+        "label": {
+          "text": "FRENCH INDOCHINA",
+          "at": [104.6, 15.6]
+        }
+      }
+    ]
+  },
+  "name-iraq": {
+    "center": [43.7, 33.2],
+    "radius": 7,
+    "marks": [
+      {
+        "type": "area",
+        "countries": ["368"],
+        "label": {
+          "text": "IRAQ",
+          "at": [43.7, 33.2]
+        }
+      }
+    ]
+  },
+  "name-tanganyika": {
+    "center": [35, -6],
+    "radius": 9,
+    "marks": [
+      {
+        "type": "area",
+        "countries": ["834"],
+        "label": {
+          "text": "TANGANYIKA",
+          "at": [34.8, -6]
+        },
+        "without": [
+          [[39.15, -6.5], [39.65, -6.5], [39.65, -5.7], [39.15, -5.7]],
+          [[39.5, -5.5], [39.9, -5.5], [39.9, -4.85], [39.5, -4.85]]
+        ]
+      }
+    ]
+  },
+  "australia-federation": {
+    "center": [134, -26],
+    "radius": 22,
+    "marks": [
+      {
+        "type": "area",
+        "countries": ["036"],
+        "label": {
+          "text": "AUSTRALIA",
+          "at": [134, -25]
+        }
+      }
+    ]
+  },
+  "name-burkina-faso": {
+    "center": [-1.6, 12.2],
+    "radius": 5,
+    "marks": [
+      {
+        "type": "area",
+        "countries": ["854"],
+        "label": {
+          "text": "BURKINA FASO",
+          "at": [-1.6, 12.4]
+        }
+      }
+    ]
+  },
+  "french-morocco": {
+    "center": [-6.5, 31.2],
+    "radius": 6.5,
+    "marks": [
+      {
+        "type": "area",
+        "countries": ["504"],
+        "label": {
+          "text": "FRENCH MOROCCO",
+          "at": [-6.3, 31.8]
+        },
+        "without": [
+          [
+            [-6.4, 34.98],
+            [-5.6, 34.88],
+            [-4.9, 34.82],
+            [-4.3, 34.86],
+            [-3.6, 34.95],
+            [-2.9, 35.05],
+            [-2.35, 35.1],
+            [-2.35, 36.2],
+            [-6.4, 36.2]
+          ],
+          [[-10.3, 29.1], [-9.85, 29.1], [-9.85, 29.65], [-10.3, 29.65]],
+          [[-18, 20.5], [-8, 20.5], [-8, 28.7], [-18, 28.7]]
+        ]
+      }
+    ]
+  },
+  "russia-name": {
+    "center": [62, 60],
+    "radius": 26,
+    "marks": [
+      {
+        "type": "label",
+        "label": {
+          "text": "RUSSIA",
+          "at": [62, 60]
+        }
+      }
+    ]
+  },
+  "nz-british": {
+    "center": [172.5, -41.5],
+    "radius": 8,
+    "marks": [
+      {
+        "type": "area",
+        "countries": ["554"],
+        "label": {
+          "text": "NEW ZEALAND",
+          "at": [173.5, -41.8]
+        }
+      }
+    ]
+  },
+  "alberta-saskatchewan": {
+    "center": [-110, 54],
+    "radius": 9,
+    "marks": [
+      {
+        "type": "area",
+        "provinces": ["Alberta"],
+        "label": {
+          "text": "ALBERTA",
+          "at": [-114.4, 56.6]
+        }
+      },
+      {
+        "type": "area",
+        "provinces": ["Saskatchewan"],
+        "label": {
+          "text": "SASKATCHEWAN",
+          "at": [-105.8, 51.6]
+        }
+      }
+    ]
+  },
+  "yugoslavia": {
+    "center": [19.5, 43.8],
+    "radius": 5.5,
+    "marks": [
+      {
+        "type": "label",
+        "label": {
+          "text": "YUGOSLAVIA",
+          "at": [19.2, 44.2]
+        }
+      }
+    ]
+  },
+  "kazakh-ssr": {
+    "center": [67, 48],
+    "radius": 13,
+    "marks": [
+      {
+        "type": "area",
+        "countries": ["398"],
+        "label": {
+          "text": "KAZAKH S.S.R.",
+          "at": [67, 48]
+        }
+      }
+    ]
   }
 }

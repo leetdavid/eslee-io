@@ -20,8 +20,12 @@ export interface PlateSource {
 export type SourceMark =
   | {
       type: "area";
-      /** Natural Earth country ids (ISO 3166 numeric) merged into one shape. */
+      /** Natural Earth countries merged into one shape: ISO 3166 numeric ids, or names where there is no id. */
       countries?: string[];
+      /** Natural Earth 1:50m provinces or states, by name, merged into the shape. */
+      provinces?: string[];
+      /** Parts cut out of the shape, such as islands that belonged to someone else. */
+      without?: LonLat[][];
       /** Our own outline for a border that no longer exists. */
       outline?: LonLat[];
       /** Keep only the part of the outline that lies inside these countries. */

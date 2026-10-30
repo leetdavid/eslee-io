@@ -223,10 +223,24 @@ function clipLines(lines: Position[][], box: Position[][]): Position[][] {
   return out;
 }
 
+// A country is named by its ISO numeric id, or by its Natural Earth name where it has none (Kosovo).
+const isCountry = (g: { id?: string | number; properties?: unknown }, ref: string) =>
+  String(g.id) === ref || (g.properties as { name?: string } | undefined)?.name === ref;
 function countryShape(res: Res, ids: string[]): Position[][][] {
-  const geoms = countriesOf(res).geometries.filter((g) => ids.includes(String(g.id)));
-  if (geoms.length !== ids.length) throw new Error(`Unknown country id among ${ids.join(", ")}`);
+  const geoms = countriesOf(res).geometries.filter((g) => ids.some((ref) => isCountry(g, ref)));
+  const missing = ids.filter((ref) => !geoms.some((g) => isCountry(g, ref)));
+  if (missing.length) throw new Error(`Unknown country ${missing.join(", ")}`);
   return polysOf(merge(atlas[res], geoms as never) as MultiPolygon);
+}
+
+// Provinces and states, for the ten countries Natural Earth covers at 1:50m (Canada, China, the US, ...).
+const provinces = await ne<Area>("ne_50m_admin_1_states_provinces");
+function provinceShape(names: string[]): Position[][][] {
+  const found = provinces.features.filter((f) => names.includes(String(f.properties?.name)));
+  if (found.length !== names.length) throw new Error(`Unknown province among ${names.join(", ")}`);
+  return polygonClipping.union(
+    ...(found.map((f) => polysOf(f.geometry)) as [Geom, ...Geom[]]),
+  ) as Position[][][];
 }
 
 function lakeShape(res: Res, names: string[]): Position[][][] {
@@ -262,6 +276,12 @@ function build(id: string, src: PlateSource): Plate {
     }
     let polys: Position[][][] = [];
     if (m.type === "area" && m.countries) polys = countryShape(res, m.countries);
+    if (m.type === "area" && m.provinces) {
+      const shape = provinceShape(m.provinces);
+      polys = polys.length
+        ? (polygonClipping.union(polys as Geom, shape as Geom) as Position[][][])
+        : shape;
+    }
     if (m.type === "water" && m.lakes) polys = lakeShape(res, m.lakes);
     if (m.outline) {
       const own: Position[][][] = [[[...m.outline, xy(m.outline[0])]]];
@@ -274,6 +294,12 @@ function build(id: string, src: PlateSource): Plate {
         polys as Geom,
         countryShape(res, m.clipTo) as Geom,
       ) as Position[][][];
+    // Parts that weren't the area's then, such as Zanzibar off German East Africa.
+    for (const cut of (m.type === "area" && m.without) || [])
+      polys = polygonClipping.difference(
+        polys as Geom,
+        [[[...cut, xy(cut[0])]]] as Geom,
+      ) as Position[][][];
     return { type: m.type, geometry: toMulti(polys), label: m.label };
   });
 
@@ -283,10 +309,11 @@ function build(id: string, src: PlateSource): Plate {
   );
   // Today's borders in view, kept only where they stood through the question's years.
   // Borders of the event's own area are left to its red outline.
-  const own = new Set(src.marks.flatMap((m) => (m.type === "area" && m.countries) || []));
+  const own = src.marks.flatMap((m) => (m.type === "area" && m.countries) || []);
+  const isOwn = (g: Parameters<typeof isCountry>[0]) => own.some((ref) => isCountry(g, ref));
   const pairs = new Set<string>();
   mesh(topo, countriesOf(res), (a, b) => {
-    if (a !== b && !own.has(String(a.id)) && !own.has(String(b.id))) pairs.add(borderKey(a, b));
+    if (a !== b && !isOwn(a) && !isOwn(b)) pairs.add(borderKey(a, b));
     return false;
   });
   const kept: string[] = [];
