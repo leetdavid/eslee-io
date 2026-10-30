@@ -200,6 +200,42 @@
     ],
     "note": "The Barotse boundary award of 1905."
   },
+  "Argentina / Bolivia": {
+    "spans": [
+      {
+        "from": "1925",
+        "until": null
+      }
+    ],
+    "note": "Final after the Puna de Atacama (1899) and Tarija (1925) settlements."
+  },
+  "Argentina / Chile": {
+    "spans": [
+      {
+        "from": "1902-11",
+        "until": null
+      }
+    ],
+    "note": "The 1902 Andes arbitration; the Beagle Channel (1984) and Laguna del Desierto (1994) don't show at plate scale."
+  },
+  "Argentina / Paraguay": {
+    "spans": [
+      {
+        "from": "1876",
+        "until": null
+      }
+    ],
+    "note": "Set after the Paraguayan War, 1876."
+  },
+  "Argentina / Uruguay": {
+    "spans": [
+      {
+        "from": "1828",
+        "until": null
+      }
+    ],
+    "note": "The Uruguay river, from Uruguay's independence."
+  },
   "Armenia / Azerbaijan": {
     "spans": [
       {
@@ -584,6 +620,33 @@
       }
     ],
     "note": "Bhutan against British India after the Duars War of 1865."
+  },
+  "Bolivia / Chile": {
+    "spans": [
+      {
+        "from": "1904-10",
+        "until": null
+      }
+    ],
+    "note": "Treaty of 1904, after Bolivia lost its coast."
+  },
+  "Bolivia / Paraguay": {
+    "spans": [
+      {
+        "from": "1938-07",
+        "until": null
+      }
+    ],
+    "note": "The Chaco peace treaty of 1938."
+  },
+  "Bolivia / Peru": {
+    "spans": [
+      {
+        "from": "1932",
+        "until": null
+      }
+    ],
+    "note": "Final after the 1909 treaty and its demarcation."
   },
   "Bosnia and Herz. / Croatia": {
     "spans": [
@@ -1020,6 +1083,15 @@
     ],
     "note": "Wadai against Darfur, agreed 1919 and demarcated by 1924."
   },
+  "Chile / Peru": {
+    "spans": [
+      {
+        "from": "1929-08",
+        "until": null
+      }
+    ],
+    "note": "Treaty of Lima, 1929: Tacna to Peru, Arica to Chile."
+  },
   "China / India": {
     "spans": [
       {
@@ -1127,6 +1199,24 @@
       }
     ],
     "note": "Sino-French conventions of 1887–95."
+  },
+  "Colombia / Peru": {
+    "spans": [
+      {
+        "from": "1934-05",
+        "until": null
+      }
+    ],
+    "note": "Settled after the Leticia conflict of 1932–34."
+  },
+  "Colombia / Venezuela": {
+    "spans": [
+      {
+        "from": "1941-04",
+        "until": null
+      }
+    ],
+    "note": "The 1941 treaty, after the 1891 arbitration."
   },
   "Congo / Dem. Rep. Congo": {
     "spans": [
@@ -1398,6 +1488,15 @@
       }
     ],
     "note": "Italo-Egyptian agreement of 1925."
+  },
+  "Egypt / Palestine": {
+    "spans": [
+      {
+        "from": "1906",
+        "until": null
+      }
+    ],
+    "note": "The 1906 line at Rafah, Gaza's border with Sinai."
   },
   "Egypt / Sudan": {
     "spans": [
