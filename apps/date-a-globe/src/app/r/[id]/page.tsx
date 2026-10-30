@@ -94,7 +94,12 @@ export default async function ResultPage({ params }: Params) {
         <ShareButton label={result.label} round />
       </header>
 
-      <Certificate result={result} setup={setup} pins={pins} />
+      <Certificate
+        result={result}
+        setup={setup}
+        pins={pins}
+        globe={result.era === "mid" || result.era === "web" ? `/r/${play.id}/globe` : undefined}
+      />
 
       <p className="text-center text-[13px] text-muted">
         Most likely month: <b className="font-semibold text-ink">{monthLabel(result.mostLikely)}</b>

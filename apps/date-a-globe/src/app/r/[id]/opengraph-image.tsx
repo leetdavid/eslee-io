@@ -2,7 +2,8 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { ERA_NAMES } from "@/components/certificate";
-import { type Era, yearOf } from "@/engine";
+import { currentMonth, type Era, yearOf } from "@/engine";
+import { politicalGlobe } from "@/eras/political";
 import { resultFor } from "@/server/results";
 
 export const runtime = "nodejs";
@@ -79,6 +80,11 @@ export default async function Image({ params }: { params: Promise<{ id: string }
     readFile(asset("public/brand", "icon-small.png")),
   ]);
   const result = found?.play.result;
+  // The Cold War and web map globes are drawn for the result's own years, as on the result page.
+  const globeSrc =
+    result && (era === "mid" || era === "web")
+      ? `data:image/svg+xml;base64,${Buffer.from(politicalGlobe(era, result.window, currentMonth(new Date()))).toString("base64")}`
+      : `data:image/png;base64,${globe.toString("base64")}`;
   const label = result?.label ?? "Date a Globe";
   const from = result ? yearOf(result.window.from) : 1805;
   const to = result ? yearOf(result.window.to) : 2026;
@@ -212,7 +218,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
       </div>
       {/* biome-ignore lint/performance/noImgElement: satori draws plain img elements */}
       <img
-        src={`data:image/png;base64,${globe.toString("base64")}`}
+        src={globeSrc}
         width={410}
         height={410}
         style={{ position: "absolute", right: 62, top: 96 }}

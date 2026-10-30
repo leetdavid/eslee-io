@@ -118,9 +118,11 @@ interface Props {
   result: Result;
   setup: Setup;
   pins: Pin[];
+  /** The Cold War or web map globe drawn for this result's years; the era's fixed globe if absent. */
+  globe?: string;
 }
 
-export function Certificate({ result, setup, pins }: Props) {
+export function Certificate({ result, setup, pins, globe }: Props) {
   const era = result.era;
   const draw = {
     engraved: Engraved,
@@ -129,7 +131,7 @@ export function Certificate({ result, setup, pins }: Props) {
     mid: ColdWar,
     web: WebMap,
   }[era];
-  return draw({ result, setup, pins });
+  return draw({ result, setup, pins, globe });
 }
 
 function Frame({
@@ -567,7 +569,7 @@ function Interwar({ result, setup, pins }: Props) {
   );
 }
 
-function ColdWar({ result, setup, pins }: Props) {
+function ColdWar({ result, setup, pins, globe }: Props) {
   const red = "#D7382F";
   const ink = "#1D1D1B";
   const paper = "#F7F5EE";
@@ -637,8 +639,8 @@ function ColdWar({ result, setup, pins }: Props) {
         )}
       </svg>
       <div className="g">
-        {/* biome-ignore lint/performance/noImgElement: a fixed vector globe */}
-        <img src="/eras/mid.svg" alt="" />
+        {/* biome-ignore lint/performance/noImgElement: a vector globe drawn for the result's years */}
+        <img src={globe ?? "/eras/mid.svg"} alt="" />
         <svg viewBox={`0 0 ${placed.size} ${placed.size}`} aria-hidden="true">
           <Leaders list={placed.list} color={ink} />
           {placed.list.map((p) => (
@@ -729,7 +731,7 @@ function ColdWar({ result, setup, pins }: Props) {
   );
 }
 
-function WebMap({ result, setup, pins }: Props) {
+function WebMap({ result, setup, pins, globe }: Props) {
   const blue = "#1A73E8";
   const w = 318;
   const s = scaleSpan(result);
@@ -771,8 +773,8 @@ function WebMap({ result, setup, pins }: Props) {
         )}
       </svg>
       <div className="g">
-        {/* biome-ignore lint/performance/noImgElement: a fixed vector globe */}
-        <img src="/eras/web.svg" alt="" />
+        {/* biome-ignore lint/performance/noImgElement: a vector globe drawn for the result's years */}
+        <img src={globe ?? "/eras/web.svg"} alt="" />
         <svg viewBox={`0 0 ${placed.size} ${placed.size}`} aria-hidden="true">
           <Leaders list={placed.list} color={blue} />
           {placed.list.map((p) => (
