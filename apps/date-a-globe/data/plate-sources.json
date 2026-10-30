@@ -593,6 +593,7 @@
     ]
   },
   "namibia": {
+    "approved": "2026-10-30",
     "center": [17.5, -22.5],
     "radius": 10,
     "marks": [
@@ -607,6 +608,7 @@
     ]
   },
   "canada-dominion": {
+    "approved": "2026-10-30",
     "center": [-67, 46.5],
     "radius": 6.5,
     "marks": [
@@ -624,6 +626,7 @@
     ]
   },
   "malagasy-republic": {
+    "approved": "2026-10-30",
     "center": [46.8, -19],
     "radius": 9,
     "marks": [
@@ -638,6 +641,7 @@
     ]
   },
   "manchukuo": {
+    "approved": "2026-10-30",
     "center": [125, 45],
     "radius": 12,
     "marks": [
@@ -669,6 +673,7 @@
     ]
   },
   "italian-libya": {
+    "approved": "2026-10-30",
     "center": [17.5, 27],
     "radius": 12,
     "marks": [
@@ -683,6 +688,7 @@
     ]
   },
   "german-east-africa": {
+    "approved": "2026-10-30",
     "center": [34.5, -6],
     "radius": 9,
     "marks": [
@@ -701,6 +707,7 @@
     ]
   },
   "mozambique-independent": {
+    "approved": "2026-10-30",
     "center": [35, -18],
     "radius": 11,
     "marks": [
@@ -715,6 +722,7 @@
     ]
   },
   "egypt-labelled-uar": {
+    "approved": "2026-10-30",
     "center": [30, 26.8],
     "radius": 9,
     "marks": [
@@ -729,6 +737,7 @@
     ]
   },
   "tajik-ssr": {
+    "approved": "2026-10-30",
     "center": [71, 38.8],
     "radius": 5,
     "marks": [
@@ -743,6 +752,7 @@
     ]
   },
   "angola-independent": {
+    "approved": "2026-10-30",
     "center": [17.8, -12],
     "radius": 10,
     "marks": [
@@ -757,6 +767,7 @@
     ]
   },
   "french-indochina": {
+    "approved": "2026-10-30",
     "center": [105.5, 15.5],
     "radius": 10,
     "marks": [
@@ -771,6 +782,7 @@
     ]
   },
   "name-iraq": {
+    "approved": "2026-10-30",
     "center": [43.7, 33.2],
     "radius": 7,
     "marks": [
@@ -785,6 +797,7 @@
     ]
   },
   "name-tanganyika": {
+    "approved": "2026-10-30",
     "center": [35, -6],
     "radius": 9,
     "marks": [
@@ -803,6 +816,7 @@
     ]
   },
   "australia-federation": {
+    "approved": "2026-10-30",
     "center": [134, -26],
     "radius": 22,
     "marks": [
@@ -817,6 +831,7 @@
     ]
   },
   "name-burkina-faso": {
+    "approved": "2026-10-30",
     "center": [-1.6, 12.2],
     "radius": 5,
     "marks": [
@@ -831,6 +846,7 @@
     ]
   },
   "french-morocco": {
+    "approved": "2026-10-30",
     "center": [-6.5, 31.2],
     "radius": 6.5,
     "marks": [
@@ -860,6 +876,7 @@
     ]
   },
   "russia-name": {
+    "approved": "2026-10-30",
     "center": [62, 60],
     "radius": 26,
     "marks": [
@@ -873,6 +890,7 @@
     ]
   },
   "nz-british": {
+    "approved": "2026-10-30",
     "center": [172.5, -41.5],
     "radius": 8,
     "marks": [
@@ -887,6 +905,7 @@
     ]
   },
   "alberta-saskatchewan": {
+    "approved": "2026-10-30",
     "center": [-110, 54],
     "radius": 9,
     "marks": [
@@ -909,6 +928,7 @@
     ]
   },
   "yugoslavia": {
+    "approved": "2026-10-30",
     "center": [19.5, 43.8],
     "radius": 5.5,
     "marks": [
@@ -922,6 +942,7 @@
     ]
   },
   "kazakh-ssr": {
+    "approved": "2026-10-30",
     "center": [67, 48],
     "radius": 13,
     "marks": [
