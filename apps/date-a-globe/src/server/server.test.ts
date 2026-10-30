@@ -1,7 +1,7 @@
 import { DateAGlobeEvent, DateAGlobePlay } from "@eslee/db/date-a-globe";
 import { eq } from "drizzle-orm";
 import { beforeAll, describe, expect, it, vi } from "vitest";
-import { createEngine, monthOf, type Turn } from "@/engine";
+import { createEngine, monthOf, type Setup, type Turn } from "@/engine";
 import type { Submission } from "@/lib/submission";
 import { compareWithKnown, datesCheck, type KnownEvent } from "@/server/checks";
 import { type Database, openPglite } from "@/server/database";
@@ -89,7 +89,7 @@ describe("plays", () => {
     await db.update(DateAGlobeEvent).set({ status: "trial" }).where(eq(DateAGlobeEvent.id, trialId));
     const events = await askedEvents(db);
     const engine = createEngine(events, { now: NOW });
-    const setup = { kind: "globe", regions: [] } as const;
+    const setup: Setup = { kind: "globe", regions: [] };
     const turns: Turn[] = [
       { eventId: "soviet-union", answer: "yes" },
       { eventId: "two-germanys", answer: "yes" },
