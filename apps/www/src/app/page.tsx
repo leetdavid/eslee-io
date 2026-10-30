@@ -45,6 +45,35 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Projects */}
+      <section>
+        <h3 className="mb-6 font-bold text-muted-foreground text-sm">projects</h3>
+        <ul className="flex flex-col border-border border-t">
+          {resume.projects.map((project) => (
+            <li key={project.url}>
+              <div className="flex flex-col space-y-2 border-border border-b py-4">
+                <div className="flex items-baseline justify-between">
+                  <a
+                    href={project.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-bold text-lg underline decoration-border underline-offset-4 transition-all hover:decoration-foreground"
+                  >
+                    {project.name}
+                  </a>
+                  <span className="ml-4 hidden shrink-0 font-mono text-muted-foreground text-xs sm:inline">
+                    {new URL(project.url).host}
+                  </span>
+                </div>
+                <p className="max-w-xl text-muted-foreground text-sm leading-relaxed">
+                  {project.description}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+
       {/* Experience */}
       <section>
         <h3 className="mb-6 font-bold text-muted-foreground text-sm">experience</h3>
