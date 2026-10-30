@@ -1,4 +1,13 @@
 {
+  "Afghanistan / China": {
+    "spans": [
+      {
+        "from": "1963-11",
+        "until": null
+      }
+    ],
+    "note": "Settled by the 1963 treaty along the 1895 Wakhan line."
+  },
   "Afghanistan / Iran": {
     "spans": [
       {
@@ -17,6 +26,15 @@
     ],
     "note": "The Durand Line, British India's border with Afghanistan from 1893."
   },
+  "Afghanistan / Tajikistan": {
+    "spans": [
+      {
+        "from": "1895",
+        "until": null
+      }
+    ],
+    "note": "The Panj and the Pamirs, 1895."
+  },
   "Afghanistan / Turkmenistan": {
     "spans": [
       {
@@ -26,23 +44,107 @@
     ],
     "note": "The Russo-Afghan line of 1887."
   },
-  "Algeria / Mauritania": {
+  "Afghanistan / Uzbekistan": {
     "spans": [
       {
-        "from": "1962-07",
+        "from": "1895",
         "until": null
       }
     ],
-    "note": "International once Algeria became independent; colonial maps drew it loosely."
+    "note": "The Amu Darya, Russo-British agreements of 1873–95."
+  },
+  "Albania / Greece": {
+    "spans": [
+      {
+        "from": "1923",
+        "until": null
+      }
+    ],
+    "note": "Set by the 1913–23 boundary commissions."
+  },
+  "Albania / Kosovo": {
+    "spans": [
+      {
+        "from": "1926-07",
+        "until": "1941-04"
+      },
+      {
+        "from": "1944-10",
+        "until": null
+      }
+    ],
+    "note": "Albania against Yugoslavia; Italian Albania took most of Kosovo 1941–44."
+  },
+  "Albania / Macedonia": {
+    "spans": [
+      {
+        "from": "1926-07",
+        "until": "1941-04"
+      },
+      {
+        "from": "1944-10",
+        "until": null
+      }
+    ],
+    "note": "Albania against Yugoslavia, final in 1926."
+  },
+  "Albania / Montenegro": {
+    "spans": [
+      {
+        "from": "1926-07",
+        "until": "1941-04"
+      },
+      {
+        "from": "1944-10",
+        "until": null
+      }
+    ],
+    "note": "Albania against Yugoslavia, final in 1926."
+  },
+  "Algeria / Libya": {
+    "spans": [
+      {
+        "from": "1919-09",
+        "until": null
+      }
+    ],
+    "note": "Ghadames line of 1919; the south was settled in 1956."
+  },
+  "Algeria / Mali": {
+    "spans": [
+      {
+        "from": "1947",
+        "until": null
+      }
+    ],
+    "note": "Algeria's southern line against French West Africa, on maps by the 1940s."
+  },
+  "Algeria / Mauritania": {
+    "spans": [
+      {
+        "from": "1947",
+        "until": null
+      }
+    ],
+    "note": "Algeria's southern line against French West Africa, on maps by the 1940s."
+  },
+  "Algeria / Morocco": {
+    "spans": [
+      {
+        "from": "1912-03",
+        "until": null
+      }
+    ],
+    "note": "Drawn from the French protectorate on; the south was approximate until the 1972 treaty."
   },
   "Algeria / Niger": {
     "spans": [
       {
-        "from": "1962-07",
+        "from": "1947",
         "until": null
       }
     ],
-    "note": "International once Algeria became independent."
+    "note": "Algeria's southern line against French West Africa, on maps by the 1940s."
   },
   "Algeria / Tunisia": {
     "spans": [
@@ -52,6 +154,15 @@
       }
     ],
     "note": "The southern end was disputed until the 1970 agreement."
+  },
+  "Algeria / W. Sahara": {
+    "spans": [
+      {
+        "from": "1934",
+        "until": null
+      }
+    ],
+    "note": "Spanish Sahara against French Algeria, drawn once Spain held the interior."
   },
   "Angola / Congo": {
     "spans": [
@@ -96,7 +207,37 @@
         "until": null
       }
     ],
+    "merged": [
+      {
+        "from": "1922-12",
+        "until": "1991-12"
+      }
+    ],
     "note": "A Soviet republic line until the Soviet Union ended."
+  },
+  "Armenia / Georgia": {
+    "spans": [
+      {
+        "from": "1991-12",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1922-12",
+        "until": "1991-12"
+      }
+    ],
+    "note": "A Soviet republic line until the Soviet Union ended."
+  },
+  "Armenia / Iran": {
+    "spans": [
+      {
+        "from": "1828",
+        "until": null
+      }
+    ],
+    "note": "The Aras line of 1828."
   },
   "Armenia / Turkey": {
     "spans": [
@@ -132,6 +273,15 @@
       }
     ],
     "note": "Austria against Bavaria since Salzburg went to Austria in 1816; gone during the Anschluss."
+  },
+  "Austria / Hungary": {
+    "spans": [
+      {
+        "from": "1921-12",
+        "until": null
+      }
+    ],
+    "note": "Final once Burgenland joined Austria in 1921."
   },
   "Austria / Italy": {
     "spans": [
@@ -172,6 +322,15 @@
     ],
     "note": "Austria against Czechoslovakia along the Morava, from the 1920 treaties."
   },
+  "Austria / Slovenia": {
+    "spans": [
+      {
+        "from": "1920-10",
+        "until": null
+      }
+    ],
+    "note": "The Carinthian plebiscite line of 1920."
+  },
   "Austria / Switzerland": {
     "spans": [
       {
@@ -192,13 +351,34 @@
         "until": null
       }
     ],
+    "merged": [
+      {
+        "from": "1922-12",
+        "until": "1991-12"
+      }
+    ],
     "note": "A Soviet republic line until the Soviet Union ended."
+  },
+  "Azerbaijan / Iran": {
+    "spans": [
+      {
+        "from": "1828",
+        "until": null
+      }
+    ],
+    "note": "The Aras line of the Treaty of Turkmenchay, 1828."
   },
   "Azerbaijan / Russia": {
     "spans": [
       {
         "from": "1991-12",
         "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1922-12",
+        "until": "1991-12"
       }
     ],
     "note": "A Soviet republic line until the Soviet Union ended."
@@ -211,6 +391,105 @@
       }
     ],
     "note": "Turkey's short border with Nakhchivan came with the 1932 Turkey–Iran exchange."
+  },
+  "Bangladesh / India": {
+    "spans": [
+      {
+        "from": "1947-08",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1858",
+        "until": "1947-08"
+      }
+    ],
+    "note": "The Radcliffe line of 1947."
+  },
+  "Bangladesh / Myanmar": {
+    "spans": [
+      {
+        "from": "1937-04",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1886",
+        "until": "1937-04"
+      }
+    ],
+    "note": "Burma against Bengal from 1937."
+  },
+  "Belarus / Latvia": {
+    "spans": [
+      {
+        "from": "1991-09",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1940-08",
+        "until": "1991-09"
+      }
+    ],
+    "note": "A Soviet republic line until Latvia's return to independence."
+  },
+  "Belarus / Lithuania": {
+    "spans": [
+      {
+        "from": "1991-09",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1940-08",
+        "until": "1991-09"
+      }
+    ],
+    "note": "A Soviet republic line until Lithuania's return to independence."
+  },
+  "Belarus / Poland": {
+    "spans": [
+      {
+        "from": "1945-08",
+        "until": null
+      }
+    ],
+    "note": "The Soviet–Polish line of 1945."
+  },
+  "Belarus / Russia": {
+    "spans": [
+      {
+        "from": "1991-12",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1922-12",
+        "until": "1991-12"
+      }
+    ],
+    "note": "A Soviet republic line until the Soviet Union ended."
+  },
+  "Belarus / Ukraine": {
+    "spans": [
+      {
+        "from": "1991-12",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1922-12",
+        "until": "1991-12"
+      }
+    ],
+    "note": "A Soviet republic line until the Soviet Union ended."
   },
   "Belgium / France": {
     "spans": [
@@ -288,6 +567,15 @@
     ],
     "note": "Dahomey against German Togo, 1897; the same line under French Togo."
   },
+  "Bhutan / China": {
+    "spans": [
+      {
+        "from": "1959-03",
+        "until": null
+      }
+    ],
+    "note": "The traditional line, held de facto since 1959; never formally agreed."
+  },
   "Bhutan / India": {
     "spans": [
       {
@@ -297,6 +585,123 @@
     ],
     "note": "Bhutan against British India after the Duars War of 1865."
   },
+  "Bosnia and Herz. / Croatia": {
+    "spans": [
+      {
+        "from": "1992-04",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1918-12",
+        "until": "1992-04"
+      }
+    ],
+    "note": "Inside Yugoslavia until Bosnia was recognised in 1992."
+  },
+  "Bosnia and Herz. / Montenegro": {
+    "spans": [
+      {
+        "from": "1992-04",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1918-12",
+        "until": "1992-04"
+      }
+    ],
+    "note": "Inside Yugoslavia until Bosnia was recognised in 1992."
+  },
+  "Bosnia and Herz. / Serbia": {
+    "spans": [
+      {
+        "from": "1992-04",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1918-12",
+        "until": "1992-04"
+      }
+    ],
+    "note": "Inside Yugoslavia until Bosnia was recognised in 1992."
+  },
+  "Botswana / Namibia": {
+    "spans": [
+      {
+        "from": "1890",
+        "until": null
+      }
+    ],
+    "note": "Anglo-German agreement of 1890."
+  },
+  "Botswana / South Africa": {
+    "spans": [
+      {
+        "from": "1895",
+        "until": null
+      }
+    ],
+    "note": "Bechuanaland's southern line, final in 1895."
+  },
+  "Botswana / Zambia": {
+    "spans": [
+      {
+        "from": "1890",
+        "until": null
+      }
+    ],
+    "note": "The Kazungula meeting point on the Zambezi."
+  },
+  "Botswana / Zimbabwe": {
+    "spans": [
+      {
+        "from": "1891",
+        "until": null
+      }
+    ],
+    "note": "Bechuanaland against Matabeleland."
+  },
+  "Brazil / France": {
+    "spans": [
+      {
+        "from": "1900",
+        "until": null
+      }
+    ],
+    "note": "French Guiana's southern line, Swiss award of 1900."
+  },
+  "Brazil / Guyana": {
+    "spans": [
+      {
+        "from": "1904",
+        "until": null
+      }
+    ],
+    "note": "Arbitration of 1904."
+  },
+  "Brazil / Suriname": {
+    "spans": [
+      {
+        "from": "1906",
+        "until": null
+      }
+    ],
+    "note": "Treaty of 1906."
+  },
+  "Brunei / Malaysia": {
+    "spans": [
+      {
+        "from": "1890",
+        "until": null
+      }
+    ],
+    "note": "Brunei's line after Limbang went to Sarawak in 1890."
+  },
   "Bulgaria / Greece": {
     "spans": [
       {
@@ -305,6 +710,41 @@
       }
     ],
     "note": "Fixed once Western Thrace was Greek, confirmed at Lausanne in 1923."
+  },
+  "Bulgaria / Macedonia": {
+    "spans": [
+      {
+        "from": "1920-08",
+        "until": "1941-04"
+      },
+      {
+        "from": "1944-10",
+        "until": null
+      }
+    ],
+    "note": "Bulgaria against Yugoslavia; Bulgaria held Vardar Macedonia 1941–44."
+  },
+  "Bulgaria / Romania": {
+    "spans": [
+      {
+        "from": "1940-09",
+        "until": null
+      }
+    ],
+    "note": "Southern Dobruja returned to Bulgaria in 1940."
+  },
+  "Bulgaria / Serbia": {
+    "spans": [
+      {
+        "from": "1920-08",
+        "until": "1941-04"
+      },
+      {
+        "from": "1944-10",
+        "until": null
+      }
+    ],
+    "note": "The 1919 Neuilly line; changed in the 1941–44 occupation."
   },
   "Bulgaria / Turkey": {
     "spans": [
@@ -376,6 +816,12 @@
         "until": null
       }
     ],
+    "merged": [
+      {
+        "from": "1919",
+        "until": "1962-07"
+      }
+    ],
     "note": "Inside Ruanda-Urundi until independence."
   },
   "Burundi / Tanzania": {
@@ -392,6 +838,12 @@
       {
         "from": "1954-07",
         "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1893",
+        "until": "1954-07"
       }
     ],
     "note": "Inside French Indochina until 1954."
@@ -414,6 +866,12 @@
       {
         "from": "1954-07",
         "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1893",
+        "until": "1954-07"
       }
     ],
     "note": "Inside French Indochina until 1954."
@@ -463,6 +921,15 @@
     ],
     "note": "Restored after the 1911–19 German Neukamerun cession."
   },
+  "Cameroon / Niger": {
+    "spans": [
+      {
+        "from": "1906",
+        "until": null
+      }
+    ],
+    "note": "Kamerun against the French territories, 1906."
+  },
   "Cameroon / Nigeria": {
     "spans": [
       {
@@ -471,6 +938,15 @@
       }
     ],
     "note": "Set by the 1961 Cameroons plebiscites."
+  },
+  "Canada / United States of America": {
+    "spans": [
+      {
+        "from": "1903-10",
+        "until": null
+      }
+    ],
+    "note": "Complete with the 1903 Alaska boundary award."
   },
   "Central African Rep. / Chad": {
     "spans": [
@@ -517,6 +993,24 @@
     ],
     "note": "Ubangi-Shari against the Sudan, demarcated by 1924."
   },
+  "Chad / Libya": {
+    "spans": [
+      {
+        "from": "1919-09",
+        "until": null
+      }
+    ],
+    "note": "The 1919 line most maps kept; the Aouzou Strip was disputed until 1994."
+  },
+  "Chad / Niger": {
+    "spans": [
+      {
+        "from": "1931",
+        "until": null
+      }
+    ],
+    "note": "Fixed once Tibesti moved to Chad in 1929–30."
+  },
   "Chad / Sudan": {
     "spans": [
       {
@@ -525,6 +1019,33 @@
       }
     ],
     "note": "Wadai against Darfur, agreed 1919 and demarcated by 1924."
+  },
+  "China / India": {
+    "spans": [
+      {
+        "from": "1962-11",
+        "until": null
+      }
+    ],
+    "note": "The line of actual control after the 1962 war; drawn variously before and still disputed."
+  },
+  "China / Kazakhstan": {
+    "spans": [
+      {
+        "from": "1881",
+        "until": null
+      }
+    ],
+    "note": "Treaty of Saint Petersburg, 1881."
+  },
+  "China / Kyrgyzstan": {
+    "spans": [
+      {
+        "from": "1881",
+        "until": null
+      }
+    ],
+    "note": "Treaty of Saint Petersburg, 1881."
   },
   "China / Laos": {
     "spans": [
@@ -535,6 +1056,33 @@
     ],
     "note": "French Indochina against China, convention of 1895."
   },
+  "China / Mongolia": {
+    "spans": [
+      {
+        "from": "1946-01",
+        "until": null
+      }
+    ],
+    "note": "China recognised Mongolia in January 1946."
+  },
+  "China / Myanmar": {
+    "spans": [
+      {
+        "from": "1960-10",
+        "until": null
+      }
+    ],
+    "note": "Settled by the 1960 treaty; the north was undefined before."
+  },
+  "China / Nepal": {
+    "spans": [
+      {
+        "from": "1961-10",
+        "until": null
+      }
+    ],
+    "note": "Settled by the 1961 treaty."
+  },
   "China / North Korea": {
     "spans": [
       {
@@ -544,6 +1092,51 @@
     ],
     "note": "The Yalu and Tumen, settled with the Gando convention of 1909."
   },
+  "China / Pakistan": {
+    "spans": [
+      {
+        "from": "1963-03",
+        "until": null
+      }
+    ],
+    "note": "Settled by the 1963 agreement; British India's line with China was undefined here."
+  },
+  "China / Russia": {
+    "spans": [
+      {
+        "from": "1860-11",
+        "until": null
+      }
+    ],
+    "note": "The Amur and Ussuri, Convention of Peking, 1860."
+  },
+  "China / Tajikistan": {
+    "spans": [
+      {
+        "from": "1895",
+        "until": null
+      }
+    ],
+    "note": "Pamirs line of 1895, approximate until 2002."
+  },
+  "China / Vietnam": {
+    "spans": [
+      {
+        "from": "1895",
+        "until": null
+      }
+    ],
+    "note": "Sino-French conventions of 1887–95."
+  },
+  "Congo / Dem. Rep. Congo": {
+    "spans": [
+      {
+        "from": "1887",
+        "until": null
+      }
+    ],
+    "note": "The Congo and Ubangi rivers, 1885–87."
+  },
   "Congo / Gabon": {
     "spans": [
       {
@@ -552,6 +1145,79 @@
       }
     ],
     "note": "Final when the Haut-Ogooué went back to Gabon in 1946."
+  },
+  "Croatia / Hungary": {
+    "spans": [
+      {
+        "from": "1920-06",
+        "until": "1941-04"
+      },
+      {
+        "from": "1945-05",
+        "until": null
+      }
+    ],
+    "note": "The Trianon line; Hungary held Međimurje 1941–45."
+  },
+  "Croatia / Montenegro": {
+    "spans": [
+      {
+        "from": "1992-01",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1918-12",
+        "until": "1992-01"
+      }
+    ],
+    "note": "Inside Yugoslavia until Croatia was recognised in 1992."
+  },
+  "Croatia / Serbia": {
+    "spans": [
+      {
+        "from": "1992-01",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1918-12",
+        "until": "1992-01"
+      }
+    ],
+    "note": "Inside Yugoslavia until Croatia was recognised in 1992."
+  },
+  "Croatia / Slovenia": {
+    "spans": [
+      {
+        "from": "1992-01",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1918-12",
+        "until": "1992-01"
+      }
+    ],
+    "note": "Inside Yugoslavia until both were recognised in 1992."
+  },
+  "Cyprus / N. Cyprus": {
+    "spans": [
+      {
+        "from": "1974-08",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1878",
+        "until": "1974-08"
+      }
+    ],
+    "note": "The 1974 ceasefire line."
   },
   "Czechia / Germany": {
     "spans": [
@@ -575,6 +1241,29 @@
     ],
     "note": "Czechoslovakia against Poland once Silesia became Polish in 1945."
   },
+  "Czechia / Slovakia": {
+    "spans": [
+      {
+        "from": "1939-03",
+        "until": "1945-05"
+      },
+      {
+        "from": "1993-01",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1918-10",
+        "until": "1939-03"
+      },
+      {
+        "from": "1945-05",
+        "until": "1993-01"
+      }
+    ],
+    "note": "International only while Slovakia was separate, 1939–45, and since 1993."
+  },
   "Côte d'Ivoire / Ghana": {
     "spans": [
       {
@@ -583,6 +1272,15 @@
       }
     ],
     "note": "Gold Coast against Ivory Coast, Anglo-French agreement of 1905."
+  },
+  "Côte d'Ivoire / Guinea": {
+    "spans": [
+      {
+        "from": "1920",
+        "until": null
+      }
+    ],
+    "note": "Ivory Coast against French Guinea."
   },
   "Côte d'Ivoire / Liberia": {
     "spans": [
@@ -656,6 +1354,15 @@
     ],
     "note": "Schleswig plebiscite line, 1920."
   },
+  "Djibouti / Eritrea": {
+    "spans": [
+      {
+        "from": "1901",
+        "until": null
+      }
+    ],
+    "note": "Franco-Italian protocols of 1900–01."
+  },
   "Djibouti / Ethiopia": {
     "spans": [
       {
@@ -673,6 +1380,24 @@
       }
     ],
     "note": "French and British Somaliland, Anglo-French agreement of 1888."
+  },
+  "Egypt / Israel": {
+    "spans": [
+      {
+        "from": "1906",
+        "until": null
+      }
+    ],
+    "note": "The 1906 Sinai line, also drawn while Israel held Sinai."
+  },
+  "Egypt / Libya": {
+    "spans": [
+      {
+        "from": "1925-12",
+        "until": null
+      }
+    ],
+    "note": "Italo-Egyptian agreement of 1925."
   },
   "Egypt / Sudan": {
     "spans": [
@@ -692,6 +1417,109 @@
     ],
     "note": "Rio Muni against French Congo, Franco-Spanish treaty of 1900."
   },
+  "Eritrea / Ethiopia": {
+    "spans": [
+      {
+        "from": "1908",
+        "until": "1936-05"
+      },
+      {
+        "from": "1941-04",
+        "until": "1962-11"
+      },
+      {
+        "from": "1993-05",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1936-05",
+        "until": "1941-04"
+      },
+      {
+        "from": "1962-11",
+        "until": "1993-05"
+      }
+    ],
+    "note": "Gone inside Italian East Africa (1936–41) and after Ethiopia annexed Eritrea (1962–93)."
+  },
+  "Eritrea / Sudan": {
+    "spans": [
+      {
+        "from": "1902",
+        "until": null
+      }
+    ],
+    "note": "Italian Eritrea against the Sudan, 1898–1902."
+  },
+  "Estonia / Latvia": {
+    "spans": [
+      {
+        "from": "1920",
+        "until": "1940-08"
+      },
+      {
+        "from": "1991-09",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1940-08",
+        "until": "1991-09"
+      }
+    ],
+    "note": "Between the Baltic states, gone while they were Soviet."
+  },
+  "Estonia / Russia": {
+    "spans": [
+      {
+        "from": "1991-09",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1940-08",
+        "until": "1991-09"
+      }
+    ],
+    "note": "Today's line dates from Estonia's return to independence; the 1920–40 line ran further east."
+  },
+  "Ethiopia / Kenya": {
+    "spans": [
+      {
+        "from": "1907",
+        "until": null
+      }
+    ],
+    "note": "Anglo-Ethiopian treaty of 1907; later adjustments don't show at globe scale."
+  },
+  "Ethiopia / S. Sudan": {
+    "spans": [
+      {
+        "from": "1902",
+        "until": null
+      }
+    ],
+    "note": "The 1902 Ethiopia–Sudan line."
+  },
+  "Ethiopia / Somalia": {
+    "spans": [
+      {
+        "from": "1950-04",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1936-05",
+        "until": "1941-04"
+      }
+    ],
+    "note": "The provisional administrative line from the 1950 trust territory on."
+  },
   "Ethiopia / Somaliland": {
     "spans": [
       {
@@ -701,6 +1529,15 @@
     ],
     "note": "British Somaliland and Ethiopia, Anglo-Ethiopian treaty of 1897."
   },
+  "Ethiopia / Sudan": {
+    "spans": [
+      {
+        "from": "1902",
+        "until": null
+      }
+    ],
+    "note": "Anglo-Ethiopian treaty of 1902."
+  },
   "Finland / Norway": {
     "spans": [
       {
@@ -709,6 +1546,15 @@
       }
     ],
     "note": "The 1826 Norway–Russia line, Finland's from 1917."
+  },
+  "Finland / Russia": {
+    "spans": [
+      {
+        "from": "1944-09",
+        "until": null
+      }
+    ],
+    "note": "The armistice of 1944, which took Karelia and Petsamo."
   },
   "Finland / Sweden": {
     "spans": [
@@ -736,6 +1582,15 @@
     ],
     "note": "The Rhine and Lorraine line; moved west while Alsace-Lorraine was German (1871–1918, 1940–44)."
   },
+  "France / Italy": {
+    "spans": [
+      {
+        "from": "1860-04",
+        "until": null
+      }
+    ],
+    "note": "From the cession of Nice and Savoy; the 1947 changes don't show at this scale."
+  },
   "France / Luxembourg": {
     "spans": [
       {
@@ -744,6 +1599,24 @@
       }
     ],
     "note": "Luxembourg against France since the 1839 settlement."
+  },
+  "France / Spain": {
+    "spans": [
+      {
+        "from": "1868",
+        "until": null
+      }
+    ],
+    "note": "The Pyrenees, Treaties of Bayonne, 1856–68."
+  },
+  "France / Suriname": {
+    "spans": [
+      {
+        "from": "1891",
+        "until": null
+      }
+    ],
+    "note": "The Maroni, arbitration of 1891."
   },
   "France / Switzerland": {
     "spans": [
@@ -762,6 +1635,30 @@
       }
     ],
     "note": "Anglo-French agreement of 1889."
+  },
+  "Georgia / Russia": {
+    "spans": [
+      {
+        "from": "1991-12",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1922-12",
+        "until": "1991-12"
+      }
+    ],
+    "note": "A Soviet republic line until the Soviet Union ended."
+  },
+  "Georgia / Turkey": {
+    "spans": [
+      {
+        "from": "1921-10",
+        "until": null
+      }
+    ],
+    "note": "Treaty of Kars, 1921."
   },
   "Germany / Luxembourg": {
     "spans": [
@@ -816,6 +1713,19 @@
     ],
     "note": "The British and French Togoland line of 1919–20, Ghana's since 1957."
   },
+  "Greece / Macedonia": {
+    "spans": [
+      {
+        "from": "1913-08",
+        "until": "1941-04"
+      },
+      {
+        "from": "1944-10",
+        "until": null
+      }
+    ],
+    "note": "The 1913 Greek–Serbian line."
+  },
   "Greece / Turkey": {
     "spans": [
       {
@@ -843,6 +1753,24 @@
     ],
     "note": "Franco-Liberian agreements, final in 1911."
   },
+  "Guinea / Mali": {
+    "spans": [
+      {
+        "from": "1920",
+        "until": null
+      }
+    ],
+    "note": "French Guinea against French Sudan."
+  },
+  "Guinea / Senegal": {
+    "spans": [
+      {
+        "from": "1920",
+        "until": null
+      }
+    ],
+    "note": "French Guinea against Senegal."
+  },
   "Guinea / Sierra Leone": {
     "spans": [
       {
@@ -861,6 +1789,104 @@
     ],
     "note": "Franco-Portuguese convention of 1886."
   },
+  "Guyana / Suriname": {
+    "spans": [
+      {
+        "from": "1899",
+        "until": null
+      }
+    ],
+    "note": "The Courantyne; the New River Triangle is disputed."
+  },
+  "Guyana / Venezuela": {
+    "spans": [
+      {
+        "from": "1899",
+        "until": null
+      }
+    ],
+    "note": "The 1899 Paris award, disputed by Venezuela since 1962."
+  },
+  "Hungary / Romania": {
+    "spans": [
+      {
+        "from": "1920-06",
+        "until": "1940-08"
+      },
+      {
+        "from": "1944-10",
+        "until": null
+      }
+    ],
+    "note": "The Trianon line; Hungary held northern Transylvania 1940–44."
+  },
+  "Hungary / Serbia": {
+    "spans": [
+      {
+        "from": "1920-06",
+        "until": "1941-04"
+      },
+      {
+        "from": "1944-10",
+        "until": null
+      }
+    ],
+    "note": "The Trianon line; Hungary held Bačka 1941–44."
+  },
+  "Hungary / Slovakia": {
+    "spans": [
+      {
+        "from": "1920-06",
+        "until": "1938-11"
+      },
+      {
+        "from": "1945-05",
+        "until": null
+      }
+    ],
+    "note": "The Trianon line; Hungary held southern Slovakia 1938–45."
+  },
+  "Hungary / Slovenia": {
+    "spans": [
+      {
+        "from": "1920-06",
+        "until": "1941-04"
+      },
+      {
+        "from": "1945-05",
+        "until": null
+      }
+    ],
+    "note": "The Trianon line; Hungary held Prekmurje 1941–45."
+  },
+  "Hungary / Ukraine": {
+    "spans": [
+      {
+        "from": "1920-06",
+        "until": "1939-03"
+      },
+      {
+        "from": "1945-06",
+        "until": null
+      }
+    ],
+    "note": "The Czechoslovak–Hungarian line of 1920, Soviet from 1945."
+  },
+  "India / Myanmar": {
+    "spans": [
+      {
+        "from": "1937-04",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1886",
+        "until": "1937-04"
+      }
+    ],
+    "note": "Burma was separated from India in 1937."
+  },
   "India / Nepal": {
     "spans": [
       {
@@ -870,6 +1896,58 @@
     ],
     "note": "Nepal against British India, final with the 1860 return of the Terai."
   },
+  "India / Pakistan": {
+    "spans": [
+      {
+        "from": "1947-08",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1858",
+        "until": "1947-08"
+      }
+    ],
+    "note": "Partition, 1947."
+  },
+  "Indonesia / Malaysia": {
+    "spans": [
+      {
+        "from": "1891",
+        "until": null
+      }
+    ],
+    "note": "Anglo-Dutch convention of 1891 on Borneo."
+  },
+  "Indonesia / Timor-Leste": {
+    "spans": [
+      {
+        "from": "1914",
+        "until": "1976-07"
+      },
+      {
+        "from": "1999-10",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1976-07",
+        "until": "1999-10"
+      }
+    ],
+    "note": "The 1914 line; gone while Indonesia held East Timor."
+  },
+  "Iran / Iraq": {
+    "spans": [
+      {
+        "from": "1914",
+        "until": null
+      }
+    ],
+    "note": "Constantinople protocol of 1913–14; the Shatt al-Arab changes don't show at this scale."
+  },
   "Iran / Pakistan": {
     "spans": [
       {
@@ -878,6 +1956,33 @@
       }
     ],
     "note": "Persia against British Baluchistan, demarcated by 1896."
+  },
+  "Iran / Turkey": {
+    "spans": [
+      {
+        "from": "1932",
+        "until": null
+      }
+    ],
+    "note": "Final after the 1932 Ararat exchange."
+  },
+  "Iran / Turkmenistan": {
+    "spans": [
+      {
+        "from": "1881",
+        "until": null
+      }
+    ],
+    "note": "Akhal-Khorasan line of 1881."
+  },
+  "Iraq / Jordan": {
+    "spans": [
+      {
+        "from": "1932",
+        "until": null
+      }
+    ],
+    "note": "Drawn by Iraq's independence in 1932."
   },
   "Iraq / Kuwait": {
     "spans": [
@@ -890,7 +1995,22 @@
         "until": null
       }
     ],
+    "merged": [
+      {
+        "from": "1990-08",
+        "until": "1991-02"
+      }
+    ],
     "note": "Agreed in 1923; erased during the 1990–91 annexation."
+  },
+  "Iraq / Saudi Arabia": {
+    "spans": [
+      {
+        "from": "1981-12",
+        "until": null
+      }
+    ],
+    "note": "The Uqair line of 1922 with a Neutral Zone between, divided in 1981; drawn dashed on globes before."
   },
   "Iraq / Syria": {
     "spans": [
@@ -910,6 +2030,57 @@
     ],
     "note": "Treaty of Ankara, 1926."
   },
+  "Ireland / United Kingdom": {
+    "spans": [
+      {
+        "from": "1922-12",
+        "until": null
+      }
+    ],
+    "note": "The Irish Free State, 1922."
+  },
+  "Israel / Jordan": {
+    "spans": [
+      {
+        "from": "1922",
+        "until": null
+      }
+    ],
+    "note": "Transjordan's line with Palestine along the Jordan valley and the Arava."
+  },
+  "Israel / Lebanon": {
+    "spans": [
+      {
+        "from": "1923",
+        "until": null
+      }
+    ],
+    "note": "The 1923 Paulet–Newcombe line."
+  },
+  "Israel / Palestine": {
+    "spans": [
+      {
+        "from": "1949-04",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1920",
+        "until": "1949-04"
+      }
+    ],
+    "note": "The 1949 armistice line."
+  },
+  "Israel / Syria": {
+    "spans": [
+      {
+        "from": "1923",
+        "until": null
+      }
+    ],
+    "note": "The 1923 line, with the Golan shown as Syrian."
+  },
   "Italy / San Marino": {
     "spans": [
       {
@@ -918,6 +2089,15 @@
       }
     ],
     "note": "San Marino's border, unchanged for centuries."
+  },
+  "Italy / Slovenia": {
+    "spans": [
+      {
+        "from": "1954-10",
+        "until": null
+      }
+    ],
+    "note": "Final after the Free Territory of Trieste was divided in 1954."
   },
   "Italy / Switzerland": {
     "spans": [
@@ -928,11 +2108,84 @@
     ],
     "note": "Ticino and Graubünden against Lombardy and Piedmont, then Italy."
   },
+  "Jordan / Palestine": {
+    "spans": [
+      {
+        "from": "1922",
+        "until": "1950-04"
+      },
+      {
+        "from": "1967-06",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1950-04",
+        "until": "1967-06"
+      }
+    ],
+    "note": "The Jordan river; the West Bank was Jordanian 1950–67."
+  },
+  "Jordan / Saudi Arabia": {
+    "spans": [
+      {
+        "from": "1965-08",
+        "until": null
+      }
+    ],
+    "note": "The 1965 land swap that gave Jordan more of the Aqaba coast."
+  },
+  "Jordan / Syria": {
+    "spans": [
+      {
+        "from": "1931",
+        "until": null
+      }
+    ],
+    "note": "Franco-British agreement of 1931."
+  },
+  "Kazakhstan / Kyrgyzstan": {
+    "spans": [
+      {
+        "from": "1991-12",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1922-12",
+        "until": "1991-12"
+      }
+    ],
+    "note": "A Soviet republic line until the Soviet Union ended."
+  },
+  "Kazakhstan / Russia": {
+    "spans": [
+      {
+        "from": "1991-12",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1922-12",
+        "until": "1991-12"
+      }
+    ],
+    "note": "A Soviet republic line until the Soviet Union ended."
+  },
   "Kazakhstan / Turkmenistan": {
     "spans": [
       {
         "from": "1991-12",
         "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1922-12",
+        "until": "1991-12"
       }
     ],
     "note": "A Soviet republic line until the Soviet Union ended."
@@ -944,7 +2197,22 @@
         "until": null
       }
     ],
+    "merged": [
+      {
+        "from": "1922-12",
+        "until": "1991-12"
+      }
+    ],
     "note": "A Soviet republic line until the Soviet Union ended."
+  },
+  "Kenya / S. Sudan": {
+    "spans": [
+      {
+        "from": "1914",
+        "until": null
+      }
+    ],
+    "note": "The 1914 Kenya–Sudan line, with the Ilemi Triangle shown on the Kenyan side."
   },
   "Kenya / Somalia": {
     "spans": [
@@ -973,6 +2241,51 @@
     ],
     "note": "Final after Uganda's Rudolf Province went to Kenya in 1926."
   },
+  "Kosovo / Macedonia": {
+    "spans": [
+      {
+        "from": "1993-04",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1918-12",
+        "until": "1993-04"
+      }
+    ],
+    "note": "Macedonia against Serbia from Macedonia's admission in 1993."
+  },
+  "Kosovo / Montenegro": {
+    "spans": [
+      {
+        "from": "2006-06",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1918-12",
+        "until": "2006-06"
+      }
+    ],
+    "note": "Montenegro against Serbia from 2006."
+  },
+  "Kosovo / Serbia": {
+    "spans": [
+      {
+        "from": "2008-02",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1918-12",
+        "until": "2008-02"
+      }
+    ],
+    "note": "Kosovo's declaration of 2008, shown on most maps since."
+  },
   "Kuwait / Saudi Arabia": {
     "spans": [
       {
@@ -981,6 +2294,36 @@
       }
     ],
     "note": "The Neutral Zone was divided in 1969."
+  },
+  "Kyrgyzstan / Tajikistan": {
+    "spans": [
+      {
+        "from": "1991-12",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1922-12",
+        "until": "1991-12"
+      }
+    ],
+    "note": "A Soviet republic line until the Soviet Union ended."
+  },
+  "Kyrgyzstan / Uzbekistan": {
+    "spans": [
+      {
+        "from": "1991-12",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1922-12",
+        "until": "1991-12"
+      }
+    ],
+    "note": "A Soviet republic line until the Soviet Union ended."
   },
   "Laos / Myanmar": {
     "spans": [
@@ -1004,6 +2347,64 @@
     ],
     "note": "The Mekong and the 1904–07 lines; Thailand held the west bank 1941–46."
   },
+  "Laos / Vietnam": {
+    "spans": [
+      {
+        "from": "1954-07",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1893",
+        "until": "1954-07"
+      }
+    ],
+    "note": "Inside French Indochina until 1954."
+  },
+  "Latvia / Lithuania": {
+    "spans": [
+      {
+        "from": "1921",
+        "until": "1940-08"
+      },
+      {
+        "from": "1991-09",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1940-08",
+        "until": "1991-09"
+      }
+    ],
+    "note": "Between the Baltic states, gone while they were Soviet."
+  },
+  "Latvia / Russia": {
+    "spans": [
+      {
+        "from": "1991-09",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1940-08",
+        "until": "1991-09"
+      }
+    ],
+    "note": "Today's line dates from Latvia's return to independence; the 1920–40 line included Abrene."
+  },
+  "Lebanon / Syria": {
+    "spans": [
+      {
+        "from": "1920-09",
+        "until": null
+      }
+    ],
+    "note": "Greater Lebanon, 1920."
+  },
   "Lesotho / South Africa": {
     "spans": [
       {
@@ -1022,6 +2423,33 @@
     ],
     "note": "Anglo-Liberian agreement of 1911."
   },
+  "Libya / Niger": {
+    "spans": [
+      {
+        "from": "1919-09",
+        "until": null
+      }
+    ],
+    "note": "Approximate until the 1955 Franco-Libyan treaty."
+  },
+  "Libya / Sudan": {
+    "spans": [
+      {
+        "from": "1934-07",
+        "until": null
+      }
+    ],
+    "note": "Settled when the Sarra Triangle went to Italian Libya in 1934."
+  },
+  "Libya / Tunisia": {
+    "spans": [
+      {
+        "from": "1910",
+        "until": null
+      }
+    ],
+    "note": "Franco-Ottoman convention of 1910."
+  },
   "Liechtenstein / Switzerland": {
     "spans": [
       {
@@ -1030,6 +2458,45 @@
       }
     ],
     "note": "The Rhine, unchanged."
+  },
+  "Lithuania / Poland": {
+    "spans": [
+      {
+        "from": "1945-08",
+        "until": null
+      }
+    ],
+    "note": "The Soviet–Polish line of 1945."
+  },
+  "Lithuania / Russia": {
+    "spans": [
+      {
+        "from": "1991-09",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1945-08",
+        "until": "1991-09"
+      }
+    ],
+    "note": "Lithuania against Kaliningrad, from Lithuania's return to independence."
+  },
+  "Macedonia / Serbia": {
+    "spans": [
+      {
+        "from": "1993-04",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1918-12",
+        "until": "1993-04"
+      }
+    ],
+    "note": "Inside Yugoslavia until Macedonia's admission in 1993."
   },
   "Malawi / Mozambique": {
     "spans": [
@@ -1058,6 +2525,15 @@
     ],
     "note": "Nyasaland against North-Eastern Rhodesia, 1891."
   },
+  "Malaysia / Thailand": {
+    "spans": [
+      {
+        "from": "1909",
+        "until": null
+      }
+    ],
+    "note": "Anglo-Siamese treaty of 1909."
+  },
   "Mali / Mauritania": {
     "spans": [
       {
@@ -1075,6 +2551,25 @@
       }
     ],
     "note": "Redrawn when Upper Volta was split up in 1932 and put back in 1947."
+  },
+  "Mali / Senegal": {
+    "spans": [
+      {
+        "from": "1920",
+        "until": "1959-04"
+      },
+      {
+        "from": "1960-08",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1959-04",
+        "until": "1960-08"
+      }
+    ],
+    "note": "French Sudan against Senegal; inside the Mali Federation 1959–60."
   },
   "Mauritania / Senegal": {
     "spans": [
@@ -1094,6 +2589,71 @@
     ],
     "note": "Franco-Spanish conventions, final in 1912."
   },
+  "Moldova / Romania": {
+    "spans": [
+      {
+        "from": "1878",
+        "until": "1918-04"
+      },
+      {
+        "from": "1944-08",
+        "until": null
+      }
+    ],
+    "note": "The Prut; Bessarabia was Romanian 1918–40 and 1941–44."
+  },
+  "Moldova / Ukraine": {
+    "spans": [
+      {
+        "from": "1991-12",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1940-08",
+        "until": "1941-07"
+      },
+      {
+        "from": "1944-08",
+        "until": "1991-12"
+      }
+    ],
+    "note": "A Soviet republic line until the Soviet Union ended."
+  },
+  "Mongolia / Russia": {
+    "spans": [
+      {
+        "from": "1944-10",
+        "until": null
+      }
+    ],
+    "note": "Final once Tuva joined the Soviet Union in 1944."
+  },
+  "Montenegro / Serbia": {
+    "spans": [
+      {
+        "from": "2006-06",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1918-12",
+        "until": "2006-06"
+      }
+    ],
+    "note": "Montenegro's independence, 2006."
+  },
+  "Morocco / W. Sahara": {
+    "spans": [
+      {
+        "from": "1912-11",
+        "until": null
+      }
+    ],
+    "note": "The 27°40′ line of the 1912 Franco-Spanish convention."
+  },
   "Mozambique / South Africa": {
     "spans": [
       {
@@ -1102,6 +2662,15 @@
       }
     ],
     "note": "Delagoa Bay award of 1875 and the earlier Transvaal line."
+  },
+  "Mozambique / Tanzania": {
+    "spans": [
+      {
+        "from": "1919",
+        "until": null
+      }
+    ],
+    "note": "The Rovuma, final once the Kionga Triangle went to Mozambique in 1919."
   },
   "Mozambique / Zambia": {
     "spans": [
@@ -1166,6 +2735,43 @@
     ],
     "note": "Anglo-French convention of 1906."
   },
+  "North Korea / Russia": {
+    "spans": [
+      {
+        "from": "1860-11",
+        "until": null
+      }
+    ],
+    "note": "The lower Tumen, 1860."
+  },
+  "North Korea / South Korea": {
+    "spans": [
+      {
+        "from": "1953-07",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1910-08",
+        "until": "1953-07"
+      }
+    ],
+    "note": "The 1953 armistice line. Before it Korea was one country, divided on the 38th parallel from 1945 (an old line)."
+  },
+  "Norway / Russia": {
+    "spans": [
+      {
+        "from": "1826",
+        "until": "1920-10"
+      },
+      {
+        "from": "1944-09",
+        "until": null
+      }
+    ],
+    "note": "Gone while Finland held Petsamo, 1920–44."
+  },
   "Norway / Sweden": {
     "spans": [
       {
@@ -1174,6 +2780,115 @@
       }
     ],
     "note": "Drawn between the two kingdoms throughout their union."
+  },
+  "Oman / Saudi Arabia": {
+    "spans": [
+      {
+        "from": "1990-03",
+        "until": null
+      }
+    ],
+    "note": "Settled by the 1990 treaty; approximate before."
+  },
+  "Oman / United Arab Emirates": {
+    "spans": [
+      {
+        "from": "1999",
+        "until": null
+      }
+    ],
+    "note": "Settled in 1999–2002; approximate before."
+  },
+  "Oman / Yemen": {
+    "spans": [
+      {
+        "from": "1992-10",
+        "until": null
+      }
+    ],
+    "note": "Settled by the 1992 treaty; approximate before."
+  },
+  "Poland / Russia": {
+    "spans": [
+      {
+        "from": "1945-08",
+        "until": null
+      }
+    ],
+    "note": "Poland against Kaliningrad, Potsdam 1945."
+  },
+  "Poland / Slovakia": {
+    "spans": [
+      {
+        "from": "1920-07",
+        "until": "1938-10"
+      },
+      {
+        "from": "1945-05",
+        "until": null
+      }
+    ],
+    "note": "The 1920–24 line, changed 1938–45."
+  },
+  "Poland / Ukraine": {
+    "spans": [
+      {
+        "from": "1945-08",
+        "until": null
+      }
+    ],
+    "note": "The Soviet–Polish line of 1945; the 1951 exchange doesn't show at this scale."
+  },
+  "Portugal / Spain": {
+    "spans": [
+      {
+        "from": "1805",
+        "until": null
+      }
+    ],
+    "note": "Unchanged since Olivenza went to Spain in 1801."
+  },
+  "Qatar / Saudi Arabia": {
+    "spans": [
+      {
+        "from": "1965-12",
+        "until": null
+      }
+    ],
+    "note": "Agreed in 1965 and demarcated in 1999; approximate before."
+  },
+  "Romania / Serbia": {
+    "spans": [
+      {
+        "from": "1920-06",
+        "until": null
+      }
+    ],
+    "note": "The Banat and the Danube, 1920."
+  },
+  "Romania / Ukraine": {
+    "spans": [
+      {
+        "from": "1944-09",
+        "until": null
+      }
+    ],
+    "note": "The Soviet–Romanian line from the 1944 armistice."
+  },
+  "Russia / Ukraine": {
+    "spans": [
+      {
+        "from": "1991-12",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1922-12",
+        "until": "1991-12"
+      }
+    ],
+    "note": "A Soviet republic line until the Soviet Union ended."
   },
   "Rwanda / Tanzania": {
     "spans": [
@@ -1200,6 +2915,12 @@
         "until": null
       }
     ],
+    "merged": [
+      {
+        "from": "1899",
+        "until": "2011-07"
+      }
+    ],
     "note": "South Sudan's independence."
   },
   "S. Sudan / Uganda": {
@@ -1210,6 +2931,48 @@
       }
     ],
     "note": "Sudan–Uganda adjustment of 1914."
+  },
+  "Saudi Arabia / United Arab Emirates": {
+    "spans": [
+      {
+        "from": "1974-08",
+        "until": null
+      }
+    ],
+    "note": "Settled by the 1974 Jeddah treaty, after the Buraimi dispute; approximate before."
+  },
+  "Saudi Arabia / Yemen": {
+    "spans": [
+      {
+        "from": "2000-06",
+        "until": null
+      }
+    ],
+    "note": "Settled by the 2000 Jeddah treaty; the 1934 Taif line covered only the west."
+  },
+  "Slovakia / Ukraine": {
+    "spans": [
+      {
+        "from": "1945-06",
+        "until": null
+      }
+    ],
+    "note": "Czechoslovakia ceded Carpathian Ruthenia to the Soviet Union in 1945."
+  },
+  "Somalia / Somaliland": {
+    "spans": [
+      {
+        "from": "1894",
+        "until": "1960-07"
+      }
+    ],
+    "merged": [
+      {
+        "from": "1960-07",
+        "until": null
+      }
+    ],
+    "note": "British against Italian Somaliland until they united in 1960. Most maps show one Somalia since."
   },
   "South Africa / Zimbabwe": {
     "spans": [
@@ -1238,6 +3001,21 @@
     ],
     "note": "Final when Hatay joined Turkey in 1939."
   },
+  "Tajikistan / Uzbekistan": {
+    "spans": [
+      {
+        "from": "1991-12",
+        "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1922-12",
+        "until": "1991-12"
+      }
+    ],
+    "note": "A Soviet republic line until the Soviet Union ended."
+  },
   "Tanzania / Uganda": {
     "spans": [
       {
@@ -1261,6 +3039,12 @@
       {
         "from": "1991-12",
         "until": null
+      }
+    ],
+    "merged": [
+      {
+        "from": "1922-12",
+        "until": "1991-12"
       }
     ],
     "note": "A Soviet republic line until the Soviet Union ended."

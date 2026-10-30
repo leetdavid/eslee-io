@@ -15,9 +15,10 @@ import type {
 } from "geojson";
 import polygonClipping, { type Geom } from "polygon-clipping";
 import { merge, mesh } from "topojson-client";
-import type { GeometryCollection, GeometryObject, Topology } from "topojson-specification";
-import { currentMonth, parseDate } from "../src/engine/months";
+import type { GeometryCollection, Topology } from "topojson-specification";
+import { currentMonth } from "../src/engine/months";
 import type { Span } from "../src/engine/types";
+import { borderKey, borderStood, stretchesOf } from "../src/plates/borders";
 import type { Label, LensBase, LonLat, Mark, Plate, PlateSource } from "../src/plates/types";
 
 const require = createRequire(import.meta.url);
@@ -54,35 +55,15 @@ type Res = "10m" | "50m";
 const countriesOf = (res: Res) =>
   atlas[res].objects.countries as GeometryCollection<{ name: string }>;
 
-// When each of today's borders was on maps, keyed by the two Natural Earth names in order ("Egypt / Sudan").
-// A plate draws one of today's borders only if it stood through every span its question asks about;
-// a border missing from data/borders.json is never drawn.
-const borderDates = read<Record<string, { spans: Span[]; note: string }>>(
-  new URL("data/borders.json", root).pathname,
-);
+// A plate draws one of today's borders only if it stood through every span its question asks about
+// (src/plates/borders.ts); a border missing from data/borders.json is never drawn.
 const eventSpans = new Map(
   read<{ id: string; spans: Span[] }[]>(new URL("data/events.json", root).pathname).map((e) => [
     e.id,
     e.spans,
   ]),
 );
-const nameOf = (g: GeometryObject) => String((g.properties as { name?: string } | undefined)?.name);
-const pairKey = (a: GeometryObject, b: GeometryObject) => [nameOf(a), nameOf(b)].sort().join(" / ");
 const NOW = currentMonth(new Date());
-const monthsOf = (s: Span) => ({
-  from: parseDate(s.from).month,
-  to: s.until ? parseDate(s.until).month : NOW,
-});
-function stoodThrough(key: string, asked: Span[]) {
-  const dates = borderDates[key];
-  if (!dates) return false;
-  return asked.every((span) => {
-    const a = monthsOf(span);
-    // Nothing before 1805 is asked, so a span that starts earlier only needs the border from 1805.
-    const from = Math.max(0, a.from);
-    return dates.spans.some((d) => monthsOf(d).from <= from && monthsOf(d).to >= a.to);
-  });
-}
 let tolerance = 0.01;
 type XY = [number, number];
 // GeoJSON types a position as number[]; read one as x, y.
@@ -163,7 +144,9 @@ const toMulti = (polys: Position[][][]): MultiPolygon => ({
 // would wrap the world as a thin strip, so its longitudes are unwrapped to run on past ±180 instead.
 // A ring that jumps once goes round a pole (Antarctica) and is right as it is.
 function unwrap(ring: Position[]): Position[] {
-  const jumps = ring.filter((p, i) => i > 0 && Math.abs(xy(p)[0] - pt(ring, i - 1)[0]) > 180).length;
+  const jumps = ring.filter(
+    (p, i) => i > 0 && Math.abs(xy(p)[0] - pt(ring, i - 1)[0]) > 180,
+  ).length;
   if (jumps < 2 || jumps % 2) return ring;
   let shift = 0;
   return ring.map((p, i) => {
@@ -253,8 +236,9 @@ function lakeShape(res: Res, names: string[]): Position[][][] {
 }
 
 function build(id: string, src: PlateSource): Plate {
-  const asked = eventSpans.get(id);
-  if (!asked) throw new Error(`${id}: no event with this id in data/events.json`);
+  const spans = eventSpans.get(id);
+  if (!spans) throw new Error(`${id}: no event with this id in data/events.json`);
+  const asked = stretchesOf(spans, NOW);
   const res: Res = src.radius <= 2.5 ? "10m" : "50m";
   // About half a pixel at the magnifier's scale (98 px across the lens radius).
   tolerance = (0.5 * src.radius) / 98;
@@ -302,7 +286,7 @@ function build(id: string, src: PlateSource): Plate {
   const own = new Set(src.marks.flatMap((m) => (m.type === "area" && m.countries) || []));
   const pairs = new Set<string>();
   mesh(topo, countriesOf(res), (a, b) => {
-    if (a !== b && !own.has(String(a.id)) && !own.has(String(b.id))) pairs.add(pairKey(a, b));
+    if (a !== b && !own.has(String(a.id)) && !own.has(String(b.id))) pairs.add(borderKey(a, b));
     return false;
   });
   const kept: string[] = [];
@@ -310,13 +294,13 @@ function build(id: string, src: PlateSource): Plate {
   const borderCoords: Position[][] = [];
   for (const key of [...pairs].sort()) {
     const lines = clipLines(
-      mesh(topo, countriesOf(res), (a, b) => a !== b && pairKey(a, b) === key).coordinates,
+      mesh(topo, countriesOf(res), (a, b) => a !== b && borderKey(a, b) === key).coordinates,
       box,
     );
     // Only what shows inside the magnifier's circle matters.
     const near = (p: Position) => (geoDistance(xy(p) as LonLat, src.center) * 180) / Math.PI;
     if (!lines.some((l) => l.some((p) => near(p) <= src.radius))) continue;
-    if (stoodThrough(key, asked)) {
+    if (borderStood(key, asked, NOW)) {
       kept.push(key);
       borderCoords.push(...lines.map((l) => simplify(l)));
     } else hidden.push(key);

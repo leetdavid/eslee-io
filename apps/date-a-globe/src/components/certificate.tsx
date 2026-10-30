@@ -3,6 +3,7 @@ import { geoDistance, geoOrthographic } from "d3-geo";
 import type { CSSProperties, ReactNode } from "react";
 import type { Era, Result, Setup } from "@/engine";
 import { yearOf } from "@/engine";
+import { GLOBES } from "@/eras/globes";
 
 export const ERA_NAMES: Record<Era, { name: string; years: string }> = {
   engraved: { name: "Engraver's plate", years: "1805–69" },
@@ -10,15 +11,6 @@ export const ERA_NAMES: Record<Era, { name: string; years: string }> = {
   interwar: { name: "Interwar", years: "1919–45" },
   mid: { name: "Cold War classroom", years: "1946–91" },
   web: { name: "Web map", years: "1992–today" },
-};
-
-// Each era globe was drawn once, turned to suit its era; pins use the same projection.
-const GLOBES: Record<Era, { size: number; r: number; rotate: [number, number, number] }> = {
-  engraved: { size: 240, r: 110, rotate: [-62, -36, 0] },
-  imperial: { size: 240, r: 110, rotate: [-70, -26, 0] },
-  interwar: { size: 240, r: 110, rotate: [-52, -36, 0] },
-  mid: { size: 260, r: 120, rotate: [-50, -18, 0] },
-  web: { size: 240, r: 110, rotate: [-30, -22, 0] },
 };
 
 export interface Pin {

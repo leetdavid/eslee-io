@@ -86,7 +86,10 @@ describe("plays", () => {
 
   it("doesn't count a trial answer twice when a game is picked up again", async () => {
     const trialId = "holy-roman-empire";
-    await db.update(DateAGlobeEvent).set({ status: "trial" }).where(eq(DateAGlobeEvent.id, trialId));
+    await db
+      .update(DateAGlobeEvent)
+      .set({ status: "trial" })
+      .where(eq(DateAGlobeEvent.id, trialId));
     const events = await askedEvents(db);
     const engine = createEngine(events, { now: NOW });
     const setup: Setup = { kind: "globe", regions: [] };

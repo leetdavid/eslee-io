@@ -1,0 +1,52 @@
+[
+  {
+    "name": "Inner German border",
+    "spans": [{ "from": "1949-10", "until": "1990-10" }],
+    "note": "East against West Germany, the line used on the Two Germanys plate.",
+    "path": [
+      [10.9, 54.02],
+      [10.76, 53.6],
+      [11.3, 53.12],
+      [11.55, 52.85],
+      [10.95, 52.45],
+      [10.55, 52.0],
+      [10.6, 51.6],
+      [10.15, 51.3],
+      [10.2, 50.6],
+      [10.75, 50.4],
+      [11.6, 50.4],
+      [12.1, 50.3]
+    ]
+  },
+  {
+    "name": "Vietnamese demarcation line",
+    "spans": [{ "from": "1954-07", "until": "1976-07" }],
+    "note": "North against South Vietnam along the Ben Hai river, near the 17th parallel.",
+    "path": [[106.55, 16.95], [106.8, 17.0], [107.1, 17.02]]
+  },
+  {
+    "name": "Korean 38th parallel",
+    "spans": [{ "from": "1945-08", "until": "1953-07" }],
+    "note": "The 1945 division of Korea, before the 1953 armistice line.",
+    "path": [[124.7, 38.0], [128.65, 38.0]]
+  },
+  {
+    "name": "Yemeni border",
+    "spans": [{ "from": "1934-02", "until": "1990-05" }],
+    "note": "Approximate: Yemen against the Aden Protectorate, then North against South Yemen until 1990.",
+    "path": [
+      [43.47, 12.7],
+      [44.0, 13.05],
+      [44.4, 13.5],
+      [44.75, 13.78],
+      [45.3, 13.9],
+      [45.62, 13.97],
+      [45.62, 14.6],
+      [45.62, 14.87],
+      [46.0, 15.2],
+      [46.4, 15.6],
+      [46.8, 16.2],
+      [47.2, 16.9]
+    ]
+  }
+]
